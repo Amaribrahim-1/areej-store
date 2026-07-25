@@ -1,0 +1,29 @@
+---
+description: Non-negotiable performance, security, and testing rules, plus the per-feature review checklist for the Areej project.
+alwaysApply: true
+---
+
+# Per-Feature Review Checklist (run every time, no exceptions)
+Clean code → Performance → Security → Accessibility (RTL/Arabic) → UX/UI → Testing needed? → Scalability → Git action needed?
+For every point raised, explain **why**, not just the fix. Keep answering "why" if asked, until the principle is understood.
+
+# Non-Negotiable Technical Rules
+- Every product image uses `next/image`. No raw `<img>` for product photos (Supabase free-tier storage is limited — 1GB).
+- RLS enabled + default-deny on every Supabase table. Explicit policy per role (guest/customer/admin).
+- Order totals/prices always recalculated server-side before insert — never trust a client-submitted total.
+- Every Zod schema validated client-side **and** again before the Supabase write.
+- Admin routes protected server-side (middleware/server component check), not just hidden client-side.
+- Sanitize free-text user input (reviews, contact form) before storage/render.
+- Only the Supabase anon key (`NEXT_PUBLIC_`) is ever exposed client-side — never the service role key.
+
+# Performance
+- React Compiler is enabled (`reactCompiler: true` in `next.config.ts`) — it handles memoization automatically at build time. Manual `useMemo`/`useCallback`/`React.memo` should be rare exceptions, not the default. If you find yourself reaching for one, that's a signal to double-check with the developer first (it likely means the component is breaking the Rules of React, which is worth surfacing and explaining, not silently working around).
+- Set sensible TanStack Query `staleTime` per resource; avoid request waterfalls (fetch in parallel where possible).
+
+# Testing (introduced progressively, not upfront)
+Priority when it comes up: (1) Zod schemas / pure business logic (discount calc, variant price resolution), (2) critical flows (checkout, add-to-cart), (3) full E2E later, not an MVP requirement.
+
+# Scalability Markers
+- A new product category should only touch `features/products/`.
+- Checkout should stay payment-method-agnostic even though COD is hardcoded for MVP.
+- No feature reaches into another feature's internal folder directly.
