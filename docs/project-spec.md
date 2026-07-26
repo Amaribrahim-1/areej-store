@@ -171,8 +171,11 @@ This log records every point where scope, structure, or an original note was cor
 8. **"List by Categories":** appeared as a separate item in the original notes (grouped near the Wishlist). It is **not a standalone page or a deferred feature** — it's covered by the existing category filter on the Products page.
 9. **Testimonials Data Source:** Decided that Home page testimonials are automatically queried from the highest-rated product reviews that contain text comments, rather than introducing a separate admin testimonial entry system.
 10. **Discount Pricing & Featured Section:** Implemented dual price fields (Original Price & Current Price) at the variant level for Perfumes/Musk and product level for Fermentation/Hair Oil. Products with active discounts (`Current Price < Original Price`) automatically populate the "Featured / Top Sales" section on the Home page, eliminating the need for a manual "isFeatured" toggle in MVP.
-11. **Admin Order Notifications:** Confirmed that instant admin notifications via WhatsApp (CallMeBot) with Email fallback are included in the MVP scope to alert Alaa immediately when a new order is placed.
+11. **Admin Order Notifications:** Confirmed that instant admin notifications via WhatsApp (CallMeBot) with Email fallback are included in the MVP scope to alert Alaa immediately when a new order is placed. *Technical note: CallMeBot has rate limits and a one-time phone verification step — this should be validated early during implementation, not assumed to work identically to a paid WhatsApp Business API.*
+12. **Sourcing model (informational, confirmed with Alaa):** Alaa buys **pre-made sizes** directly rather than purchasing from a single bulk source and portioning it out herself. This doesn't change the MVP build (still no inventory/stock system either way — see item 5), but is recorded here in case stock tracking is introduced post-MVP, since pre-made sizes make per-variant stock counts a more natural fit than a shared bulk source would.
 
 ---
 
-## 
+## Open Questions
+
+None remaining — all points raised during scoping were resolved with client input (see Assumptions & Decisions Log above).

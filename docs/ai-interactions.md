@@ -58,7 +58,7 @@ When something breaks:
 
 ## First Action in a New Session
 
-The first task in a fresh Cursor session on this project — using `project-spec.md`, this file, and `coding-standards.md` together — is to generate **`tasks.md`**: a clear, ordered breakdown of the entire MVP into concrete, workable tasks.
+The first task in a fresh Cursor session on this project — using `project-spec.md`, `backlog.md`, this file, and `coding-standards.md` together — is to generate **`tasks.md`**: a clear, ordered breakdown of the entire MVP into concrete, workable tasks. Every task must be checked against `backlog.md`: if something on that list (coupons, Google Auth, wishlist, shipping-fee calculation, etc.) would end up implemented as part of a task, that's a scope-creep signal — flag it to the developer rather than silently building it in.
 
 ## Ultimate Goal
 
