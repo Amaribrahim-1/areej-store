@@ -26,6 +26,7 @@ Concrete, project-specific conventions. If a rule here can't be checked against 
 src/
   app/                    → Next.js App Router routes only (thin — no business logic here)
     (customer)/
+      _components/        → page-scoped presentational components for this route group
     (admin)/
     api/                  → route handlers if needed (webhooks, WhatsApp notify trigger)
   features/
@@ -49,6 +50,8 @@ src/
 ```
 
 Route files (`app/`) stay thin: they compose components from `features/`, they don't contain query logic or business rules directly.
+
+**`_components/` (route-scoped, private):** presentational components that are page-scoped, non-reusable, have no domain, and no cross-feature reuse go in an underscore-prefixed `_components/` folder inside their route group (e.g. `app/(customer)/_components/Hero.tsx`). The `_` prefix makes Next.js treat the folder as private, so it is never routable. This is the deliberate third bucket between the other two: `features/*/components/` is for anything tied to a domain, `components/shared/` is for anything reused across features, and `_components/` is for the remainder — one-off layout/presentational pieces (a Home hero, a static features strip) that belong to exactly one page and would pollute either of the other two. If such a component later gains data-fetching or gets reused elsewhere, move it to the appropriate `features/*` or `components/shared/` folder at that point — do not let `_components/` accumulate logic.
 
 ---
 
