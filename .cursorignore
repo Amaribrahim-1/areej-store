@@ -1,0 +1,49 @@
+# Dependencies & Libraries (مكاتب وتدفقات مالهاش لازمة للـ AI)
+node_modules/
+.pnpm-store/
+.yarn/
+
+# Build & Cache Outputs (ملفات البناء والـ Cache)
+.next/
+out/
+build/
+dist/
+.cache/
+.turbo/
+
+# Package Lockfiles (ملفات قفل النسخ - بتبقى آلاف السطور وبتاكل الـ Tokens)
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lockb
+
+# Environment & Secrets (حماية أكيدة للمفاتيح والـ Secrets)
+.env
+.env.local
+.env*.local
+*.pem
+*.key
+
+# Media & Binary Assets (الصور والفيديوهات والملفات الثقيلة)
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.svg
+*.ico
+*.mp4
+*.pdf
+*.zip
+
+# Database & Logs (سجلات الأخطاء وقواعد البيانات المحلية)
+*.log
+*.sqlite
+*.db
+npm-debug.log*
+yarn-debug.log*
+
+# System & OS Files
+.DS_Store
+Thumbs.db
+.git/
