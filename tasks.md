@@ -77,7 +77,7 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 
 - [x] **1.2 — Write the migration** for the agreed schema, with constraints (`current_price <= original_price`, rating `1..5`, status enums/checks).
 
-- [ ] **1.3 — RLS: enable + default deny on every table**, then explicit policies per role (`coding-standards.md` §7):
+- [x] **1.3 — RLS: enable + default deny on every table**, then explicit policies per role (`coding-standards.md` §7):
 
   - `products` / `product_variants`: public read where `status = 'active'`; write admin-only.
   - `orders` / `order_items`: customer reads only their own rows; admin reads all; only admin updates status.
