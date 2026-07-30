@@ -14,7 +14,7 @@ Ordered breakdown of the full MVP, derived from `docs/project-spec.md` and const
 
 ## Ordering rationale (why not spec order)
 
-`project-spec.md` lists the Admin Panel first, but building it first would mean starting with the single hardest form in the MVP (multi-variant product with a required photo per variant) before React Hook Form + Zod have been used once. Instead: seed a few products manually in Supabase Studio, build the read-only storefront (teaches TanStack Query), then cart (teaches Zustand), then small forms (auth, review, contact), then the admin panel where the heavy form and all the mutations live.
+`project-spec.md` lists the Admin Panel first, but building it first would mean starting with the heaviest form in the MVP (multi-variant product + image upload) before React Hook Form + Zod have been used once. Instead: seed a few products manually in Supabase Studio, build the read-only storefront (teaches TanStack Query), then cart (teaches Zustand), then small forms (auth, review, contact), then the admin panel where the heavy form and all the mutations live.
 
 ---
 
@@ -24,31 +24,31 @@ Ordered breakdown of the full MVP, derived from `docs/project-spec.md` and const
 
 The existing scaffold has three concrete deviations from the agreed standards. Fix them before writing feature code, because every component built after this inherits them.
 
-- **0.1 — Fix RTL + Arabic root layout.**
+- [x] **0.1 — Fix RTL + Arabic root layout.**
   `src/app/layout.tsx` currently ships `lang="en"` with no `dir`. Set `<html dir="rtl" lang="ar">` per `accessibility-rtl.mdc`. Replace the Latin-only fonts (Geist / Geist Mono / Figtree, all `subsets: ['latin']`) with an Arabic-capable font (e.g. Cairo, Tajawal, or IBM Plex Sans Arabic) wired to `--font-sans`. Update `metadata` (still `"Create Next App"`) to the Areej title/description in Arabic.
   Also flip `"rtl": false` → `true` in `components.json` so future generated Shadcn components come out RTL-aware.
 
-- **0.2 — Resolve the icon library conflict.**
+- [x] **0.2 — Resolve the icon library conflict.**
   `package.json` has **both** `lucide-react` and `@hugeicons/*`, and `components.json` has `"iconLibrary": "hugeicons"`. `coding-standards.md` §1 and `stack-conventions.mdc` both say Lucide React only, no second icon library. Decide (Lucide, per the standard), switch `components.json`, and uninstall the loser. Two icon libraries means two bundle costs and two visual languages.
   🚩 This is exactly the "confirm explicitly if the icon library prompt defaults to something else" case flagged in `stack-conventions.mdc` — it defaulted to hugeicons via the Maia style preset.
 
-- **0.3 — Environment variables.**
+- [x] **0.3 — Environment variables.**
   `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Add a committed `.env.example` documenting required keys with empty values. Confirm `.env*.local` is gitignored.
   🚩 The service role key must **not** get a `NEXT_PUBLIC_` prefix, ever (`coding-standards.md` §7). If a later task needs it, it stays server-only.
 
-- **0.4 — Supabase clients.** **`SUPABASE`** **`NEW CONCEPT`** (`@supabase/ssr` in App Router)
+- [x] **0.4 — Supabase clients.** **`SUPABASE`** **`NEW CONCEPT`** (`@supabase/ssr` in App Router)
   `src/lib/supabase/client.ts` (browser) and `src/lib/supabase/server.ts` (server components / route handlers), using `@supabase/ssr` — already installed. Cookie-based session handling so auth works across server and client.
 
-- **0.5 — TanStack Query provider.** **`NEW CONCEPT`**
+- [x] **0.5 — TanStack Query provider.** **`NEW CONCEPT`**
   A client `Providers` component holding `QueryClientProvider`, mounted in the root layout. Set global defaults (`staleTime`, `retry`) and document the reasoning; per-resource `staleTime` gets tuned in the feature tasks.
 
-- **0.6 — Mount Sonner `<Toaster />`** in the root layout, with RTL-correct positioning.
+- [x] **0.6 — Mount Sonner `<Toaster />`** in the root layout, with RTL-correct positioning.
 
-- **0.7 — Shared constants and cross-feature types.**
+- [x] **0.7 — Shared constants and cross-feature types.**
   Only `button.tsx` exists in `components/ui/` so far. Create `src/types/` entries for genuinely cross-feature shapes only. Magic strings (`coding-standards.md` §4) live in per-feature `constants.ts`: product categories (`Perfumes / Musk / Fermentation / Hair Oil`) and order statuses (`Pending / Shipping / Delivered / Cancelled`).
   🚩 Do not add a `Coupon` type, a `shipping_fee` field, or a `stock`/`quantity_available` field to any shared type. Coupons and shipping-fee calculation are backlog items; inventory tracking is out of MVP entirely (spec decision #5).
 
-- **0.8 — Pull the Shadcn primitives the MVP needs** (input, label, form, select, dialog, table, card, badge, textarea, skeleton, dropdown-menu, tabs). Generated files stay untouched in `components/ui/`.
+- [x] **0.8 — Pull the Shadcn primitives the MVP needs** (input, label, form, select, dialog, table, card, badge, textarea, skeleton, dropdown-menu, tabs). Generated files stay untouched in `components/ui/`.
 
 `[commit: chore(setup): rtl arabic layout + providers, chore(setup): supabase clients, chore(deps): single icon library]`
 
@@ -58,36 +58,44 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 
 `[branch: feature/db-schema]` — **all of Phase 1 is `SUPABASE`: only on explicit request.**
 
-- **1.1 — Schema design review before any SQL.**
+- [x] **1.1 — Schema design review before any SQL.**
   Tables (`snake_case` plural per `coding-standards.md` §3): `profiles`, `products`, `product_variants`, `orders`, `order_items`, `reviews`, `contact_messages`.
-  Key modelling points to settle first, out loud:
-  - Dual pricing: `original_price` + `current_price`. Variant-level for Perfumes/Musk, product-level for Fermentation/Hair Oil. Decide how the "no variants" case is represented (nullable product-level price vs. a single implicit variant row) — this choice ripples into the cart, the product card, and the discount query.
-  - `products.status` (active/inactive) controls storefront visibility.
-  - `order_items` must snapshot the price at purchase time — an order's history cannot shift when Alaa edits a price later.
-  - `profiles` holds Name, Phone, Address (governorate / markaz / free-text description), linked to `auth.users`.
-  - Admin identification: a role column on `profiles` (single admin account per spec).
-  🚩 No `stock` / `quantity_available` column (spec decision #5). No `coupons` table, no `orders.coupon_id`, no `orders.shipping_fee` (backlog). No `is_featured` flag — Featured is derived from `current_price < original_price` (spec decision #10). No `testimonials` table — testimonials are queried from top-rated reviews with comments (spec decision #9).
 
-- **1.2 — Write the migration** for the agreed schema, with constraints (`current_price <= original_price`, rating `1..5`, status enums/checks).
+  **Agreed model (do not re-litigate in 1.2):**
 
-- **1.3 — RLS: enable + default deny on every table**, then explicit policies per role (`coding-standards.md` §7):
+  - **Always ≥1 `product_variants` row per product.** Prices (`original_price` / `current_price` as `numeric(10,2)`) live only on variants. `volume_label` is nullable. Category does not control variant shape — Alaa picks 1..N size rows per product. Storefront size selector only when `variants.length > 1`.
+  - **One required `image_url` on `products`** (shared across all sizes). No per-variant photos in MVP (backlog).
+  - `products.status` (`active`/`inactive`) controls storefront visibility; soft-delete only — no hard delete of products.
+  - `products.slug` unique for URLs; categories are the fixed four English check values (Arabic labels in UI map).
+  - `order_items` snapshots product name, variant label, and unit price at purchase time.
+  - `orders` snapshots customer name, phone, and address at checkout; new checkouts re-read the current profile to prefill.
+  - `orders.payment_method` with default `cod` + check constraint.
+  - `profiles` holds Name, Phone, Address (governorate / markaz / free-text), `role` (`customer`/`admin`), linked to `auth.users`; profile row via trigger on signup.
+  - Reviews: `unique(product_id, user_id)`; average rating computed in query/view (no cached columns on products).
+  - Place-order: Postgres RPC recalculates totals server-side (task 1.5).
+    🚩 No `stock` / `quantity_available` column (spec decision #5). No `coupons` table, no `orders.coupon_id`, no `orders.shipping_fee` (backlog). No `is_featured` flag — Featured is derived from any variant with `current_price < original_price` (spec decision #10). No `testimonials` table (spec decision #9). No admin category CRUD / no per-variant images (backlog).
+
+- [x] **1.2 — Write the migration** for the agreed schema, with constraints (`current_price <= original_price`, rating `1..5`, status enums/checks).
+
+- [ ] **1.3 — RLS: enable + default deny on every table**, then explicit policies per role (`coding-standards.md` §7):
+
   - `products` / `product_variants`: public read where `status = 'active'`; write admin-only.
   - `orders` / `order_items`: customer reads only their own rows; admin reads all; only admin updates status.
   - `reviews`: public read; insert only by an authenticated customer; admin read-all.
   - `profiles`: owner reads/updates own row; admin reads all.
   - `contact_messages`: insert-only for anyone; read admin-only.
 
-- **1.4 — Storage bucket for product images** with policies: public read, admin-only write. Note the 1GB free-tier ceiling and agree on an upload size/dimension cap now rather than after 300 photos.
+- [ ] **1.4 — Storage bucket for product images** with policies: public read, admin-only write. One image per product. Agree upload caps now: client-side compress/resize to WebP before upload (Alaa should not need to pick dimensions manually); accept common image MIME types; note the 1GB free-tier ceiling.
 
-- **1.5 — Server-side total recalculation.** **`SUPABASE`**
-  A Postgres function (or route handler) that takes cart line items, re-reads prices from the DB, computes the order total server-side, and inserts the order + items atomically. Client-submitted totals are display values only (`coding-standards.md` §7).
+- [ ] **1.5 — Server-side total recalculation.** **`SUPABASE`**
+  A Postgres RPC that takes cart line items, re-reads prices from the DB, computes the order total server-side, and inserts the order + items atomically. Client-submitted totals are display values only (`coding-standards.md` §7).
   🚩 No shipping fee and no coupon discount enter this calculation. Keep it as `sum(line totals)` — but structure it so a fee/discount could be added later without a rewrite.
 
-- **1.6 — Generate TypeScript DB types** into `src/lib/supabase/types.ts` and confirm the generation command is repeatable (it re-runs after every migration).
+- [ ] **1.6 — Generate TypeScript DB types** into `src/lib/supabase/types.ts` and confirm the generation command is repeatable (it re-runs after every migration).
 
-- **1.7 — Seed data**: 6–8 products via Supabase Studio, covering all four categories, at least two multi-variant products, and at least two with an active discount (so Home's Featured section has real data). This unblocks the entire storefront before the admin panel exists.
+- [ ] **1.7 — Seed data**: 6–8 products via Supabase Studio, covering all four categories, at least two multi-variant products, and at least two with an active discount (so Home's Featured section has real data). This unblocks the entire storefront before the admin panel exists.
 
-- **1.8 — Run Supabase advisors** (security + performance) and read the output. This is the habit, not a one-off.
+- [ ] **1.8 — Run Supabase advisors** (security + performance) and read the output. This is the habit, not a one-off.
 
 `[commit: feat(db): products and variants schema, feat(db): rls policies, feat(db): server-side order total function]`
 
@@ -126,7 +134,7 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - **3.7 — Search input**, debounced, wired to the same query.
   🚩 Category filtering here **is** the "List by Categories" item from the original notes (spec decision #8) — no separate categories page is needed.
 - **3.8 — Product details page**: gallery, name, `PriceTag`, rating, description, category.
-- **3.9 — Variant selector** (Perfumes & Musk): selecting a size swaps the displayed photo and price. Fermentation & Hair Oil render a single price/photo and skip the selector. Variant price resolution is pure logic — a prime candidate for the first unit test (`coding-standards.md` §8).
+- **3.9 — Variant selector**: show when `variants.length > 1`; selecting a size swaps the displayed price only (photo stays the product-level image). Single-variant products skip the selector. Variant price resolution is pure logic — a prime candidate for the first unit test (`coding-standards.md` §8).
 - **3.10 — Quantity selector + Add to Cart button** (wired in Phase 4).
 - **3.11 — Parallel fetching on the details page**: product, variants, and reviews must not run as a waterfall (§5).
 
@@ -292,18 +300,18 @@ Built after products and reviews exist, because every section on it is driven by
 - **13.1 — `api/useAdminProducts.ts`**: all products including inactive ones (the storefront query filters to active only).
 - **13.2 — Products table**: Name, Category, Price, Status, Edit button, "Add Product" button.
   🚩 No "available quantity" column — MVP has no inventory system (spec decision #5). If a stock column feels missing while building this, that's the deferred feature knocking.
-- **13.3 — `productSchema` with conditional shape** — **`NEW CONCEPT`** (Zod discriminated union / `superRefine`):
-  - Perfumes & Musk → at least one variant, each with volume label, original price, current price, and a **required** photo.
-  - Fermentation & Hair Oil → a single original/current price pair and one required photo, no variants.
+- **13.3 — `productSchema`** — **`NEW CONCEPT`** (Zod array / `superRefine` for variants):
+  - Every product: name, description, category, status, one required photo, and **at least one** variant row (optional `volume_label`, `original_price`, `current_price`).
   - `current_price <= original_price` on every price pair.
-  Standalone Zod example first, then apply.
-- **13.4 — Add-product form (shared with edit)**: name, description, category, status toggle, pricing block that switches shape based on the selected category.
-- **13.5 — Variant repeater UI**: add/remove variant rows, each with its own price pair and photo (`useFieldArray`).
-- **13.6 — Image upload to Supabase Storage**: client-side size/dimension validation before upload (1GB ceiling, §5), progress/error states, and cleanup of orphaned files when a variant row is removed or a create fails midway.
+  - Category is a fixed enum for MVP — it does **not** change the form shape.
+    Standalone Zod example first, then apply.
+- **13.4 — Add-product form (shared with edit)**: name, description, category, status toggle, single image upload, and a variants block (always present; starts with one row).
+- **13.5 — Variant repeater UI**: add/remove variant rows, each with volume label (optional) and price pair (`useFieldArray`). Cannot remove the last remaining row.
+- **13.6 — Image upload to Supabase Storage**: one product image; client-side compress/resize to WebP + size validation before upload (1GB ceiling, §5), progress/error states, and cleanup of the orphaned file if create fails midway.
 - **13.7 — Create mutation** + redirect + toast.
-- **13.8 — Edit form prefill** from existing product + variants, and a diffed update (changed variants updated, removed variants deleted along with their storage objects).
+- **13.8 — Edit form prefill** from existing product + variants, and a diffed update (changed variants updated; removed variants deleted only when safe — e.g. not referenced by `order_items`). Replacing the product image cleans up the old storage object.
 - **13.9 — Status toggle from the table** as a quick action (active/inactive controls storefront visibility).
-- **13.10 — Delete vs. deactivate.** Deleting a product referenced by past `order_items` corrupts order history. Decide: soft delete / deactivate only. This is a data-integrity decision, not a UI preference.
+- **13.10 — Soft delete only.** Deleting a product referenced by past `order_items` corrupts order history — deactivate via `status = 'inactive'` only (agreed in 1.1).
 - **13.11 — Re-validate `productSchema` server-side before the write** (§7).
 - **13.12 — Unit-test the discount and variant price-resolution logic** (§8 priority 1).
 
@@ -348,22 +356,24 @@ Built after products and reviews exist, because every section on it is driven by
 
 Everything below is **deferred**. Each item is listed with the task where it would most likely creep in, so it gets refused at the right moment instead of discovered in review.
 
-| Deferred item | Where it would creep in |
-|---|---|
-| Coupon system | 0.7 (shared types), 1.1/1.5 (schema + total function), 4.5 (cart totals) |
-| Google Auth | 5.5 (login form) |
-| Wishlist | 2.2 (navbar icon), 3.4 (product card heart button) |
-| Shipping fee calculation | 1.1/1.5 (schema + total function), 4.5 (cart totals), 6.2 (checkout) |
-| Admin dashboard charts | 11.5 (KPI cards) |
-| Animated Testimonials / Featured carousels | 9.4, 9.5 (Home sections) |
-| Forgot Password (customer) | 5.5 (login form) |
-| Change/Reset Password (admin) | 11.1 (admin login) |
-| Real-time notifications for new reviews | 6.6 (order notification), 14.3 (admin reviews) |
-| Inventory / stock tracking (out of MVP entirely) | 1.1 (schema), 13.2 (products table) |
-| English / i18n toggle (out of MVP entirely) | 0.1 (root layout), 2.2 (navbar) |
-| Manual `is_featured` flag (replaced by discount logic) | 1.1 (schema), 13.4 (product form) |
-| Separate `testimonials` table / admin entry screen | 1.1 (schema), 9.5 (Home testimonials) |
-| Standalone "List by Categories" page (covered by the catalog filter) | 3.7 (catalog filters) |
+| Deferred item                                                        | Where it would creep in                                                  |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Coupon system                                                        | 0.7 (shared types), 1.1/1.5 (schema + total function), 4.5 (cart totals) |
+| Google Auth                                                          | 5.5 (login form)                                                         |
+| Wishlist                                                             | 2.2 (navbar icon), 3.4 (product card heart button)                       |
+| Shipping fee calculation                                             | 1.1/1.5 (schema + total function), 4.5 (cart totals), 6.2 (checkout)     |
+| Admin dashboard charts                                               | 11.5 (KPI cards)                                                         |
+| Animated Testimonials / Featured carousels                           | 9.4, 9.5 (Home sections)                                                 |
+| Forgot Password (customer)                                           | 5.5 (login form)                                                         |
+| Change/Reset Password (admin)                                        | 11.1 (admin login)                                                       |
+| Real-time notifications for new reviews                              | 6.6 (order notification), 14.3 (admin reviews)                           |
+| Inventory / stock tracking (out of MVP entirely)                     | 1.1 (schema), 13.2 (products table)                                      |
+| English / i18n toggle (out of MVP entirely)                          | 0.1 (root layout), 2.2 (navbar)                                          |
+| Manual `is_featured` flag (replaced by discount logic)               | 1.1 (schema), 13.4 (product form)                                        |
+| Separate `testimonials` table / admin entry screen                   | 1.1 (schema), 9.5 (Home testimonials)                                    |
+| Standalone "List by Categories" page (covered by the catalog filter) | 3.7 (catalog filters)                                                    |
+| Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)             |
+| Admin-managed categories (CRUD)                                      | 1.1 (schema), 13.4 (product form category field)                         |
 
 ## Open Dependencies (not blocked on code)
 

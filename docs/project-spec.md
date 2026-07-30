@@ -85,10 +85,9 @@ Design priority: **mobile-first** (most customers shop from mobile devices).
 
 - Purpose: create or update a product.
 - Elements:
-  - Name, Description, Category (**Perfumes / Musk / Fermentation / Hair Oil**)
-  - **Pricing & Discounts:** Dual price fields—**Original Price** and **Current Price** (if Current < Original, a discount display is triggered).
-  - **Perfumes & Musk:** one or more size variants, each with its own volume label (e.g., 2ml, 5ml, 100ml), its own Original Price and Current Price pair, and its own required product photo.
-  - **Fermentation & Hair Oil:** single Original/Current price pair and one required product photo — no variants (fixed 40ml size for Fermentation).
+  - Name, Description, Category (**Perfumes / Musk / Fermentation / Hair Oil** — fixed list for MVP)
+  - **One required product photo** (product-level — shared across all sizes of that product).
+  - **Variants (1..N):** every product has at least one variant row. Each variant has an optional volume label (e.g. 2ml, 5ml, 100ml, or null when size is irrelevant) and its own Original Price / Current Price pair. Alaa chooses how many size rows a product needs; category does not force the shape.
   - Status toggle (active/inactive — controls storefront visibility).
 
 **7. Reviews**
@@ -113,9 +112,9 @@ Design priority: **mobile-first** (most customers shop from mobile devices).
 **3. Product Details**
 
 - Purpose: view a specific product and add it to cart.
-- Elements: product photo(s), Name, Price display (shows original price with strikethrough alongside the highlighted current price if a discount is active), Rating, Description, Category.
-  - **Perfumes & Musk:** category → type → size/volume variant selector, each variant showing its own photo and price.
-  - **Fermentation & Hair Oil:** single price, single photo, quantity selector.
+- Elements: product photo, Name, Price display (shows original price with strikethrough alongside the highlighted current price if a discount is active), Rating, Description, Category.
+  - **One product photo** for all sizes; selecting a size changes the displayed price only.
+  - **Size/volume selector** when the product has more than one variant; skipped when there is only one (price + quantity only).
   - Add to Cart with quantity.
   - Reviews section: existing reviews + "Add a Review" (star rating required, comment optional).
 
@@ -162,17 +161,20 @@ A number of features were deliberately deferred to keep this first version lean.
 This log records every point where scope, structure, or an original note was corrected, clarified, or decided during planning — nothing below was assumed silently.
 
 1. **Language:** original notes mentioned Arabic as primary with an English option "from day one." Final decision: **Arabic only** for MVP; English is fully deferred, not even scaffolded.
-2. **Product photos:** originally considered a single photo per product store-wide, to conserve Supabase's free-tier storage. Final decision: **required photo per size variant** for Perfumes & Musk (since each size is visually distinct), and a single required photo for Fermentation & Hair Oil (no variants). Storage usage will be monitored on the 1GB free tier; compression/optimization will be revisited if it becomes a real constraint.
+2. **Product photos:** MVP uses **one required photo per product** (product-level), shared across all size variants — sizes of the same scent are the same product; only the bottle/volume changes. Per-variant photos are deferred (see `backlog.md`). Client-side compress/resize to WebP before upload; storage usage monitored against the 1GB free tier.
 3. **Testimonials & Featured Products display:** original notes described an auto-advancing carousel with left/right arrow navigation (similar to major e-commerce sites). MVP ships a **static grid/list** version instead; the animated, auto-rotating carousel is deferred (see backlog).
 4. **Shipping fees:** original notes implied fees would be calculated by governorate/markaz and added to the order total. MVP **defers this entirely** — there is no shipping partner yet, so shipping is coordinated manually, outside the system.
 5. **Inventory/stock tracking:** the original Products table draft included an "available quantity" column. Final decision: **MVP has no inventory/stock system at all** — orders are placed first, then sourced via Alaa's supplier on demand. The "available quantity" column has been removed from the Products table accordingly.
-6. **Musk category:** originally unclear whether Musk was a sub-type of Perfumes or its own category. Decided: **Musk is a separate category**, but structurally follows the same product-per-type + size-variant model as Perfumes.
+6. **Musk category:** originally unclear whether Musk was a sub-type of Perfumes or its own category. Decided: **Musk is a separate category** with the same variant model as every other category (1..N size rows decided per product, not by category).
 7. **Checkout flow:** originally the Cart page appeared to be the final step. MVP adds a required "Confirm Order" action after Cart, which requires the customer to be registered/logged in — **guests must create an account to complete checkout.** This is followed by a simple order-confirmation message (no online payment step, since COD is the only method).
 8. **"List by Categories":** appeared as a separate item in the original notes (grouped near the Wishlist). It is **not a standalone page or a deferred feature** — it's covered by the existing category filter on the Products page.
 9. **Testimonials Data Source:** Decided that Home page testimonials are automatically queried from the highest-rated product reviews that contain text comments, rather than introducing a separate admin testimonial entry system.
-10. **Discount Pricing & Featured Section:** Implemented dual price fields (Original Price & Current Price) at the variant level for Perfumes/Musk and product level for Fermentation/Hair Oil. Products with active discounts (`Current Price < Original Price`) automatically populate the "Featured / Top Sales" section on the Home page, eliminating the need for a manual "isFeatured" toggle in MVP.
+10. **Discount Pricing & Featured Section:** Dual price fields (`original_price` / `current_price`) live **always on `product_variants`** (every product has ≥1 variant row). Products with an active discount on any variant (`current_price < original_price`) populate the Home "Featured / Top Sales" section — no manual `is_featured` toggle.
 11. **Admin Order Notifications:** Confirmed that instant admin notifications via WhatsApp (CallMeBot) with Email fallback are included in the MVP scope to alert Alaa immediately when a new order is placed. *Technical note: CallMeBot has rate limits and a one-time phone verification step — this should be validated early during implementation, not assumed to work identically to a paid WhatsApp Business API.*
 12. **Sourcing model (informational, confirmed with Alaa):** Alaa buys **pre-made sizes** directly rather than purchasing from a single bulk source and portioning it out herself. This doesn't change the MVP build (still no inventory/stock system either way — see item 5), but is recorded here in case stock tracking is introduced post-MVP, since pre-made sizes make per-variant stock counts a more natural fit than a shared bulk source would.
+13. **Variant representation:** every product has at least one row in `product_variants` (including single-size / no-size products). `volume_label` is nullable. Storefront shows a size selector only when `variants.length > 1`. Category never dictates whether a product “has variants.”
+14. **Categories fixed for MVP:** the four categories (`Perfumes`, `Musk`, `Fermentation`, `Hair Oil`) are a code + DB check-constraint list. Adding a fifth later is a small, deliberate change (`features/products/` constants + Arabic labels + migration). Admin category CRUD is deferred.
+15. **Phase 1 schema agreements (pre-migration):** prices as `numeric(10,2)`; soft-delete products via `status = 'inactive'` only (no hard delete); `orders` snapshot customer name/phone/address at checkout; `order_items` snapshot product name, variant label, and unit price; `payment_method` column with `cod` default; admin via `profiles.role`; profile row created by trigger on `auth.users` insert; one review per customer per product (`unique`); product `slug`; average rating computed in query/view (not cached columns); place-order as Postgres RPC; English enum/check values in DB with Arabic UI maps.
 
 ---
 

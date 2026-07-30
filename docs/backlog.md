@@ -17,11 +17,11 @@ Companion to `project-spec.md`. Items here were deliberately scoped out of the M
 | **Change/Reset Password (admin)** | Same reasoning as above — admin credentials are provisioned directly via Supabase for MVP. |
 | **Shipping fee calculation** (by Governorate/Markaz) | Blocked on a real shipping-company partnership; currently Alaa delivers manually and coordinates fees outside the system. |
 | **Real-time notifications for new reviews** | Order notifications (WhatsApp/Email) were pulled into MVP, but review notifications were not — Alaa will continue checking the admin Reviews page directly for now. |
+| **Per-variant product photos** | MVP uses one photo per product (shared across sizes). Per-size photos can be added later if packaging visuals matter enough to justify storage and admin UX cost. |
+| **Admin-managed categories** | MVP ships four fixed categories in code + DB check. Adding a fifth later is a small change (`features/products/` + migration). A categories table / admin CRUD is unnecessary until Alaa regularly invents new category labels. |
 
 ---
 
 ## Borderline — Needs Client Input
 
-No borderline items remain open at this time. All items originally flagged during scoping (product photo requirements, Testimonials data source, discount/Featured logic, admin order notifications) were resolved through direct discussion with the client (Alaa) and are documented in `project-spec.md`'s Assumptions & Decisions Log.
-
-One informational, non-blocking item remains noted in the spec's Open Questions section: Alaa's sourcing model (bulk source vs. pre-made sizes) is still undecided on her end, but it does not affect the MVP build since there's no inventory system either way.
+No borderline items remain open at this time. Product photo scope, Testimonials data source, discount/Featured logic, admin order notifications, variant representation, and related Phase 1 schema agreements are documented in `project-spec.md`'s Assumptions & Decisions Log.

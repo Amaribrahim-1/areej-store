@@ -132,6 +132,6 @@ Per `ai-interactions.md`, testing tools/depth are taught as they come up, not fr
 
 ## 10. Scalability Markers (what "scalable" means concretely, here)
 
-- Adding a new product category should only touch `features/products/` — not ripple into cart or checkout logic.
+- Adding a new product category should only touch `features/products/` (constants + Arabic label map) plus a small DB check-constraint migration — not ripple into cart or checkout logic. Admin category CRUD is out of MVP.
 - Adding a new payment method later should be possible without rewriting the checkout flow — keep "payment method" as a swappable concept even though COD is hardcoded for MVP.
 - No feature should reach into another feature's internal folder directly — cross-feature communication happens through shared types (`types/`) or shared components (`components/shared/`), not deep imports like `features/cart/components/InternalThing`.
