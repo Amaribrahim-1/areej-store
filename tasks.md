@@ -87,11 +87,11 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 
 - [x] **1.4 — Storage bucket for product images** with policies: public read, admin-only write. One image per product. Agree upload caps now: client-side compress/resize to WebP before upload (Alaa should not need to pick dimensions manually); accept common image MIME types; note the 1GB free-tier ceiling.
 
-- [ ] **1.5 — Server-side total recalculation.** **`SUPABASE`**
+- [x] **1.5 — Server-side total recalculation.** **`SUPABASE`**
   A Postgres RPC that takes cart line items, re-reads prices from the DB, computes the order total server-side, and inserts the order + items atomically. Client-submitted totals are display values only (`coding-standards.md` §7).
   🚩 No shipping fee and no coupon discount enter this calculation. Keep it as `sum(line totals)` — but structure it so a fee/discount could be added later without a rewrite.
 
-- [ ] **1.6 — Generate TypeScript DB types** into `src/lib/supabase/types.ts` and confirm the generation command is repeatable (it re-runs after every migration).
+- [x] **1.6 — Generate TypeScript DB types** into `src/lib/supabase/types.ts` and confirm the generation command is repeatable (it re-runs after every migration).
 
 - [ ] **1.7 — Seed data**: 6–8 products via Supabase Studio, covering all four categories, at least two multi-variant products, and at least two with an active discount (so Home's Featured section has real data). This unblocks the entire storefront before the admin panel exists.
 
