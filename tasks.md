@@ -347,8 +347,29 @@ Built after products and reviews exist, because every section on it is driven by
 - **15.8 — Storage audit**: measure actual usage against the 1GB budget and record the number, so the compression decision (spec decision #2) is data-driven.
 - **15.9 — Deploy** (Vercel) with production env vars, then a real end-to-end order placed on production to confirm the WhatsApp notification actually fires.
 - **15.10 — Handover to Alaa**: how to add a product, how to update an order status. Arabic.
+- **15.11 — Portfolio README & project writeup.**
+  A GitHub-facing `README.md` and a short project writeup usable for the
+  CV/LinkedIn, written *from the accumulated project history* — not
+  generated from a fresh read of the final codebase alone. Source material
+  to read, in this order: the git log (commit messages carry the real
+  decision trail), `project-spec.md`'s Assumptions & Decisions Log, the
+  Supabase migration files' section comments (the richest technical
+  reasoning in the repo — e.g. why `private.is_admin()` exists, why
+  `search_path = ''` on SECURITY DEFINER functions), and `backlog.md` (to
+  accurately describe what was deliberately scoped out, not silently
+  omit it).
+  README covers: what the project is and for whom, the real stack
+  decisions (not a generic list — the *why* behind Base UI/Maia, TanStack
+  Query vs Zustand split, RLS design), a few concrete technical
+  highlights worth a reviewer's attention (server-side total
+  recalculation, RLS column-level grants preventing self-promotion), setup
+  instructions, and the live deploy link (15.9).
+  Depends on 15.9 (deploy) being done first — the live link and a couple
+  of real screenshots/GIFs belong in the README, and those should already
+  exist from having been captured feature-by-feature during Phases 2–14,
+  not staged retroactively here.
 
-`[commit: chore(a11y): rtl audit fixes, chore(security): rls verification fixes, chore(release): production deploy config]`
+`[commit: chore(a11y): rtl audit fixes, chore(security): rls verification fixes, chore(release): production deploy config, docs(readme): portfolio project writeup]`
 
 ---
 
