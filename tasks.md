@@ -85,7 +85,7 @@ The existing scaffold has three concrete deviations from the agreed standards. F
   - `profiles`: owner reads/updates own row; admin reads all.
   - `contact_messages`: insert-only for anyone; read admin-only.
 
-- [ ] **1.4 — Storage bucket for product images** with policies: public read, admin-only write. One image per product. Agree upload caps now: client-side compress/resize to WebP before upload (Alaa should not need to pick dimensions manually); accept common image MIME types; note the 1GB free-tier ceiling.
+- [x] **1.4 — Storage bucket for product images** with policies: public read, admin-only write. One image per product. Agree upload caps now: client-side compress/resize to WebP before upload (Alaa should not need to pick dimensions manually); accept common image MIME types; note the 1GB free-tier ceiling.
 
 - [ ] **1.5 — Server-side total recalculation.** **`SUPABASE`**
   A Postgres RPC that takes cart line items, re-reads prices from the DB, computes the order total server-side, and inserts the order + items atomically. Client-submitted totals are display values only (`coding-standards.md` §7).
