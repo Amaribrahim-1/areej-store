@@ -93,9 +93,9 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 
 - [x] **1.6 — Generate TypeScript DB types** into `src/lib/supabase/types.ts` and confirm the generation command is repeatable (it re-runs after every migration).
 
-- [ ] **1.7 — Seed data**: 6–8 products via Supabase Studio, covering all four categories, at least two multi-variant products, and at least two with an active discount (so Home's Featured section has real data). This unblocks the entire storefront before the admin panel exists.
+- [x] **1.7 — Seed data**: 6–8 products via Supabase Studio, covering all four categories, at least two multi-variant products, and at least two with an active discount (so Home's Featured section has real data). This unblocks the entire storefront before the admin panel exists.
 
-- [ ] **1.8 — Run Supabase advisors** (security + performance) and read the output. This is the habit, not a one-off.
+- [x] **1.8 — Run Supabase advisors** (security + performance) and read the output. This is the habit, not a one-off. Fixed: `set_updated_at` search_path, revoke `place_order` from anon, drop product-images SELECT listing policy. Accepted intentional WARNs: `contact_messages` insert-anyone, `authenticated` execute on `place_order`.
 
 `[commit: feat(db): products and variants schema, feat(db): rls policies, feat(db): server-side order total function]`
 
