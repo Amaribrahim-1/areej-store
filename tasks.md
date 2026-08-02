@@ -110,7 +110,7 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 - [x] **2.3 — `Navbar`** (`components/shared/`): logo, nav links, cart icon with item count, auth-state-aware account link. Mobile-first: drawer/sheet on small screens. RTL-correct, directional icons flipped.
   🚩 No wishlist icon in the navbar (backlog). No language toggle (Arabic-only MVP, spec decision #1).
 - [x] **2.4 — `Footer`** (`components/shared/`): brand blurb, nav links, contact/social links.
-- [ ] **2.5 — `PriceTag`** (`components/shared/`): renders a single price, or original-strikethrough + highlighted current price when discounted. One component, used by product card, product details, cart, and admin. Getting this right once prevents four inconsistent price renderings.
+- [x] **2.5 — `PriceTag`** (`components/shared/`): renders a single price, or original-strikethrough + highlighted current price when discounted. One component, used by product card, product details, cart, and admin. Getting this right once prevents four inconsistent price renderings.
 - [ ] **2.6 — `StarRating`** (`components/shared/`): display mode + interactive mode (used by the review form). Needs `aria-label` like `"4 من 5 نجوم"` — custom non-native control (`accessibility-rtl.mdc`).
 - [ ] **2.7 — Loading / empty / error primitives**: skeletons, empty-state block, error block. Every list in the app reuses these.
 - [ ] **2.8 — `not-found` and `error` boundaries** for both route groups.
