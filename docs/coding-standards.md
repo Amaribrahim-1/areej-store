@@ -125,8 +125,9 @@ Per `ai-interactions.md`, testing tools/depth are taught as they come up, not fr
 
 - Commit format: `type(scope): description` — e.g., `feat(cart): add quantity selector`, `fix(checkout): prevent double order submit`.
 - Types: `feat`, `fix`, `refactor`, `style`, `docs`, `chore`, `test`.
-- One feature branch per MVP feature/page: `feature/product-details`, `feature/admin-orders`. Merge to `main` when the feature is reviewed and working — even solo, this builds the habit for team environments later.
+- One feature branch per MVP feature/page: `feature/product-details`, `feature/admin-orders`. Do feature work on the branch, not directly on `main`. Merge to `main` when the feature is reviewed and working — even solo, this builds the habit for team environments later.
 - Commit at logical checkpoints within a feature (e.g., "schema + types" then "UI" then "wired to Supabase"), not one giant commit per feature.
+- **Always merge with `--no-ff`** (`git merge --no-ff feature/<name>` from `main`) so every finished branch leaves an explicit merge commit in history. Fast-forward merges hide that you used branches; `--no-ff` keeps the graph readable for reviewers and portfolio. Do not squash feature branches unless explicitly decided for a one-off reason.
 
 ---
 

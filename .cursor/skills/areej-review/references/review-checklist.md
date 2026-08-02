@@ -103,7 +103,9 @@ Write under `### Scalability`, or `Scalability: clean`. Severity: **Should fix**
 1. Is there a logical checkpoint ready to commit (schema+types / UI / Supabase
    wiring)?
 2. Is the work on an appropriate `feature/<name>` branch?
-3. If committing is due: suggest `type(scope): description` — do not commit unless
+3. If the feature branch is complete: remind to merge to `main` with
+   `git merge --no-ff` (explicit merge commit per `git-conventions.mdc`).
+4. If committing is due: suggest `type(scope): description` — do not commit unless
    asked. Explain why **now**.
 
 Write under `### Git action needed?` (even if "no action — already committed /

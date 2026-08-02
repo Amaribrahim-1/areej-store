@@ -171,6 +171,9 @@ not bureaucracy — flag them in the moment with a concrete reason.
   wiring).
 - Flag if work belongs on a feature branch (`feature/<name>`) vs sitting
   uncommitted on the wrong branch.
+- When a feature branch is done: remind to merge into `main` with
+  `git merge --no-ff` (explicit merge commit — project rule), not a silent
+  fast-forward.
 - Suggest message shape `type(scope): description` with allowed types — do not
   create the commit unless asked.
 - Explain **why now**, not a generic "remember to commit."
