@@ -111,9 +111,9 @@ The existing scaffold has three concrete deviations from the agreed standards. F
   🚩 No wishlist icon in the navbar (backlog). No language toggle (Arabic-only MVP, spec decision #1).
 - [x] **2.4 — `Footer`** (`components/shared/`): brand blurb, nav links, contact/social links.
 - [x] **2.5 — `PriceTag`** (`components/shared/`): renders a single price, or original-strikethrough + highlighted current price when discounted. One component, used by product card, product details, cart, and admin. Getting this right once prevents four inconsistent price renderings.
-- [ ] **2.6 — `StarRating`** (`components/shared/`): display mode + interactive mode (used by the review form). Needs `aria-label` like `"4 من 5 نجوم"` — custom non-native control (`accessibility-rtl.mdc`).
-- [ ] **2.7 — Loading / empty / error primitives**: skeletons, empty-state block, error block. Every list in the app reuses these.
-- [ ] **2.8 — `not-found` and `error` boundaries** for both route groups.
+- [x] **2.6 — `StarRating`** (`components/shared/`): display mode + interactive mode (used by the review form). Needs `aria-label` like `"4 من 5 نجوم"` — custom non-native control (`accessibility-rtl.mdc`).
+- [x] **2.7 — Loading / empty / error primitives**: skeletons, empty-state block, error block. Every list in the app reuses these.
+- [x] **2.8 — `not-found` and `error` boundaries** for both route groups.
 
 `[commit: feat(shell): brand color tokens, feat(shell): route groups and layouts, feat(shell): navbar and footer, feat(shared): price tag and star rating]`
 
