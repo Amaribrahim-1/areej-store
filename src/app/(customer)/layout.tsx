@@ -1,7 +1,14 @@
+import Navbar from "@/components/shared/Navbar";
+
 export default function CustomerLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <main>{children}</main>;
+  return (
+    <>
+      <Navbar />
+      <main>{children}</main>
+    </>
+  );
 }
