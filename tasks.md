@@ -105,16 +105,17 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 
 `[branch: feature/app-shell]`
 
-- **2.1 — Route group skeleton**: `app/(customer)/` and `app/(admin)/` with their own layouts. Route files stay thin (`coding-standards.md` §2).
-- **2.2 — `Navbar`** (`components/shared/`): logo, nav links, cart icon with item count, auth-state-aware account link. Mobile-first: drawer/sheet on small screens. RTL-correct, directional icons flipped.
+- [x] **2.1 — Brand color tokens.** Wire the approved Areej amber scale (`#B8874A` base) into `globals.css` as CSS variables + Tailwind theme tokens (`--brand-*`, semantic `--primary` / `--text-accent` / `--bg-accent` / `--border-accent`). Source of truth for the *why* and usage rules: `docs/color-system.md`. No ad-hoc hex in feature components after this. No dark-mode ramp (out of MVP).
+- [x] **2.2 — Route group skeleton**: `app/(customer)/` and `app/(admin)/` with their own layouts. Route files stay thin (`coding-standards.md` §2).
+- [x] **2.3 — `Navbar`** (`components/shared/`): logo, nav links, cart icon with item count, auth-state-aware account link. Mobile-first: drawer/sheet on small screens. RTL-correct, directional icons flipped.
   🚩 No wishlist icon in the navbar (backlog). No language toggle (Arabic-only MVP, spec decision #1).
-- **2.3 — `Footer`** (`components/shared/`): brand blurb, nav links, contact/social links.
-- **2.4 — `PriceTag`** (`components/shared/`): renders a single price, or original-strikethrough + highlighted current price when discounted. One component, used by product card, product details, cart, and admin. Getting this right once prevents four inconsistent price renderings.
-- **2.5 — `StarRating`** (`components/shared/`): display mode + interactive mode (used by the review form). Needs `aria-label` like `"4 من 5 نجوم"` — custom non-native control (`accessibility-rtl.mdc`).
-- **2.6 — Loading / empty / error primitives**: skeletons, empty-state block, error block. Every list in the app reuses these.
-- **2.7 — `not-found` and `error` boundaries** for both route groups.
+- [x] **2.4 — `Footer`** (`components/shared/`): brand blurb, nav links, contact/social links.
+- [x] **2.5 — `PriceTag`** (`components/shared/`): renders a single price, or original-strikethrough + highlighted current price when discounted. One component, used by product card, product details, cart, and admin. Getting this right once prevents four inconsistent price renderings.
+- [x] **2.6 — `StarRating`** (`components/shared/`): display mode + interactive mode (used by the review form). Needs `aria-label` like `"4 من 5 نجوم"` — custom non-native control (`accessibility-rtl.mdc`).
+- [x] **2.7 — Loading / empty / error primitives**: skeletons, empty-state block, error block. Every list in the app reuses these.
+- [x] **2.8 — `not-found` and `error` boundaries** for both route groups.
 
-`[commit: feat(shell): route groups and layouts, feat(shell): navbar and footer, feat(shared): price tag and star rating]`
+`[commit: feat(shell): brand color tokens, feat(shell): route groups and layouts, feat(shell): navbar and footer, feat(shared): price tag and star rating]`
 
 ---
 
@@ -381,7 +382,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 | -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | Coupon system                                                        | 0.7 (shared types), 1.1/1.5 (schema + total function), 4.5 (cart totals) |
 | Google Auth                                                          | 5.5 (login form)                                                         |
-| Wishlist                                                             | 2.2 (navbar icon), 3.4 (product card heart button)                       |
+| Wishlist                                                             | 2.3 (navbar icon), 3.4 (product card heart button)                       |
 | Shipping fee calculation                                             | 1.1/1.5 (schema + total function), 4.5 (cart totals), 6.2 (checkout)     |
 | Admin dashboard charts                                               | 11.5 (KPI cards)                                                         |
 | Animated Testimonials / Featured carousels                           | 9.4, 9.5 (Home sections)                                                 |
@@ -389,7 +390,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 | Change/Reset Password (admin)                                        | 11.1 (admin login)                                                       |
 | Real-time notifications for new reviews                              | 6.6 (order notification), 14.3 (admin reviews)                           |
 | Inventory / stock tracking (out of MVP entirely)                     | 1.1 (schema), 13.2 (products table)                                      |
-| English / i18n toggle (out of MVP entirely)                          | 0.1 (root layout), 2.2 (navbar)                                          |
+| English / i18n toggle (out of MVP entirely)                          | 0.1 (root layout), 2.3 (navbar)                                          |
 | Manual `is_featured` flag (replaced by discount logic)               | 1.1 (schema), 13.4 (product form)                                        |
 | Separate `testimonials` table / admin entry screen                   | 1.1 (schema), 9.5 (Home testimonials)                                    |
 | Standalone "List by Categories" page (covered by the catalog filter) | 3.7 (catalog filters)                                                    |
