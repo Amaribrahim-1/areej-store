@@ -125,7 +125,7 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 
 Read-only path first: it teaches TanStack Query against real seeded data with no mutation risk.
 
-- **3.1 — `features/products/` skeleton**: `api/`, `components/`, `hooks/`, `schema.ts`, `constants.ts`.
+- [x] **3.1 — `features/products/` skeleton**: `api/`, `components/`, `hooks/`, `schema.ts`, `constants.ts` (DB English category keys + Arabic `PRODUCT_CATEGORY_LABELS` map).
 - **3.2 — `api/useProducts.ts`**: paginated list query accepting search / category / price / rating / sort params. Filtering, sorting, and pagination happen in the Supabase query, not in JS after fetching everything. Set a catalog-appropriate `staleTime` (minutes are fine — `coding-standards.md` §5).
 - **3.3 — `api/useProduct.ts`**: single product + its variants by id/slug.
 - **3.4 — `ProductCard`**: `next/image` (never a raw `<img>`, §5), name, `PriceTag`, rating, category. Meaningful Arabic `alt`. Add the Supabase storage domain to `next.config.ts` `images.remotePatterns`.
