@@ -8,7 +8,7 @@ Ordered breakdown of the full MVP, derived from `docs/project-spec.md` and const
 - Within a phase, tasks are ordered. Across phases, later phases assume earlier ones are done.
 - `[branch: ...]` marks the feature branch for that group, per `git-conventions.mdc` (one branch per MVP feature/page).
 - `[commit: ...]` marks a suggested logical commit checkpoint inside a feature — not a rule, a starting point.
-- **`SUPABASE`** = backend work. Per `ai-interactions.md`, AI does not touch Supabase unprompted — these tasks are AI-assisted **only when explicitly requested**, and always explained.
+- **`SUPABASE` / backend** = AI-owned track (database + `features/*/api/` data-access), per the team split in `docs/ai-interactions.md`. AI implements from scratch when the task needs it and explains what shipped; frontend remains human-owned unless help is requested.
 - **`NEW CONCEPT`** = the developer has not used this in real code before. A small standalone teaching example comes first, then the real implementation.
 - 🚩 **Backlog guard** = a point where a deferred feature would naturally creep in. Do not build it. Listed so the omission is deliberate, not forgotten.
 
