@@ -50,3 +50,7 @@ Backend/DB the AI owns: fix and explain; do not make Postgres/RLS the developer'
 # First Action
 
 On a fresh session, read `docs/project-spec.md`, `docs/backlog.md`, `docs/ai-interactions.md`, and `docs/coding-standards.md`, then generate `tasks.md`: an ordered, concrete task breakdown of the full MVP. Cross-check every task against `backlog.md` — if a task would implement something explicitly deferred (e.g., coupons, Google Auth, wishlist), flag it instead of including it.
+
+# MVP task workflow
+
+For a concrete MVP task (e.g. «يلا التاسك 3.4»), use the project skill `.cursor/skills/areej-task/SKILL.md` (`areej-task`) — explain → FE/BE split → BE gate → FE start signal → review → check `tasks.md` → commit commands.
