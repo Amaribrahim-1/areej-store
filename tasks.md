@@ -126,7 +126,15 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 Read-only path first: it teaches TanStack Query against real seeded data with no mutation risk.
 
 - [x] **3.1 — `features/products/` skeleton**: `api/`, `components/`, `hooks/`, `schema.ts`, `constants.ts` (DB English category keys + Arabic `PRODUCT_CATEGORY_LABELS` map).
-- **3.2 — `api/useProducts.ts`**: paginated list query accepting search / category / price / rating / sort params. Filtering, sorting, and pagination happen in the Supabase query, not in JS after fetching everything. Set a catalog-appropriate `staleTime` (minutes are fine — `coding-standards.md` §5).
+- [x] **3.2 — Catalog list query** (`getProducts` + `useProducts`): paginated list with search / category / price / rating / sort. Filtering, sorting, and pagination happen in the Supabase query, not in JS after fetching everything. Catalog `staleTime`: 5 minutes (`coding-standards.md` §5). Read model: `catalog_products` view (security_invoker) for display price + rating aggregates.
+  **Locked contract (decide once — UI in 3.6/3.7 only feeds this object):**
+  - Params: `search?` (name `ilike`), `category?`, `minPrice?` / `maxPrice?` (against the product’s min variant `current_price`), `minRating?` (avg rating; products with no reviews excluded when set), `sort` (`newest` default | `price-asc` | `price-desc` | `rating-desc`), `page` (1-based), `pageSize` default `12`.
+  - List row shape: product fields + display price pair from the lowest-`current_price` variant (tie-break: lowest `sort_order`) + average rating + review count.
+  - Files: pure `api/getProducts.ts` + thin `api/useProducts.ts` (`queryKey: ['products', params]`). Types live in feature-local `features/products/types.ts` — not `src/types/` (cross-feature only) and not inside the hook file.
+  - [x] **3.2.1** — `ProductsQueryParams` + list result types in `features/products/types.ts`.
+  - [x] **3.2.2** — `api/getProducts.ts` (Supabase query; active products only).
+  - [x] **3.2.3** — `api/useProducts.ts` wraps `getProducts` with TanStack Query + 5 min `staleTime`.
+  - [x] **3.2.4** — Smoke call with defaults (`page: 1`, `sort: 'newest'`) against seeded data (`/products` + `CatalogSmoke`).
 - **3.3 — `api/useProduct.ts`**: single product + its variants by id/slug.
 - **3.4 — `ProductCard`**: `next/image` (never a raw `<img>`, §5), name, `PriceTag`, rating, category. Meaningful Arabic `alt`. Add the Supabase storage domain to `next.config.ts` `images.remotePatterns`.
   🚩 No wishlist / heart button on the card (backlog).

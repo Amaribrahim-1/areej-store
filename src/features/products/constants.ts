@@ -13,3 +13,9 @@ export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
   Fermentation: "مخمرية",
   "Hair Oil": "زيوت الشعر",
 };
+
+/** Default page size for the storefront catalog grid. */
+export const PRODUCTS_PAGE_SIZE = 12;
+
+/** Catalog changes rarely — tolerate a few minutes of cache. */
+export const PRODUCTS_STALE_TIME_MS = 5 * 60 * 1000;
