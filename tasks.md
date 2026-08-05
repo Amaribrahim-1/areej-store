@@ -147,7 +147,7 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
       🚩 Category filtering here **is** the "List by Categories" item from the original notes (spec decision #8) — no separate categories page is needed.
 - [x] **3.8 — Product details page**: gallery, name, `PriceTag`, rating, description, category.
 - [x] **3.9 — Variant selector**: show when `variants.length > 1`; selecting a size swaps the displayed price only (photo stays the product-level image). Single-variant products skip the selector. Variant price resolution is pure logic — a prime candidate for the first unit test (`coding-standards.md` §8).
-- **3.10 — Quantity selector + Add to Cart button** (wired in Phase 4).
+- [x] **3.10 — Quantity selector + Add to Cart button** (wired in Phase 4).
 - **3.11 — Parallel fetching on the details page**: product, variants, and reviews must not run as a waterfall (§5).
 
 `[commit: feat(products): list query hook, feat(products): product card and grid, feat(products): filters and search, feat(product-details): variant selector]`

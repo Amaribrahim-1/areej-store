@@ -2,19 +2,21 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { PackageXIcon } from "lucide-react";
+import { PackageXIcon, ShoppingCartIcon } from "lucide-react";
 
-import PriceTag from "@/components/shared/PriceTag";
+import PriceTag, { formatPrice } from "@/components/shared/PriceTag";
 import StarRating from "@/components/shared/StarRating";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 import { useProduct } from "../api/useProduct";
 import { PRODUCT_CATEGORY_LABELS } from "../constants";
 import { resolveDisplayVariant } from "../lib/resolveDisplayVariant";
 import type { ProductDetail } from "../types";
+import QuantitySelector from "./QuantitySelector";
 import VariantSelector from "./VariantSelector";
 
 type ProductDetailsProps = {
@@ -54,12 +56,16 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
   const [selectedVariantId, setSelectedVariantId] = useState(
     product.variants[0].id,
   );
+  const [quantity, setQuantity] = useState(1);
 
   const categoryLabel = PRODUCT_CATEGORY_LABELS[product.category];
   const displayVariant = resolveDisplayVariant(
     product.variants,
     selectedVariantId,
   );
+  // Line totals for the selected variant × quantity (display only until cart).
+  const lineCurrentPrice = displayVariant.currentPrice * quantity;
+  const lineOriginalPrice = displayVariant.originalPrice * quantity;
 
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 lg:gap-16">
@@ -102,12 +108,18 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
             )}
           </div>
 
-          <div className="pt-2">
+          <div className="space-y-1 pt-2">
             <PriceTag
-              currentPrice={displayVariant.currentPrice}
-              originalPrice={displayVariant.originalPrice}
+              currentPrice={lineCurrentPrice}
+              originalPrice={lineOriginalPrice}
               size="lg"
             />
+            {quantity > 1 ? (
+              <p className="text-xs text-muted-foreground">
+                سعر القطعة {formatPrice(displayVariant.currentPrice)} ×{" "}
+                {quantity}
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -116,6 +128,26 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
           selectedId={selectedVariantId}
           onSelect={setSelectedVariantId}
         />
+
+        <div className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center">
+          <QuantitySelector
+            id="product-quantity"
+            value={quantity}
+            onChange={setQuantity}
+          />
+          {/* Cart store + Sonner toast wiring: Phase 4.3 */}
+          <Button
+            type="button"
+            size="lg"
+            className="w-full cursor-pointer sm:w-auto sm:min-w-48"
+            onClick={() => {
+              // Intentionally empty until useCartStore exists (Phase 4).
+            }}
+          >
+            <ShoppingCartIcon data-icon="inline-start" />
+            أضف للعربة
+          </Button>
+        </div>
 
         {product.description ? (
           <div className="space-y-2 border-t border-border pt-6">
@@ -152,6 +184,10 @@ export function ProductDetailsSkeleton() {
             <Skeleton className="h-10 w-20 rounded-4xl" />
             <Skeleton className="h-10 w-20 rounded-4xl" />
           </div>
+        </div>
+        <div className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center">
+          <Skeleton className="h-11 w-40 rounded-4xl" />
+          <Skeleton className="h-10 w-full rounded-4xl sm:w-48" />
         </div>
         <div className="space-y-3 border-t border-border pt-6">
           <Skeleton className="h-6 w-32" />
