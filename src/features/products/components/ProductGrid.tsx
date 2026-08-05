@@ -3,17 +3,36 @@
 import { ProductGridSkeleton } from "@/components/shared/ContentSkeleton";
 
 import { useProducts } from "../api/useProducts";
-import { PRODUCTS_PAGE_SIZE } from "../constants";
+import {
+  PRODUCTS_PAGE_SIZE,
+  type ProductCategory,
+} from "../constants";
+import useCatalogFilterParams from "../hooks/useCatalogFilterParams";
+import type { ProductSort } from "../types";
 import ProductCard from "./ProductCard";
 
 /**
- * Storefront catalog grid — loads the first page (filters / pagination in 3.5–3.7).
+ * Storefront catalog grid — params come from URL via useCatalogFilterParams.
  */
 export default function ProductGrid() {
+  const {
+    selectedCategory,
+    selectedRating,
+    selectedSorting,
+    minPrice,
+    maxPrice,
+  } = useCatalogFilterParams();
+
   const { data, isPending, isError, error } = useProducts({
     page: 1,
     pageSize: PRODUCTS_PAGE_SIZE,
-    sort: "newest",
+    category: selectedCategory
+      ? (selectedCategory as ProductCategory)
+      : undefined,
+    minRating: toOptionalNumber(selectedRating),
+    minPrice: toOptionalNumber(minPrice),
+    maxPrice: toOptionalNumber(maxPrice),
+    sort: selectedSorting as ProductSort,
   });
 
   if (isPending) {
@@ -32,7 +51,7 @@ export default function ProductGrid() {
     return (
       <div className="rounded-2xl bg-brand-50 px-6 py-16 text-center">
         <p className="font-heading text-lg text-brand-800">لا توجد منتجات</p>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-muted-foreground text-sm">
           لم نعثر على منتجات للعرض حالياً. حاول لاحقاً.
         </p>
       </div>
@@ -51,4 +70,10 @@ export default function ProductGrid() {
       </ul>
     </div>
   );
+}
+
+function toOptionalNumber(raw: string): number | undefined {
+  if (!raw) return undefined;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : undefined;
 }

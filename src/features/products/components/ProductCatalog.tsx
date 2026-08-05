@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import CatalogFiltersPanel from "./CatalogFiltersPanel";
+import useCatalogFilterParams from "../hooks/useCatalogFilterParams";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "الأحدث" },
@@ -34,11 +35,9 @@ type ProductCatalogProps = {
   children: ReactNode;
 };
 
-/**
- * Catalog page shell: search + sidebar filters + toolbar.
- * UI only — no URL / useProducts wiring yet (your 3.6 / 3.7 logic).
- */
 export default function ProductCatalog({ children }: ProductCatalogProps) {
+  const { selectedSorting, updateFilterParam } = useCatalogFilterParams();
+
   return (
     <div className="space-y-6">
       <div className="relative">
@@ -97,7 +96,8 @@ export default function ProductCatalog({ children }: ProductCatalogProps) {
                 id="catalog-sort"
                 name="sort"
                 className={cn(selectClassName, "w-auto max-w-[12rem]")}
-                defaultValue="newest"
+                value={selectedSorting}
+                onChange={(e) => updateFilterParam("sort", e.target.value)}
               >
                 {SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>

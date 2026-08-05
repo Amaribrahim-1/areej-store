@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 import { PRODUCT_CATEGORIES, PRODUCT_CATEGORY_LABELS } from "../constants";
+import useCatalogFilterParams from "../hooks/useCatalogFilterParams";
 
 const RATING_OPTIONS = [
   { value: "", label: "الكل" },
@@ -15,8 +16,6 @@ const RATING_OPTIONS = [
   { value: "4", label: "من 4 نجوم" },
   { value: "5", label: "من 5 نجوم" },
 ] as const;
-
-const VALID_RATINGS = new Set(["3", "4", "5"]);
 
 const selectClassName = cn(
   "h-9 w-full min-w-0 rounded-4xl border border-input bg-background px-3 text-sm",
@@ -44,37 +43,31 @@ export default function CatalogFiltersPanel({
   const maxPriceId = `${idPrefix}-max-price`;
   const categoryGroupName = `${idPrefix}-category`;
 
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
+  const {
+    selectedCategory,
+    selectedRating,
+    minPrice,
+    maxPrice,
+    updateFilterParam,
+    setFilterParams,
+    removeFilters,
+  } = useCatalogFilterParams();
 
-  const categoryRaw = searchParams.get("category") ?? "";
-  const selectedCategory = PRODUCT_CATEGORIES.includes(
-    categoryRaw as (typeof PRODUCT_CATEGORIES)[number],
-  )
-    ? categoryRaw
-    : "";
+  // Draft while typing — commit both prices with «تطبيق».
+  const [draftMinPrice, setDraftMinPrice] = useState(minPrice);
+  const [draftMaxPrice, setDraftMaxPrice] = useState(maxPrice);
 
-  const ratingRaw = searchParams.get("minRating") ?? "";
-  const selectedRating = VALID_RATINGS.has(ratingRaw) ? ratingRaw : "";
+  useEffect(() => {
+    setDraftMinPrice(minPrice);
+    setDraftMaxPrice(maxPrice);
+  }, [minPrice, maxPrice]);
 
-  const minPrice = searchParams.get("minPrice") ?? "";
-  const maxPrice = searchParams.get("maxPrice") ?? "";
-
-  function updateFilterParam(key: string, value: string) {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (value) params.set(key, value);
-    else params.delete(key);
-
-    params.delete("page");
-
-    const qs = params.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }
-
-  function removeFilters() {
-    router.replace(pathname, { scroll: false });
+  function applyPriceFilters() {
+    if (draftMinPrice === minPrice && draftMaxPrice === maxPrice) return;
+    setFilterParams({
+      minPrice: draftMinPrice,
+      maxPrice: draftMaxPrice,
+    });
   }
 
   return (
@@ -132,42 +125,59 @@ export default function CatalogFiltersPanel({
 
       <div className="space-y-3">
         <p className="text-sm font-medium text-foreground">السعر (ج.م)</p>
-        <div className="flex items-center gap-2">
-          <div className="flex-1 space-y-1">
-            <Label htmlFor={minPriceId} className="sr-only">
-              من
-            </Label>
-            <Input
-              id={minPriceId}
-              name="minPrice"
-              type="number"
-              inputMode="numeric"
-              min={0}
-              placeholder="من"
-              className="bg-background"
-              value={minPrice}
-              onChange={(e) => updateFilterParam("minPrice", e.target.value)}
-            />
+        <div className="flex flex-col gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <Label htmlFor={minPriceId} className="sr-only">
+                من
+              </Label>
+              <Input
+                id={minPriceId}
+                name="minPrice"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                placeholder="من"
+                className="bg-background text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                value={draftMinPrice}
+                onChange={(e) => setDraftMinPrice(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") applyPriceFilters();
+                }}
+              />
+            </div>
+            <span className="shrink-0 text-muted-foreground" aria-hidden>
+              —
+            </span>
+            <div className="min-w-0 flex-1">
+              <Label htmlFor={maxPriceId} className="sr-only">
+                إلى
+              </Label>
+              <Input
+                id={maxPriceId}
+                name="maxPrice"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                placeholder="إلى"
+                className="bg-background text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                value={draftMaxPrice}
+                onChange={(e) => setDraftMaxPrice(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") applyPriceFilters();
+                }}
+              />
+            </div>
           </div>
-          <span className="text-muted-foreground" aria-hidden>
-            —
-          </span>
-          <div className="flex-1 space-y-1">
-            <Label htmlFor={maxPriceId} className="sr-only">
-              إلى
-            </Label>
-            <Input
-              id={maxPriceId}
-              name="maxPrice"
-              type="number"
-              inputMode="numeric"
-              min={0}
-              placeholder="إلى"
-              className="bg-background"
-              value={maxPrice}
-              onChange={(e) => updateFilterParam("maxPrice", e.target.value)}
-            />
-          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="w-full"
+            onClick={applyPriceFilters}
+          >
+            تطبيق
+          </Button>
         </div>
       </div>
 
