@@ -143,8 +143,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
       🚩 No wishlist / heart button on the card (backlog).
 - [x] **3.5 — `ProductGrid` + pagination**, with loading skeletons and an empty state.
 - [x] **3.6 — Catalog filter UI**: category, price range, rating, sort. Filter state is client/UI state → Zustand or URL search params, never duplicated into a store alongside the server data (`coding-standards.md` §1). Prefer URL params so a filtered catalog is shareable and back-button-correct — decide explicitly.
-- **3.7 — Search input**, debounced, wired to the same query.
-  🚩 Category filtering here **is** the "List by Categories" item from the original notes (spec decision #8) — no separate categories page is needed.
+- [x] **3.7 — Search input**, debounced, wired to the same query.
+      🚩 Category filtering here **is** the "List by Categories" item from the original notes (spec decision #8) — no separate categories page is needed.
 - **3.8 — Product details page**: gallery, name, `PriceTag`, rating, description, category.
 - **3.9 — Variant selector**: show when `variants.length > 1`; selecting a size swaps the displayed price only (photo stays the product-level image). Single-variant products skip the selector. Variant price resolution is pure logic — a prime candidate for the first unit test (`coding-standards.md` §8).
 - **3.10 — Quantity selector + Add to Cart button** (wired in Phase 4).
