@@ -1,12 +1,13 @@
 ---
 name: areej-task
 description: >-
-  Runs the Areej MVP task workflow under the FE/BE team split: explain the task,
-  split frontend vs backend, wait for go-ahead before backend work, give a FE
-  start signal (with API usage contract), review the developer's frontend,
-  whole-task review, check off tasks.md, then commit commands from the real
-  diff. Use when the developer invokes areej-task, says "يلا التاسك" / "يلا
-  التاسك X.Y", starts a new MVP task by id, or asks to run the task workflow.
+  Runs the Areej MVP task workflow under the company-style FE/BE split: explain
+  the task, split frontend vs backend in chat, wait for go-ahead before backend
+  work, ship get* helpers + an API-only chat usage contract (no FE recipes),
+  give a FE start signal, review after the developer's draft, whole-task review,
+  check off tasks.md, then commit commands from the real diff. Use when the
+  developer invokes areej-task, says "يلا التاسك" / "يلا التاسك X.Y", starts a
+  new MVP task by id, or asks to run the task workflow.
   DO NOT USE for ad-hoc reviews only (areej-review), clean-code-only passes
   (clean-code-guard), docs-only edits (docs-guard), or test-code review
   (test-guard). Manual invoke only — do not auto-start this skill.
@@ -15,14 +16,16 @@ disable-model-invocation: true
 
 # areej-task
 
-Orchestrate one MVP task end-to-end under the locked team split in
+Orchestrate one MVP task end-to-end under the locked company-style team split in
 `docs/ai-interactions.md` and `.cursor/rules/mentor-behavior.mdc`.
 
-- **Human** = frontend developer (UI, components, wiring, Zustand UI state, RHF+Zod client).
-- **AI** = backend & database (Supabase + `features/*/api/` data-access).
+- **Human (frontend team)** = feature `types.ts` from the usage contract, TanStack
+  `use*` wrappers, UI, components, wiring, Zustand UI state, RHF+Zod client.
+- **AI (backend team)** = Supabase + pure `get*` / mutate helpers in
+  `features/*/api/` (not the `use*` hooks). Always hand FE a chat usage contract.
 
 Talk to the developer in Egyptian Arabic. Code, usage contracts, commit messages,
-and `tasks.md` edits stay in English.
+and `tasks.md` edits stay in English. `tasks.md` describes **what**, never who.
 
 Do **not** invent product scope. Authoritative sources (re-read as needed):
 
@@ -62,16 +65,16 @@ Only when explicitly invoked (e.g. `areej-task`, «يلا التاسك 3.4», «
 
 In Egyptian Arabic, explain what the task requires, why it exists, and what “done” looks like. Use `tasks.md` (+ spec if needed). Keep it concrete; no implementation yet.
 
-### 2 — Split FE vs BE
+### 2 — Split FE vs BE (chat only — not in `tasks.md`)
 
-Present two lists:
+Present two lists in chat:
 
 | Track | Owner | Concrete work items |
 |---|---|---|
-| Frontend | Human | … |
-| Backend / data-access | AI | … (Supabase, `features/*/api/`, types regen, etc.) |
+| Frontend | Human | types from contract, `use*` hooks, UI, wiring, … |
+| Backend | AI | Supabase, pure `get*` / mutate helpers, types regen, … |
 
-If BE is empty, say so explicitly (FE-only task).
+If BE is empty, say so explicitly (FE-only task). Do not put owner names into `tasks.md`.
 
 ### Guards (before any implementation)
 
@@ -84,17 +87,21 @@ If BE is empty, say so explicitly (FE-only task).
 - Tell the developer BE should ship first and **wait for an explicit go-ahead** (e.g. «ابدأ الباك»).
 - On go-ahead: implement BE/DB from scratch as the backend teammate.
 - Verify when possible (migration applied, SQL smoke, types, lint on touched api files).
-- Deliver a short **usage contract in chat** (English): params, return shape, errors, key file paths. Do **not** write a docs file unless they ask.
+- Deliver a **usage contract in chat** (English) — API surface only: function
+  name + path, params, return shape (incl. null/empty), errors, minimal call
+  example. Do **not** write a docs file unless they ask. Do **not** include FE
+  implementation recipes (`queryKey`, hook structure, where to put types, etc.).
 
 ### 4 — Frontend start signal
 
-Clear signal that FE can begin. Include:
+Clear signal that FE can begin. Include **only**:
 
-- What to build (FE list from step 2)
-- Which hooks/APIs to call (from the usage contract if BE shipped)
-- Out of scope / backlog flags
+- That the usage contract above is the API they consume
+- Out of scope / backlog flags (if any)
+- Reminder that `tasks.md` sub-tasks are the acceptance checklist
 
-Then stop implementing FE unless they ask for help. Wait for their draft.
+Do **not** prescribe how to write types, `use*`, or smoke UI. Then stop. Wait
+for their draft (or an explicit ask for help).
 
 ### 5 — Review their frontend
 
@@ -130,6 +137,7 @@ If step 2 finds no BE work: after explain + split + guards → go directly to st
 ## Anti-patterns
 
 - Starting BE without go-ahead when BE is needed
+- Giving FE start signal with implementation recipes (hook/`queryKey`/file how-tos) before their draft
 - Giving FE start signal before BE contract/verification when BE was required
 - Auto-committing or expanding into backlog items
 - Replacing areej-review / clean-code-guard with a vague “looks good”

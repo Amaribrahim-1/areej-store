@@ -8,7 +8,7 @@ Ordered breakdown of the full MVP, derived from `docs/project-spec.md` and const
 - Within a phase, tasks are ordered. Across phases, later phases assume earlier ones are done.
 - `[branch: ...]` marks the feature branch for that group, per `git-conventions.mdc` (one branch per MVP feature/page).
 - `[commit: ...]` marks a suggested logical commit checkpoint inside a feature — not a rule, a starting point.
-- **`SUPABASE` / backend** = AI-owned track (database + `features/*/api/` data-access), per the team split in `docs/ai-interactions.md`. AI implements from scratch when the task needs it and explains what shipped; frontend remains human-owned unless help is requested.
+- **Backend vs frontend ownership** is defined in `docs/ai-interactions.md` (company-style: pure `getProduct`-style helpers vs feature `types` + `use*` hooks + UI). This file lists **what** to build only — not who. Owner split happens in chat during the task workflow.
 - **`NEW CONCEPT`** = the developer has not used this in real code before. A small standalone teaching example comes first, then the real implementation.
 - 🚩 **Backlog guard** = a point where a deferred feature would naturally creep in. Do not build it. Listed so the omission is deliberate, not forgotten.
 
@@ -135,7 +135,12 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
   - [x] **3.2.2** — `api/getProducts.ts` (Supabase query; active products only).
   - [x] **3.2.3** — `api/useProducts.ts` wraps `getProducts` with TanStack Query + 5 min `staleTime`.
   - [x] **3.2.4** — Smoke call with defaults (`page: 1`, `sort: 'newest'`) against seeded data (`/products` + `CatalogSmoke`).
-- **3.3 — `api/useProduct.ts`**: single product + its variants by id/slug.
+- **3.3 — Single product query (product + variants by id or slug).**
+  Storefront detail read model: one active product with all variants (ordered by `sort_order`) plus rating aggregates for the details header. Lookup by `slug` (primary URL) or `id` (exactly one). Missing/inactive → empty result (not an error). No new migration — reuse `products`, `product_variants`, and `catalog_products` for rating fields.
+  - [x] **3.3.1** — Detail query params + result types (`ProductQueryParams`, `ProductVariant`, `ProductDetail`) in `features/products/types.ts`.
+  - [x] **3.3.2** — `api/getProduct.ts`: fetch active product + nested variants (ordered) + rating fields; return `ProductDetail | null`.
+  - [x] **3.3.3** — `api/useProduct.ts`: TanStack Query wrapper (`queryKey: ['product', params]`, catalog `staleTime`).
+  - [x] **3.3.4** — Smoke call against seeded data (by slug from seed) proving variants + rating shape.
 - **3.4 — `ProductCard`**: `next/image` (never a raw `<img>`, §5), name, `PriceTag`, rating, category. Meaningful Arabic `alt`. Add the Supabase storage domain to `next.config.ts` `images.remotePatterns`.
   🚩 No wishlist / heart button on the card (backlog).
 - **3.5 — `ProductGrid` + pagination**, with loading skeletons and an empty state.

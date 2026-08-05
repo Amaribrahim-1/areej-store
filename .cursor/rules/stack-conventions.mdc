@@ -31,4 +31,4 @@ Route files in `app/` compose feature components — they never contain query lo
 - One component = one responsibility.
 - Extract inline handlers out of `.map()` renders.
 - No `any` — use `unknown` + narrowing, or fix the type.
-- Every Supabase call goes through a `features/*/api/` hook — never call `supabase.from(...)` directly inside a component.
+- Every Supabase call goes through `features/*/api/`: components use `use*` hooks only; hooks call pure `get*` / mutate helpers — never `supabase.from(...)` inside a component.
