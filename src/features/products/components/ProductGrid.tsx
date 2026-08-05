@@ -3,10 +3,7 @@
 import { ProductGridSkeleton } from "@/components/shared/ContentSkeleton";
 
 import { useProducts } from "../api/useProducts";
-import {
-  PRODUCTS_PAGE_SIZE,
-  type ProductCategory,
-} from "../constants";
+import { PRODUCTS_PAGE_SIZE, type ProductCategory } from "../constants";
 import useCatalogFilterParams from "../hooks/useCatalogFilterParams";
 import type { ProductSort } from "../types";
 import ProductCard from "./ProductCard";
@@ -21,6 +18,7 @@ export default function ProductGrid() {
     selectedSorting,
     minPrice,
     maxPrice,
+    searchValue,
   } = useCatalogFilterParams();
 
   const { data, isPending, isError, error } = useProducts({
@@ -33,6 +31,7 @@ export default function ProductGrid() {
     minPrice: toOptionalNumber(minPrice),
     maxPrice: toOptionalNumber(maxPrice),
     sort: selectedSorting as ProductSort,
+    search: searchValue,
   });
 
   if (isPending) {

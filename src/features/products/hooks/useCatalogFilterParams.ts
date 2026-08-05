@@ -31,6 +31,8 @@ export default function useCatalogFilterParams() {
   const minPrice = searchParams.get("minPrice") ?? "";
   const maxPrice = searchParams.get("maxPrice") ?? "";
 
+  const searchValue = searchParams.get("search") ?? "";
+
   function updateFilterParam(key: string, value: string) {
     setFilterParams({ [key]: value });
   }
@@ -63,5 +65,6 @@ export default function useCatalogFilterParams() {
     updateFilterParam,
     setFilterParams,
     removeFilters,
+    searchValue,
   };
 }

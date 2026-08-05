@@ -1,7 +1,7 @@
 "use client";
 
 import { FilterIcon, SearchIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,30 @@ type ProductCatalogProps = {
 };
 
 export default function ProductCatalog({ children }: ProductCatalogProps) {
-  const { selectedSorting, updateFilterParam } = useCatalogFilterParams();
+  const { selectedSorting, updateFilterParam, searchValue } =
+    useCatalogFilterParams();
+  const [draftSearch, setDraftSearch] = useState(searchValue);
+  /** Skip URL→draft sync once after we wrote the URL ourselves (avoids clobbering fast typing). */
+  const skipNextUrlSyncRef = useRef(false);
+
+  useEffect(() => {
+    if (skipNextUrlSyncRef.current) {
+      skipNextUrlSyncRef.current = false;
+      return;
+    }
+    setDraftSearch(searchValue);
+  }, [searchValue]);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const next = draftSearch.trim();
+      if (next === searchValue.trim()) return;
+      skipNextUrlSyncRef.current = true;
+      updateFilterParam("search", next);
+    }, 400);
+
+    return () => clearTimeout(id);
+  }, [draftSearch, searchValue, updateFilterParam]);
 
   return (
     <div className="space-y-6">
@@ -45,13 +68,17 @@ export default function ProductCatalog({ children }: ProductCatalogProps) {
           className="pointer-events-none absolute top-1/2 start-3 size-4 -translate-y-1/2 text-muted-foreground"
           aria-hidden
         />
+        <Label htmlFor="catalog-search" className="sr-only">
+          بحث في المنتجات
+        </Label>
         <Input
           id="catalog-search"
           name="search"
           type="search"
           placeholder="ابحث عن عطر، مسك..."
           className="h-11 bg-background pe-3 ps-10"
-          aria-label="بحث في المنتجات"
+          value={draftSearch}
+          onChange={(e) => setDraftSearch(e.target.value)}
         />
       </div>
 
