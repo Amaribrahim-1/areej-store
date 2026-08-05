@@ -33,7 +33,7 @@ src/
     products/
       components/
       hooks/
-      api/                → TanStack Query hooks (useProducts, useProduct)
+      api/                → pure get*/mutate helpers (talk to Supabase) + use* TanStack wrappers (call those helpers). Components call use* only.
       schema.ts           → Zod schemas for this feature
       store.ts            → Zustand store, only if this feature needs client state
     cart/
@@ -73,7 +73,7 @@ Route files (`app/`) stay thin: they compose components from `features/`, they d
 - One component = one responsibility. If a component both fetches data and renders a form and manages local UI toggles, split it.
 - Extract inline handlers inside `.map()` renders into named functions — inline arrow functions in lists are a performance and readability flag.
 - `any` is not allowed. Use `unknown` + narrowing, or fix the type.
-- Every Supabase query and mutation goes through a `features/*/api/` hook — never call `supabase.from(...)` directly inside a component.
+- Every Supabase query and mutation goes through `features/*/api/`: components call `use*` hooks only; those hooks call pure `get*` / mutate helpers. Never call `supabase.from(...)` inside a component.
 - Magic strings (order status values, category names) live in a single `constants.ts` per feature — not retyped inline across files.
 
 ---
