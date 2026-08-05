@@ -33,6 +33,10 @@ export default function useCatalogFilterParams() {
 
   const searchValue = searchParams.get("search") ?? "";
 
+  const pageRaw = searchParams.get("page");
+  const parsedPage = Number.parseInt(pageRaw ?? "1", 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+
   function updateFilterParam(key: string, value: string) {
     setFilterParams({ [key]: value });
   }
@@ -46,10 +50,19 @@ export default function useCatalogFilterParams() {
       else params.delete(key);
     }
 
-    params.delete("page");
+    // Changing filters (not page itself) resets to page 1.
+    if (!("page" in updates)) {
+      params.delete("page");
+    }
 
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }
+
+  /** Page 1 omits the query param so the default URL stays clean. */
+  function setPage(nextPage: number) {
+    const safe = Number.isFinite(nextPage) && nextPage > 0 ? nextPage : 1;
+    setFilterParams({ page: safe <= 1 ? "" : String(safe) });
   }
 
   function removeFilters() {
@@ -62,6 +75,8 @@ export default function useCatalogFilterParams() {
     selectedSorting,
     minPrice,
     maxPrice,
+    page,
+    setPage,
     updateFilterParam,
     setFilterParams,
     removeFilters,

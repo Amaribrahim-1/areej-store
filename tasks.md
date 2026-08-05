@@ -142,6 +142,7 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **3.4 — `ProductCard`**: `next/image` (never a raw `<img>`, §5), name, `PriceTag`, rating, category. Meaningful Arabic `alt`. Add the Supabase storage domain to `next.config.ts` `images.remotePatterns`.
       🚩 No wishlist / heart button on the card (backlog).
 - [x] **3.5 — `ProductGrid` + pagination**, with loading skeletons and an empty state.
+      Pagination is URL-driven (`?page=`), reset when filters change; shared EmptyState / ErrorState.
 - [x] **3.6 — Catalog filter UI**: category, price range, rating, sort. Filter state is client/UI state → Zustand or URL search params, never duplicated into a store alongside the server data (`coding-standards.md` §1). Prefer URL params so a filtered catalog is shareable and back-button-correct — decide explicitly.
 - [x] **3.7 — Search input**, debounced, wired to the same query.
       🚩 Category filtering here **is** the "List by Categories" item from the original notes (spec decision #8) — no separate categories page is needed.
