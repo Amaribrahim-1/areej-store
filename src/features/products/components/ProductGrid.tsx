@@ -41,8 +41,8 @@ export default function ProductGrid() {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">{data.total} منتج</p>
-      <ul className="grid list-none grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+      <p className="text-sm text-muted-foreground">عرض {data.total} منتج</p>
+      <ul className="grid list-none grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3">
         {data.items.map((product) => (
           <li key={product.id}>
             <ProductCard product={product} />

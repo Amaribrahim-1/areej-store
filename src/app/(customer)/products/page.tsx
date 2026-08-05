@@ -1,3 +1,4 @@
+import ProductCatalog from "@/features/products/components/ProductCatalog";
 import ProductGrid from "@/features/products/components/ProductGrid";
 
 export default function ProductsCatalogPage() {
@@ -12,7 +13,9 @@ export default function ProductsCatalogPage() {
         </p>
       </header>
 
-      <ProductGrid />
+      <ProductCatalog>
+        <ProductGrid />
+      </ProductCatalog>
     </section>
   );
 }
