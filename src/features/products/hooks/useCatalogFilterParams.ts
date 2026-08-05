@@ -41,7 +41,6 @@ export default function useCatalogFilterParams() {
     setFilterParams({ [key]: value });
   }
 
-  /** Set multiple query keys in one replace (e.g. minPrice + maxPrice together). */
   function setFilterParams(updates: Record<string, string>) {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -50,7 +49,6 @@ export default function useCatalogFilterParams() {
       else params.delete(key);
     }
 
-    // Changing filters (not page itself) resets to page 1.
     if (!("page" in updates)) {
       params.delete("page");
     }
@@ -59,7 +57,6 @@ export default function useCatalogFilterParams() {
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }
 
-  /** Page 1 omits the query param so the default URL stays clean. */
   function setPage(nextPage: number) {
     const safe = Number.isFinite(nextPage) && nextPage > 0 ? nextPage : 1;
     setFilterParams({ page: safe <= 1 ? "" : String(safe) });

@@ -9,15 +9,6 @@ import type {
   ProductVariant,
 } from "../types";
 
-/**
- * Storefront single-product API (task 3.3).
- * Lookup by exactly one of slug | id. Active products only.
- * Missing / inactive → null (not a thrown error).
- *
- * Frontend owns feature types + useProduct; call this function from the
- * queryFn only — never supabase.from in components.
- */
-
 type ProductRow = {
   id: string;
   name: string;
@@ -46,10 +37,6 @@ function hasSlug(
   return "slug" in params;
 }
 
-/**
- * Fetch one storefront product with variants + rating aggregates.
- * Product row and catalog rating run in parallel (same lookup key).
- */
 export async function getProduct(
   params: ProductQueryParams,
 ): Promise<ProductDetail | null> {

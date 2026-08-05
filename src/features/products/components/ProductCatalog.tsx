@@ -39,7 +39,6 @@ export default function ProductCatalog({ children }: ProductCatalogProps) {
   const { selectedSorting, updateFilterParam, searchValue } =
     useCatalogFilterParams();
   const [draftSearch, setDraftSearch] = useState(searchValue);
-  /** Skip URL→draft sync once after we wrote the URL ourselves (avoids clobbering fast typing). */
   const skipNextUrlSyncRef = useRef(false);
 
   useEffect(() => {

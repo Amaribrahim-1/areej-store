@@ -25,8 +25,6 @@ type ProductDetailsProps = {
 };
 
 export default function ProductDetails({ slug }: ProductDetailsProps) {
-  // Both queries keyed by slug and start on mount — ProductReviewsList stays
-  // mounted during product loading so reviews are not gated behind product (3.11).
   const { data: product, isLoading, isError, refetch } = useProduct({ slug });
 
   return (
@@ -70,7 +68,6 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
     product.variants,
     selectedVariantId,
   );
-  // Line totals for the selected variant × quantity (display only until cart).
   const lineCurrentPrice = displayVariant.currentPrice * quantity;
   const lineOriginalPrice = displayVariant.originalPrice * quantity;
 
@@ -142,14 +139,11 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
             value={quantity}
             onChange={setQuantity}
           />
-          {/* Cart store + Sonner toast wiring: Phase 4.3 */}
           <Button
             type="button"
             size="lg"
             className="w-full cursor-pointer sm:w-auto sm:min-w-48"
-            onClick={() => {
-              // Intentionally empty until useCartStore exists (Phase 4).
-            }}
+            onClick={() => {}}
           >
             <ShoppingCartIcon data-icon="inline-start" />
             أضف للعربة

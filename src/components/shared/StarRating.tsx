@@ -9,14 +9,11 @@ const MAX_STARS = 5;
 type StarRatingSize = "sm" | "md" | "lg";
 
 type StarRatingProps = {
-  /** 0–5; fractions allowed in display mode (e.g. 4.5). */
   value: number;
   size?: StarRatingSize;
   className?: string;
-  /** When set with onChange, renders an interactive radio-like control. */
   interactive?: boolean;
   onChange?: (value: number) => void;
-  /** Disabled only applies in interactive mode. */
   disabled?: boolean;
   id?: string;
 };

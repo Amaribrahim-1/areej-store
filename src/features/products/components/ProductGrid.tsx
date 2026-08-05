@@ -14,9 +14,6 @@ import type { ProductSort } from "../types";
 import CatalogPagination from "./CatalogPagination";
 import ProductCard from "./ProductCard";
 
-/**
- * Storefront catalog grid — params come from URL via useCatalogFilterParams.
- */
 export default function ProductGrid() {
   const {
     selectedCategory,
@@ -46,7 +43,6 @@ export default function ProductGrid() {
     ? Math.max(1, Math.ceil(data.total / PRODUCTS_PAGE_SIZE))
     : 1;
 
-  // Clamp out-of-range ?page= into the last available page.
   useEffect(() => {
     if (isPending || !data) return;
     if (data.total === 0) return;
@@ -69,7 +65,6 @@ export default function ProductGrid() {
     );
   }
 
-  // Out-of-range ?page= — keep the skeleton up while the URL clamp effect runs.
   if (data.total > 0 && page > totalPages) {
     return <ProductGridSkeleton count={PRODUCTS_PAGE_SIZE} />;
   }
