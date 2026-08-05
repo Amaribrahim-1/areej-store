@@ -1,11 +1,18 @@
-import { CatalogSmoke } from "@/features/products/components/catalog/CatalogSmoke";
-import { ProductSmoke } from "@/features/products/components/catalog/ProductSmoke";
+import ProductGrid from "@/features/products/components/ProductGrid";
 
 export default function ProductsCatalogPage() {
   return (
-    <>
-      <CatalogSmoke />
-      <ProductSmoke />
-    </>
+    <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+      <header className="mb-8 space-y-2 text-start sm:mb-10">
+        <h1 className="font-heading text-3xl font-bold tracking-tight text-brand sm:text-4xl">
+          المنتجات
+        </h1>
+        <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
+          تصفّح مجموعة عطور ومسك ومخمريات زيوت الشعر من أريج.
+        </p>
+      </header>
+
+      <ProductGrid />
+    </section>
   );
 }

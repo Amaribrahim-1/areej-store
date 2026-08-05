@@ -25,28 +25,28 @@ Ordered breakdown of the full MVP, derived from `docs/project-spec.md` and const
 The existing scaffold has three concrete deviations from the agreed standards. Fix them before writing feature code, because every component built after this inherits them.
 
 - [x] **0.1 — Fix RTL + Arabic root layout.**
-  `src/app/layout.tsx` currently ships `lang="en"` with no `dir`. Set `<html dir="rtl" lang="ar">` per `accessibility-rtl.mdc`. Replace the Latin-only fonts (Geist / Geist Mono / Figtree, all `subsets: ['latin']`) with an Arabic-capable font (e.g. Cairo, Tajawal, or IBM Plex Sans Arabic) wired to `--font-sans`. Update `metadata` (still `"Create Next App"`) to the Areej title/description in Arabic.
-  Also flip `"rtl": false` → `true` in `components.json` so future generated Shadcn components come out RTL-aware.
+      `src/app/layout.tsx` currently ships `lang="en"` with no `dir`. Set `<html dir="rtl" lang="ar">` per `accessibility-rtl.mdc`. Replace the Latin-only fonts (Geist / Geist Mono / Figtree, all `subsets: ['latin']`) with an Arabic-capable font (e.g. Cairo, Tajawal, or IBM Plex Sans Arabic) wired to `--font-sans`. Update `metadata` (still `"Create Next App"`) to the Areej title/description in Arabic.
+      Also flip `"rtl": false` → `true` in `components.json` so future generated Shadcn components come out RTL-aware.
 
 - [x] **0.2 — Resolve the icon library conflict.**
-  `package.json` has **both** `lucide-react` and `@hugeicons/*`, and `components.json` has `"iconLibrary": "hugeicons"`. `coding-standards.md` §1 and `stack-conventions.mdc` both say Lucide React only, no second icon library. Decide (Lucide, per the standard), switch `components.json`, and uninstall the loser. Two icon libraries means two bundle costs and two visual languages.
-  🚩 This is exactly the "confirm explicitly if the icon library prompt defaults to something else" case flagged in `stack-conventions.mdc` — it defaulted to hugeicons via the Maia style preset.
+      `package.json` has **both** `lucide-react` and `@hugeicons/*`, and `components.json` has `"iconLibrary": "hugeicons"`. `coding-standards.md` §1 and `stack-conventions.mdc` both say Lucide React only, no second icon library. Decide (Lucide, per the standard), switch `components.json`, and uninstall the loser. Two icon libraries means two bundle costs and two visual languages.
+      🚩 This is exactly the "confirm explicitly if the icon library prompt defaults to something else" case flagged in `stack-conventions.mdc` — it defaulted to hugeicons via the Maia style preset.
 
 - [x] **0.3 — Environment variables.**
-  `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Add a committed `.env.example` documenting required keys with empty values. Confirm `.env*.local` is gitignored.
-  🚩 The service role key must **not** get a `NEXT_PUBLIC_` prefix, ever (`coding-standards.md` §7). If a later task needs it, it stays server-only.
+      `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Add a committed `.env.example` documenting required keys with empty values. Confirm `.env*.local` is gitignored.
+      🚩 The service role key must **not** get a `NEXT_PUBLIC_` prefix, ever (`coding-standards.md` §7). If a later task needs it, it stays server-only.
 
 - [x] **0.4 — Supabase clients.** **`SUPABASE`** **`NEW CONCEPT`** (`@supabase/ssr` in App Router)
-  `src/lib/supabase/client.ts` (browser) and `src/lib/supabase/server.ts` (server components / route handlers), using `@supabase/ssr` — already installed. Cookie-based session handling so auth works across server and client.
+      `src/lib/supabase/client.ts` (browser) and `src/lib/supabase/server.ts` (server components / route handlers), using `@supabase/ssr` — already installed. Cookie-based session handling so auth works across server and client.
 
 - [x] **0.5 — TanStack Query provider.** **`NEW CONCEPT`**
-  A client `Providers` component holding `QueryClientProvider`, mounted in the root layout. Set global defaults (`staleTime`, `retry`) and document the reasoning; per-resource `staleTime` gets tuned in the feature tasks.
+      A client `Providers` component holding `QueryClientProvider`, mounted in the root layout. Set global defaults (`staleTime`, `retry`) and document the reasoning; per-resource `staleTime` gets tuned in the feature tasks.
 
 - [x] **0.6 — Mount Sonner `<Toaster />`** in the root layout, with RTL-correct positioning.
 
 - [x] **0.7 — Shared constants and cross-feature types.**
-  Only `button.tsx` exists in `components/ui/` so far. Create `src/types/` entries for genuinely cross-feature shapes only. Magic strings (`coding-standards.md` §4) live in per-feature `constants.ts`: product categories (`Perfumes / Musk / Fermentation / Hair Oil`) and order statuses (`Pending / Shipping / Delivered / Cancelled`).
-  🚩 Do not add a `Coupon` type, a `shipping_fee` field, or a `stock`/`quantity_available` field to any shared type. Coupons and shipping-fee calculation are backlog items; inventory tracking is out of MVP entirely (spec decision #5).
+      Only `button.tsx` exists in `components/ui/` so far. Create `src/types/` entries for genuinely cross-feature shapes only. Magic strings (`coding-standards.md` §4) live in per-feature `constants.ts`: product categories (`Perfumes / Musk / Fermentation / Hair Oil`) and order statuses (`Pending / Shipping / Delivered / Cancelled`).
+      🚩 Do not add a `Coupon` type, a `shipping_fee` field, or a `stock`/`quantity_available` field to any shared type. Coupons and shipping-fee calculation are backlog items; inventory tracking is out of MVP entirely (spec decision #5).
 
 - [x] **0.8 — Pull the Shadcn primitives the MVP needs** (input, label, form, select, dialog, table, card, badge, textarea, skeleton, dropdown-menu, tabs). Generated files stay untouched in `components/ui/`.
 
@@ -59,10 +59,9 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 `[branch: feature/db-schema]` — **all of Phase 1 is `SUPABASE`: only on explicit request.**
 
 - [x] **1.1 — Schema design review before any SQL.**
-  Tables (`snake_case` plural per `coding-standards.md` §3): `profiles`, `products`, `product_variants`, `orders`, `order_items`, `reviews`, `contact_messages`.
+      Tables (`snake_case` plural per `coding-standards.md` §3): `profiles`, `products`, `product_variants`, `orders`, `order_items`, `reviews`, `contact_messages`.
 
   **Agreed model (do not re-litigate in 1.2):**
-
   - **Always ≥1 `product_variants` row per product.** Prices (`original_price` / `current_price` as `numeric(10,2)`) live only on variants. `volume_label` is nullable. Category does not control variant shape — Alaa picks 1..N size rows per product. Storefront size selector only when `variants.length > 1`.
   - **One required `image_url` on `products`** (shared across all sizes). No per-variant photos in MVP (backlog).
   - `products.status` (`active`/`inactive`) controls storefront visibility; soft-delete only — no hard delete of products.
@@ -78,7 +77,6 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 - [x] **1.2 — Write the migration** for the agreed schema, with constraints (`current_price <= original_price`, rating `1..5`, status enums/checks).
 
 - [x] **1.3 — RLS: enable + default deny on every table**, then explicit policies per role (`coding-standards.md` §7):
-
   - `products` / `product_variants`: public read where `status = 'active'`; write admin-only.
   - `orders` / `order_items`: customer reads only their own rows; admin reads all; only admin updates status.
   - `reviews`: public read; insert only by an authenticated customer; admin read-all.
@@ -88,8 +86,8 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 - [x] **1.4 — Storage bucket for product images** with policies: public read, admin-only write. One image per product. Agree upload caps now: client-side compress/resize to WebP before upload (Alaa should not need to pick dimensions manually); accept common image MIME types; note the 1GB free-tier ceiling.
 
 - [x] **1.5 — Server-side total recalculation.** **`SUPABASE`**
-  A Postgres RPC that takes cart line items, re-reads prices from the DB, computes the order total server-side, and inserts the order + items atomically. Client-submitted totals are display values only (`coding-standards.md` §7).
-  🚩 No shipping fee and no coupon discount enter this calculation. Keep it as `sum(line totals)` — but structure it so a fee/discount could be added later without a rewrite.
+      A Postgres RPC that takes cart line items, re-reads prices from the DB, computes the order total server-side, and inserts the order + items atomically. Client-submitted totals are display values only (`coding-standards.md` §7).
+      🚩 No shipping fee and no coupon discount enter this calculation. Keep it as `sum(line totals)` — but structure it so a fee/discount could be added later without a rewrite.
 
 - [x] **1.6 — Generate TypeScript DB types** into `src/lib/supabase/types.ts` and confirm the generation command is repeatable (it re-runs after every migration).
 
@@ -105,10 +103,10 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 
 `[branch: feature/app-shell]`
 
-- [x] **2.1 — Brand color tokens.** Wire the approved Areej amber scale (`#B8874A` base) into `globals.css` as CSS variables + Tailwind theme tokens (`--brand-*`, semantic `--primary` / `--text-accent` / `--bg-accent` / `--border-accent`). Source of truth for the *why* and usage rules: `docs/color-system.md`. No ad-hoc hex in feature components after this. No dark-mode ramp (out of MVP).
+- [x] **2.1 — Brand color tokens.** Wire the approved Areej amber scale (`#B8874A` base) into `globals.css` as CSS variables + Tailwind theme tokens (`--brand-*`, semantic `--primary` / `--text-accent` / `--bg-accent` / `--border-accent`). Source of truth for the _why_ and usage rules: `docs/color-system.md`. No ad-hoc hex in feature components after this. No dark-mode ramp (out of MVP).
 - [x] **2.2 — Route group skeleton**: `app/(customer)/` and `app/(admin)/` with their own layouts. Route files stay thin (`coding-standards.md` §2).
 - [x] **2.3 — `Navbar`** (`components/shared/`): logo, nav links, cart icon with item count, auth-state-aware account link. Mobile-first: drawer/sheet on small screens. RTL-correct, directional icons flipped.
-  🚩 No wishlist icon in the navbar (backlog). No language toggle (Arabic-only MVP, spec decision #1).
+      🚩 No wishlist icon in the navbar (backlog). No language toggle (Arabic-only MVP, spec decision #1).
 - [x] **2.4 — `Footer`** (`components/shared/`): brand blurb, nav links, contact/social links.
 - [x] **2.5 — `PriceTag`** (`components/shared/`): renders a single price, or original-strikethrough + highlighted current price when discounted. One component, used by product card, product details, cart, and admin. Getting this right once prevents four inconsistent price renderings.
 - [x] **2.6 — `StarRating`** (`components/shared/`): display mode + interactive mode (used by the review form). Needs `aria-label` like `"4 من 5 نجوم"` — custom non-native control (`accessibility-rtl.mdc`).
@@ -127,7 +125,7 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 - [x] **3.1 — `features/products/` skeleton**: `api/`, `components/`, `hooks/`, `schema.ts`, `constants.ts` (DB English category keys + Arabic `PRODUCT_CATEGORY_LABELS` map).
 - [x] **3.2 — Catalog list query** (`getProducts` + `useProducts`): paginated list with search / category / price / rating / sort. Filtering, sorting, and pagination happen in the Supabase query, not in JS after fetching everything. Catalog `staleTime`: 5 minutes (`coding-standards.md` §5). Read model: `catalog_products` view (security_invoker) for display price + rating aggregates.
-  **Locked contract (decide once — UI in 3.6/3.7 only feeds this object):**
+      **Locked contract (decide once — UI in 3.6/3.7 only feeds this object):**
   - Params: `search?` (name `ilike`), `category?`, `minPrice?` / `maxPrice?` (against the product’s min variant `current_price`), `minRating?` (avg rating; products with no reviews excluded when set), `sort` (`newest` default | `price-asc` | `price-desc` | `rating-desc`), `page` (1-based), `pageSize` default `12`.
   - List row shape: product fields + display price pair from the lowest-`current_price` variant (tie-break: lowest `sort_order`) + average rating + review count.
   - Files: pure `api/getProducts.ts` + thin `api/useProducts.ts` (`queryKey: ['products', params]`). Types live in feature-local `features/products/types.ts` — not `src/types/` (cross-feature only) and not inside the hook file.
@@ -141,9 +139,9 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
   - [x] **3.3.2** — `api/getProduct.ts`: fetch active product + nested variants (ordered) + rating fields; return `ProductDetail | null`.
   - [x] **3.3.3** — `api/useProduct.ts`: TanStack Query wrapper (`queryKey: ['product', params]`, catalog `staleTime`).
   - [x] **3.3.4** — Smoke call against seeded data (by slug from seed) proving variants + rating shape.
-- **3.4 — `ProductCard`**: `next/image` (never a raw `<img>`, §5), name, `PriceTag`, rating, category. Meaningful Arabic `alt`. Add the Supabase storage domain to `next.config.ts` `images.remotePatterns`.
-  🚩 No wishlist / heart button on the card (backlog).
-- **3.5 — `ProductGrid` + pagination**, with loading skeletons and an empty state.
+- [x] **3.4 — `ProductCard`**: `next/image` (never a raw `<img>`, §5), name, `PriceTag`, rating, category. Meaningful Arabic `alt`. Add the Supabase storage domain to `next.config.ts` `images.remotePatterns`.
+      🚩 No wishlist / heart button on the card (backlog).
+- [x] **3.5 — `ProductGrid` + pagination**, with loading skeletons and an empty state.
 - **3.6 — Catalog filter UI**: category, price range, rating, sort. Filter state is client/UI state → Zustand or URL search params, never duplicated into a store alongside the server data (`coding-standards.md` §1). Prefer URL params so a filtered catalog is shareable and back-button-correct — decide explicitly.
 - **3.7 — Search input**, debounced, wired to the same query.
   🚩 Category filtering here **is** the "List by Categories" item from the original notes (spec decision #8) — no separate categories page is needed.
@@ -363,7 +361,7 @@ Built after products and reviews exist, because every section on it is driven by
 - **15.10 — Handover to Alaa**: how to add a product, how to update an order status. Arabic.
 - **15.11 — Portfolio README & project writeup.**
   A GitHub-facing `README.md` and a short project writeup usable for the
-  CV/LinkedIn, written *from the accumulated project history* — not
+  CV/LinkedIn, written _from the accumulated project history_ — not
   generated from a fresh read of the final codebase alone. Source material
   to read, in this order: the git log (commit messages carry the real
   decision trail), `project-spec.md`'s Assumptions & Decisions Log, the
@@ -373,7 +371,7 @@ Built after products and reviews exist, because every section on it is driven by
   accurately describe what was deliberately scoped out, not silently
   omit it).
   README covers: what the project is and for whom, the real stack
-  decisions (not a generic list — the *why* behind Base UI/Maia, TanStack
+  decisions (not a generic list — the _why_ behind Base UI/Maia, TanStack
   Query vs Zustand split, RLS design), a few concrete technical
   highlights worth a reviewer's attention (server-side total
   recalculation, RLS column-level grants preventing self-promotion), setup
