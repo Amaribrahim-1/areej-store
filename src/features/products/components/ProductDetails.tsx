@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { PackageXIcon } from "lucide-react";
 
@@ -12,6 +13,9 @@ import { Badge } from "@/components/ui/badge";
 
 import { useProduct } from "../api/useProduct";
 import { PRODUCT_CATEGORY_LABELS } from "../constants";
+import { resolveDisplayVariant } from "../lib/resolveDisplayVariant";
+import type { ProductDetail } from "../types";
+import VariantSelector from "./VariantSelector";
 
 type ProductDetailsProps = {
   slug: string;
@@ -39,14 +43,26 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
     );
   }
 
+  return <ProductDetailsContent product={product} />;
+}
+
+type ProductDetailsContentProps = {
+  product: ProductDetail;
+};
+
+function ProductDetailsContent({ product }: ProductDetailsContentProps) {
+  const [selectedVariantId, setSelectedVariantId] = useState(
+    product.variants[0].id,
+  );
+
   const categoryLabel = PRODUCT_CATEGORY_LABELS[product.category];
-  // Phase 3.8: Use the first variant as the default displayed price.
-  // The variant selector will be built in Phase 3.9 to change this.
-  const displayVariant = product.variants[0];
+  const displayVariant = resolveDisplayVariant(
+    product.variants,
+    selectedVariantId,
+  );
 
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 lg:gap-16">
-      {/* Product Image */}
       <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-brand-50">
         <Image
           src={product.imageUrl}
@@ -58,7 +74,6 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
         />
       </div>
 
-      {/* Product Info */}
       <div className="flex flex-col gap-6 py-4">
         <div className="space-y-4">
           <Badge
@@ -96,6 +111,12 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
           </div>
         </div>
 
+        <VariantSelector
+          variants={product.variants}
+          selectedId={selectedVariantId}
+          onSelect={setSelectedVariantId}
+        />
+
         {product.description ? (
           <div className="space-y-2 border-t border-border pt-6">
             <h2 className="font-heading text-lg font-semibold text-foreground">
@@ -106,11 +127,6 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
             </p>
           </div>
         ) : null}
-
-        {/* Placeholders for Future Tasks */}
-        {/* <div className="mt-4 border-t border-border pt-6">
-           variant selector (3.9) and Add to cart (3.10) will go here
-        </div> */}
       </div>
     </div>
   );
@@ -127,6 +143,14 @@ export function ProductDetailsSkeleton() {
           <Skeleton className="h-5 w-40" />
           <div className="pt-2">
             <Skeleton className="h-8 w-32" />
+          </div>
+        </div>
+        <div className="space-y-3">
+          <Skeleton className="h-5 w-24" />
+          <div className="flex flex-wrap gap-2">
+            <Skeleton className="h-10 w-20 rounded-4xl" />
+            <Skeleton className="h-10 w-20 rounded-4xl" />
+            <Skeleton className="h-10 w-20 rounded-4xl" />
           </div>
         </div>
         <div className="space-y-3 border-t border-border pt-6">
