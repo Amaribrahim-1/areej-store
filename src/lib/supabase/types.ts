@@ -338,6 +338,7 @@ export type Database = {
           id: string | null
           image_url: string | null
           name: string | null
+          name_normalized: string | null
           review_count: number | null
           slug: string | null
           status: string | null

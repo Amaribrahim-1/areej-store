@@ -5,6 +5,7 @@ import {
   PRODUCTS_PAGE_SIZE,
   type ProductCategory,
 } from "../constants";
+import { normalizeArabic } from "../lib/normalizeArabic";
 import type {
   ProductListItem,
   ProductSort,
@@ -126,7 +127,11 @@ export async function getProducts(
     .eq("status", "active");
 
   if (normalized.search) {
-    query = query.ilike("name", `%${normalized.search}%`);
+    // Match against name_normalized (view) so alef/hamza variants align.
+    const searchNormalized = normalizeArabic(normalized.search);
+    if (searchNormalized) {
+      query = query.ilike("name_normalized", `%${searchNormalized}%`);
+    }
   }
   if (normalized.category) {
     query = query.eq("category", normalized.category);
