@@ -3,37 +3,11 @@ import {
   PRODUCT_CATEGORIES,
   type ProductCategory,
 } from "../constants";
-
-/**
- * Storefront single-product API (task 3.3).
- * Lookup by exactly one of slug | id. Active products only.
- * Missing / inactive → null (not a thrown error).
- *
- * Frontend owns feature types + useProduct; call this function from the
- * queryFn only — never supabase.from in components.
- */
-
-type ProductQueryParams = { slug: string } | { id: string };
-
-type ProductVariant = {
-  id: string;
-  volumeLabel: string | null;
-  originalPrice: number;
-  currentPrice: number;
-  sortOrder: number;
-};
-
-type ProductDetail = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  category: ProductCategory;
-  imageUrl: string;
-  averageRating: number | null;
-  reviewCount: number;
-  variants: ProductVariant[];
-};
+import type {
+  ProductDetail,
+  ProductQueryParams,
+  ProductVariant,
+} from "../types";
 
 type ProductRow = {
   id: string;
@@ -63,10 +37,6 @@ function hasSlug(
   return "slug" in params;
 }
 
-/**
- * Fetch one storefront product with variants + rating aggregates.
- * Product row and catalog rating run in parallel (same lookup key).
- */
 export async function getProduct(
   params: ProductQueryParams,
 ): Promise<ProductDetail | null> {
@@ -129,13 +99,15 @@ export async function getProduct(
     throw new Error(`Unexpected product category: ${row.category}`);
   }
 
-  const variants = (row.product_variants ?? []).map((variant) => ({
-    id: variant.id,
-    volumeLabel: variant.volume_label,
-    originalPrice: Number(variant.original_price),
-    currentPrice: Number(variant.current_price),
-    sortOrder: variant.sort_order,
-  }));
+  const variants: ProductVariant[] = (row.product_variants ?? []).map(
+    (variant) => ({
+      id: variant.id,
+      volumeLabel: variant.volume_label,
+      originalPrice: Number(variant.original_price),
+      currentPrice: Number(variant.current_price),
+      sortOrder: variant.sort_order,
+    }),
+  );
 
   if (variants.length === 0) {
     throw new Error(`Product ${row.id} has no variants`);

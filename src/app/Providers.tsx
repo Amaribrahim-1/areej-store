@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  // useState -> one client for browser session
   const [queryClient] = useState(
     () =>
       new QueryClient({

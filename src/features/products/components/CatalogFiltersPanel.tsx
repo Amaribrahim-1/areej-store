@@ -30,7 +30,6 @@ const radioClassName = cn(
 
 type CatalogFiltersPanelProps = {
   className?: string;
-  /** Prefix ids when the panel is rendered twice (desktop + mobile sheet). */
   idPrefix?: string;
 };
 
@@ -53,7 +52,6 @@ export default function CatalogFiltersPanel({
     removeFilters,
   } = useCatalogFilterParams();
 
-  // Draft while typing — commit both prices with «تطبيق».
   const [draftMinPrice, setDraftMinPrice] = useState(minPrice);
   const [draftMaxPrice, setDraftMaxPrice] = useState(maxPrice);
 

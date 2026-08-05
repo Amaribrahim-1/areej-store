@@ -5,7 +5,6 @@ type ContentSkeletonProps = {
   className?: string;
 };
 
-/** Generic product-card shaped placeholder — reused by catalog / home grids. */
 export function ProductCardSkeleton({ className }: ContentSkeletonProps) {
   return (
     <div className={cn("flex flex-col gap-3", className)}>
@@ -42,7 +41,6 @@ export function ProductGridSkeleton({
   );
 }
 
-/** Compact row placeholders for tables / order lists. */
 export function ListSkeleton({
   count = 5,
   className,

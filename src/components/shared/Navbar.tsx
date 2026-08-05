@@ -21,10 +21,8 @@ const NAV_LINKS = [
   { href: "/contact", label: "تواصل" },
 ] as const;
 
-/** Stub until Phase 4 cart store exists. */
 const CART_COUNT_STUB = 6;
 
-/** Stub until Phase 5 auth — treat as guest. */
 const IS_LOGGED_IN_STUB = false;
 
 const accountHref = IS_LOGGED_IN_STUB ? "/orders" : "/login";

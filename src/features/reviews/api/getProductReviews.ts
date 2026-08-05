@@ -1,15 +1,8 @@
 import { createClient } from "@/lib/supabase/client";
 
-import {
-  PRODUCT_REVIEWS_DEFAULT_LIMIT,
-} from "../constants";
+import { PRODUCT_REVIEWS_DEFAULT_LIMIT } from "../constants";
 import type { ProductReview, ProductReviewsQueryParams } from "../types";
 
-/**
- * Storefront product reviews API (task 3.11).
- * Lookup by product slug so callers can run this in parallel with getProduct({ slug }).
- * Empty list when the product is missing/inactive or has no reviews (not an error).
- */
 export async function getProductReviews(
   params: ProductReviewsQueryParams,
 ): Promise<ProductReview[]> {

@@ -13,8 +13,6 @@ import type {
   ProductsQueryParams,
 } from "../types";
 
-// Generated view rows are broadly nullable; we assert required catalog fields
-// after the query (a missing id/name/price is a data bug, not an empty state).
 type CatalogProductRow = Database["public"]["Views"]["catalog_products"]["Row"];
 
 type NormalizedCatalogParams = {
@@ -96,7 +94,6 @@ function sortColumn(sort: ProductSort): {
     case "price-desc":
       return { column: "display_current_price", ascending: false };
     case "rating-desc":
-      // Unrated products sort last when browsing by rating.
       return {
         column: "average_rating",
         ascending: false,
@@ -107,13 +104,6 @@ function sortColumn(sort: ProductSort): {
   }
 }
 
-/**
- * Storefront catalog fetch. Filtering/sorting/pagination run in PostgREST
- * against catalog_products — never load-all-then-filter in JS.
- *
- * Why a DB view: PostgREST cannot filter by min(variant price) or avg(rating)
- * while still paginating correctly without this read model.
- */
 export async function getProducts(
   params: ProductsQueryParams = {},
 ): Promise<ProductsListResult> {
@@ -127,7 +117,6 @@ export async function getProducts(
     .eq("status", "active");
 
   if (normalized.search) {
-    // Match against name_normalized (view) so alef/hamza variants align.
     const searchNormalized = normalizeArabic(normalized.search);
     if (searchNormalized) {
       query = query.ilike("name_normalized", `%${searchNormalized}%`);
@@ -143,7 +132,6 @@ export async function getProducts(
     query = query.lte("display_current_price", normalized.maxPrice);
   }
   if (normalized.minRating !== undefined) {
-    // NULL average_rating fails gte → no-review products are excluded.
     query = query.gte("average_rating", normalized.minRating);
   }
 

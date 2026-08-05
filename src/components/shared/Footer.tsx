@@ -8,10 +8,6 @@ const FOOTER_NAV_LINKS = [
   { href: "/contact", label: "تواصل" },
 ] as const;
 
-/**
- * Lucide dropped brand icons (Instagram, etc.) for trademark reasons.
- * Tiny inline mark keeps the footer recognizable without a second icon lib.
- */
 function InstagramMark({ className }: { className?: string }) {
   return (
     <svg
@@ -31,7 +27,6 @@ function InstagramMark({ className }: { className?: string }) {
   );
 }
 
-/** Placeholders until Alaa provides real profiles / numbers. */
 const SOCIAL_LINKS = [
   {
     href: "https://instagram.com",

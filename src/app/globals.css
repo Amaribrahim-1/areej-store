@@ -66,7 +66,6 @@
 }
 
 :root {
-  /* Brand scale — docs/color-system.md (approved #B8874A) */
   --brand: #b8874a;
   --brand-50: #faf5f0;
   --brand-100: #f3e9dd;
@@ -121,7 +120,6 @@
   --sidebar-ring: var(--brand-500);
 }
 
-/* Dark tokens kept for Shadcn completeness — unused in MVP (see docs/color-system.md). */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
