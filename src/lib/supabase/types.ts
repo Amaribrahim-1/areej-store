@@ -348,6 +348,17 @@ export type Database = {
       }
     }
     Functions: {
+      list_product_reviews: {
+        Args: { p_limit?: number; p_product_slug: string }
+        Returns: {
+          author_name: string
+          comment: string
+          created_at: string
+          id: string
+          product_id: string
+          rating: number
+        }[]
+      }
       place_order: {
         Args: {
           address_text: string

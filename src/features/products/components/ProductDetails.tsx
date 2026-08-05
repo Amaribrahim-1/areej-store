@@ -11,6 +11,7 @@ import ErrorState from "@/components/shared/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import ProductReviewsList from "@/features/reviews/components/product/ProductReviewsList";
 
 import { useProduct } from "../api/useProduct";
 import { PRODUCT_CATEGORY_LABELS } from "../constants";
@@ -24,28 +25,34 @@ type ProductDetailsProps = {
 };
 
 export default function ProductDetails({ slug }: ProductDetailsProps) {
+  // Both queries keyed by slug and start on mount — ProductReviewsList stays
+  // mounted during product loading so reviews are not gated behind product (3.11).
   const { data: product, isLoading, isError, refetch } = useProduct({ slug });
 
-  if (isLoading) {
-    return <ProductDetailsSkeleton />;
-  }
+  return (
+    <>
+      {isLoading ? <ProductDetailsSkeleton /> : null}
 
-  if (isError) {
-    return <ErrorState onRetry={() => refetch()} />;
-  }
+      {!isLoading && isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : null}
 
-  if (!product) {
-    return (
-      <EmptyState
-        icon={<PackageXIcon />}
-        title="المنتج غير موجود"
-        description="عذراً، المنتج الذي تبحث عنه غير موجود أو تم إخفاؤه."
-        className="min-h-[50vh]"
-      />
-    );
-  }
+      {!isLoading && !isError && !product ? (
+        <EmptyState
+          icon={<PackageXIcon />}
+          title="المنتج غير موجود"
+          description="عذراً، المنتج الذي تبحث عنه غير موجود أو تم إخفاؤه."
+          className="min-h-[50vh]"
+        />
+      ) : null}
 
-  return <ProductDetailsContent product={product} />;
+      {!isLoading && !isError && product ? (
+        <ProductDetailsContent product={product} />
+      ) : null}
+
+      <ProductReviewsList slug={slug} />
+    </>
+  );
 }
 
 type ProductDetailsContentProps = {
