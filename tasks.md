@@ -163,7 +163,7 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **4.2 — `features/cart/store.ts`**: `useCartStore` with add / remove / update-quantity / clear. Cart lines are keyed by `product_id + variant_id` — the same perfume in 5ml and 100ml are two distinct lines. Persist to `localStorage` so a guest's cart survives a refresh (guests can add to cart per spec).
       🚩 Cart is pure client state. Do **not** mirror product data from TanStack Query into this store (`coding-standards.md` §1) — store identifiers + the quantity, and read display data from the query cache.
 - [x] **4.3 — Add-to-Cart wiring** from product details (and card, if applicable) + Sonner success toast.
-- **4.4 — Cart page**: line list (image, name, variant label, quantity control, line total), remove action. Handlers inside `.map()` extracted into named functions (§4).
+- [x] **4.4 — Cart page**: line list (image, name, variant label, quantity control, line total), remove action. Handlers inside `.map()` extracted into named functions (§4).
 - **4.5 — `CartTotals`**: subtotal and total (identical for MVP).
   🚩 No coupon code input (backlog). No shipping fee line (backlog, spec decision #4). No "estimated delivery" field. Total = sum of line totals, and this is a display value only — Phase 1.5 recalculates it server-side.
 - **4.6 — Empty cart state** with a link back to the catalog.

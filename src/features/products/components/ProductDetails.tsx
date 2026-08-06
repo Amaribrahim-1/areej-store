@@ -4,24 +4,22 @@ import { useState } from "react";
 import Image from "next/image";
 import { PackageXIcon, ShoppingCartIcon } from "lucide-react";
 
-import PriceTag, { formatPrice } from "@/components/shared/PriceTag";
-import StarRating from "@/components/shared/StarRating";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
-import { Skeleton } from "@/components/ui/skeleton";
+import PriceTag, { formatPrice } from "@/components/shared/PriceTag";
+import QuantitySelector from "@/components/shared/QuantitySelector";
+import StarRating from "@/components/shared/StarRating";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import ProductReviewsList from "@/features/reviews/components/product/ProductReviewsList";
-
-import { toast } from "sonner";
-
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCartStore } from "@/features/cart/store";
+import ProductReviewsList from "@/features/reviews/components/product/ProductReviewsList";
+import { toast } from "sonner";
 
 import { useProduct } from "../api/useProduct";
 import { PRODUCT_CATEGORY_LABELS } from "../constants";
 import { resolveDisplayVariant } from "../lib/resolveDisplayVariant";
 import type { ProductDetail } from "../types";
-import QuantitySelector from "./QuantitySelector";
 import VariantSelector from "./VariantSelector";
 
 type ProductDetailsProps = {
