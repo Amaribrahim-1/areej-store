@@ -74,7 +74,12 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
   const addItem = useCartStore((state) => state.addItem);
 
   function addToCart() {
-    addItem(product.id, displayVariant.id, quantity);
+    addItem({
+      productId: product.id,
+      variantId: displayVariant.id,
+      quantity,
+      unitPriceSnapshot: displayVariant.currentPrice,
+    });
     toast.success("تمت الإضافة إلى العربة");
   }
 

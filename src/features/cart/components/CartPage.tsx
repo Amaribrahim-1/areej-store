@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCartIcon } from "lucide-react";
+import { InfoIcon, ShoppingCartIcon } from "lucide-react";
 
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
@@ -18,6 +18,7 @@ type CartPageProps = {
   lines: CartLineItemData[];
   isPending?: boolean;
   isError?: boolean;
+  showPriceDriftNotice?: boolean;
   onRetry?: () => void;
   onQuantityChange: (
     productId: string,
@@ -31,6 +32,7 @@ export default function CartPage({
   lines,
   isPending = false,
   isError = false,
+  showPriceDriftNotice = false,
   onRetry,
   onQuantityChange,
   onRemove,
@@ -70,6 +72,20 @@ export default function CartPage({
 
       {!isPending && !isError && hasLines ? (
         <>
+          {showPriceDriftNotice ? (
+            <div
+              role="status"
+              className="flex gap-3 rounded-2xl border border-border bg-brand-50 px-4 py-3 text-sm text-foreground"
+            >
+              <InfoIcon
+                className="mt-0.5 size-4 shrink-0 text-brand-700"
+                aria-hidden
+              />
+              <p>
+                تم تحديث أسعار بعض المنتجات في السلة وفقًا لأحدث سعر متاح.
+              </p>
+            </div>
+          ) : null}
           <CartLinesList
             lines={lines}
             onQuantityChange={onQuantityChange}
