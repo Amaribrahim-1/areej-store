@@ -15,6 +15,7 @@ export default function CartPageClient() {
   const items = useCartStore((state) => state.items);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
+  const clear = useCartStore((state) => state.clear);
   const syncUnitPriceSnapshots = useCartStore(
     (state) => state.syncUnitPriceSnapshots,
   );
@@ -81,6 +82,11 @@ export default function CartPageClient() {
     toast.success("تم حذف المنتج من السلة");
   }
 
+  function handleClear() {
+    clear();
+    toast.success("تم إفراغ السلة");
+  }
+
   function handleRetry() {
     void refetch();
   }
@@ -94,6 +100,7 @@ export default function CartPageClient() {
       onRetry={handleRetry}
       onQuantityChange={handleQuantityChange}
       onRemove={handleRemove}
+      onClear={handleClear}
     />
   );
 }

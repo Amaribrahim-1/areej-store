@@ -5,7 +5,7 @@ import { InfoIcon, ShoppingCartIcon } from "lucide-react";
 
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 import { computeCartSubtotal } from "../lib/computeCartSubtotal";
@@ -26,6 +26,7 @@ type CartPageProps = {
     quantity: number,
   ) => void;
   onRemove: (productId: string, variantId: string) => void;
+  onClear: () => void;
 };
 
 export default function CartPage({
@@ -36,20 +37,28 @@ export default function CartPage({
   onRetry,
   onQuantityChange,
   onRemove,
+  onClear,
 }: CartPageProps) {
   const subtotal = computeCartSubtotal(lines);
   const hasLines = lines.length > 0;
 
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
-          سلة التسوق
-        </h1>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-1">
+          <h1 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
+            سلة التسوق
+          </h1>
+          {!isPending && !isError && hasLines ? (
+            <p className="text-sm text-muted-foreground">
+              {lines.length} {lines.length === 1 ? "منتج" : "منتجات"}
+            </p>
+          ) : null}
+        </div>
         {!isPending && !isError && hasLines ? (
-          <p className="text-sm text-muted-foreground">
-            {lines.length} {lines.length === 1 ? "منتج" : "منتجات"}
-          </p>
+          <Button type="button" variant="outline" size="sm" onClick={onClear}>
+            إفراغ السلة
+          </Button>
         ) : null}
       </header>
 
