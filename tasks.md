@@ -175,6 +175,14 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
       - Navbar cart badge reads live `sum(quantity)` from `useCartStore` (replaces Phase 2 stub).
       - Cart page “إفراغ السلة” clear action wired to store `clear()`.
       - Product card hover/focus actions: “معاينة” + “أضف” (mobile always visible).
+- [x] **4.9 — Cart test tooling setup**
+      Add a minimal unit-test runner for the app (prefer Vitest if it fits the Next setup). One shared config + `npm test` (or equivalent) script. No feature tests in this task — tooling only.
+- [x] **4.10 — Cart pure-logic unit tests**
+      Unit tests for cart helpers only (no UI / no E2E):
+      - `computeCartSubtotal`
+      - `resolveCartPriceDrift` (drift, no-drift, missing snapshot silent sync)
+      - `getCartItemCount`
+      Keep cases small: empty / one / many lines. Ship before merging `feature/cart` into `main`.
 
 `[commit: feat(cart): zustand store with persist, feat(cart): cart page and totals]`
 
