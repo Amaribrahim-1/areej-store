@@ -80,6 +80,13 @@ function mapCatalogRow(row: CatalogProductRow): ProductListItem {
         ? null
         : Number(row.average_rating),
     reviewCount: Number(row.review_count ?? 0),
+    displayVariantId: requireCatalogField(
+      row.display_variant_id,
+      "display_variant_id",
+    ),
+    variantCount: Number(
+      requireCatalogField(row.variant_count, "variant_count"),
+    ),
   };
 }
 

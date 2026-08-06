@@ -335,6 +335,7 @@ export type Database = {
           description: string | null
           display_current_price: number | null
           display_original_price: number | null
+          display_variant_id: string | null
           id: string | null
           image_url: string | null
           name: string | null
@@ -343,6 +344,7 @@ export type Database = {
           slug: string | null
           status: string | null
           updated_at: string | null
+          variant_count: number | null
         }
         Relationships: []
       }
