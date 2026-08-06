@@ -164,8 +164,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
       🚩 Cart is pure client state. Do **not** mirror product data from TanStack Query into this store (`coding-standards.md` §1) — store identifiers + the quantity, and read display data from the query cache.
 - [x] **4.3 — Add-to-Cart wiring** from product details (and card, if applicable) + Sonner success toast.
 - [x] **4.4 — Cart page**: line list (image, name, variant label, quantity control, line total), remove action. Handlers inside `.map()` extracted into named functions (§4).
-- **4.5 — `CartTotals`**: subtotal and total (identical for MVP).
-  🚩 No coupon code input (backlog). No shipping fee line (backlog, spec decision #4). No "estimated delivery" field. Total = sum of line totals, and this is a display value only — Phase 1.5 recalculates it server-side.
+- [x] **4.5 — `CartTotals`**: subtotal and total (identical for MVP).
+      🚩 No coupon code input (backlog). No shipping fee line (backlog, spec decision #4). No "estimated delivery" field. Total = sum of line totals, and this is a display value only — Phase 1.5 recalculates it server-side.
 - **4.6 — Empty cart state** with a link back to the catalog.
 - **4.7 — Price-drift handling**: a persisted cart can hold a price that changed since it was stored. Decide the behaviour (re-read current price on render, warn on change, or silently update) — this is a real correctness question, not a polish item.
 

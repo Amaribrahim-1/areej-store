@@ -2,9 +2,11 @@
 
 import ErrorState from "@/components/shared/ErrorState";
 
+import { computeCartSubtotal } from "../lib/computeCartSubtotal";
 import type { CartLineItemData } from "../types";
 import CartLinesList from "./CartLinesList";
 import CartLinesSkeleton from "./CartLinesSkeleton";
+import CartTotals from "./CartTotals";
 
 type CartPageProps = {
   lines: CartLineItemData[];
@@ -27,6 +29,7 @@ export default function CartPage({
   onQuantityChange,
   onRemove,
 }: CartPageProps) {
+  const subtotal = computeCartSubtotal(lines);
   return (
     <div className="space-y-6">
       <header className="space-y-1">
@@ -45,11 +48,16 @@ export default function CartPage({
       {!isPending && isError ? <ErrorState onRetry={onRetry} /> : null}
 
       {!isPending && !isError ? (
-        <CartLinesList
-          lines={lines}
-          onQuantityChange={onQuantityChange}
-          onRemove={onRemove}
-        />
+        <>
+          <CartLinesList
+            lines={lines}
+            onQuantityChange={onQuantityChange}
+            onRemove={onRemove}
+          />
+          {lines.length > 0 ? (
+            <CartTotals subtotal={subtotal} total={subtotal} />
+          ) : null}
+        </>
       ) : null}
     </div>
   );
