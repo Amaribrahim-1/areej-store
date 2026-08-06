@@ -159,9 +159,9 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 `[branch: feature/cart]` — **`NEW CONCEPT`** (Zustand beyond a toy app)
 
-- **4.1 — Standalone Zustand teaching example first** (per `ai-interactions.md` New Concept Protocol): a tiny store with `persist`, outside the project, before touching real cart code.
-- **4.2 — `features/cart/store.ts`**: `useCartStore` with add / remove / update-quantity / clear. Cart lines are keyed by `product_id + variant_id` — the same perfume in 5ml and 100ml are two distinct lines. Persist to `localStorage` so a guest's cart survives a refresh (guests can add to cart per spec).
-  🚩 Cart is pure client state. Do **not** mirror product data from TanStack Query into this store (`coding-standards.md` §1) — store identifiers + the quantity, and read display data from the query cache.
+- [x] **4.1 — Standalone Zustand teaching example first** (per `ai-interactions.md` New Concept Protocol): a tiny store with `persist`, outside the project, before touching real cart code.
+- [x] **4.2 — `features/cart/store.ts`**: `useCartStore` with add / remove / update-quantity / clear. Cart lines are keyed by `product_id + variant_id` — the same perfume in 5ml and 100ml are two distinct lines. Persist to `localStorage` so a guest's cart survives a refresh (guests can add to cart per spec).
+      🚩 Cart is pure client state. Do **not** mirror product data from TanStack Query into this store (`coding-standards.md` §1) — store identifiers + the quantity, and read display data from the query cache.
 - **4.3 — Add-to-Cart wiring** from product details (and card, if applicable) + Sonner success toast.
 - **4.4 — Cart page**: line list (image, name, variant label, quantity control, line total), remove action. Handlers inside `.map()` extracted into named functions (§4).
 - **4.5 — `CartTotals`**: subtotal and total (identical for MVP).
