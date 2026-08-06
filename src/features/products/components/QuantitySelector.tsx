@@ -34,51 +34,46 @@ export default function QuantitySelector({
   return (
     <div
       className={cn(
-        "inline-flex h-11 items-center rounded-4xl border border-border bg-background",
+        "flex h-11 w-full items-center justify-between rounded-4xl border border-border bg-background px-1",
+        "sm:inline-flex sm:w-auto sm:min-w-36 sm:justify-center sm:gap-1",
         className,
       )}
       role="group"
       aria-label="الكمية"
     >
-      <span
-        className="border-e border-border px-3 text-sm font-medium text-muted-foreground"
-        aria-hidden
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={decrease}
+        disabled={atMin}
+        aria-label="تقليل الكمية"
+        className={cn(
+          "size-9 shrink-0 rounded-full",
+          atMin && "disabled:pointer-events-auto disabled:cursor-not-allowed",
+        )}
       >
-        الكمية
-      </span>
-      <div className="inline-flex items-center gap-0.5 p-1">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          onClick={decrease}
-          disabled={atMin}
-          aria-label="تقليل الكمية"
-          className={cn(
-            "rounded-full",
-            atMin && "disabled:pointer-events-auto disabled:cursor-not-allowed",
-          )}
-        >
-          <MinusIcon />
-        </Button>
-        <output
-          id={id}
-          aria-live="polite"
-          className="min-w-10 text-center text-base font-medium tabular-nums text-foreground"
-        >
-          {value}
-        </output>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          onClick={increase}
-          aria-label="زيادة الكمية"
-          className="rounded-full"
-        >
-          <PlusIcon />
-        </Button>
-      </div>
+        <MinusIcon />
+      </Button>
+
+      <output
+        id={id}
+        aria-live="polite"
+        className="min-w-10 flex-1 text-center text-base font-semibold tabular-nums text-foreground sm:flex-none sm:px-2"
+      >
+        {value}
+      </output>
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={increase}
+        aria-label="زيادة الكمية"
+        className="size-9 shrink-0 rounded-full"
+      >
+        <PlusIcon />
+      </Button>
     </div>
   );
 }
