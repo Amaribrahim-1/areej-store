@@ -4,20 +4,22 @@ import { useState } from "react";
 import Image from "next/image";
 import { PackageXIcon, ShoppingCartIcon } from "lucide-react";
 
-import PriceTag, { formatPrice } from "@/components/shared/PriceTag";
-import StarRating from "@/components/shared/StarRating";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
-import { Skeleton } from "@/components/ui/skeleton";
+import PriceTag, { formatPrice } from "@/components/shared/PriceTag";
+import QuantitySelector from "@/components/shared/QuantitySelector";
+import StarRating from "@/components/shared/StarRating";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useCartStore } from "@/features/cart/store";
 import ProductReviewsList from "@/features/reviews/components/product/ProductReviewsList";
+import { toast } from "sonner";
 
 import { useProduct } from "../api/useProduct";
 import { PRODUCT_CATEGORY_LABELS } from "../constants";
 import { resolveDisplayVariant } from "../lib/resolveDisplayVariant";
 import type { ProductDetail } from "../types";
-import QuantitySelector from "./QuantitySelector";
 import VariantSelector from "./VariantSelector";
 
 type ProductDetailsProps = {
@@ -31,9 +33,7 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
     <>
       {isLoading ? <ProductDetailsSkeleton /> : null}
 
-      {!isLoading && isError ? (
-        <ErrorState onRetry={() => refetch()} />
-      ) : null}
+      {!isLoading && isError ? <ErrorState onRetry={() => refetch()} /> : null}
 
       {!isLoading && !isError && !product ? (
         <EmptyState
@@ -70,6 +70,18 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
   );
   const lineCurrentPrice = displayVariant.currentPrice * quantity;
   const lineOriginalPrice = displayVariant.originalPrice * quantity;
+
+  const addItem = useCartStore((state) => state.addItem);
+
+  function addToCart() {
+    addItem({
+      productId: product.id,
+      variantId: displayVariant.id,
+      quantity,
+      unitPriceSnapshot: displayVariant.currentPrice,
+    });
+    toast.success("تمت الإضافة إلى العربة");
+  }
 
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 lg:gap-16">
@@ -134,16 +146,21 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
         />
 
         <div className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center">
-          <QuantitySelector
-            id="product-quantity"
-            value={quantity}
-            onChange={setQuantity}
-          />
+          <div className="space-y-2 sm:space-y-0">
+            <p className="text-sm font-medium text-muted-foreground sm:sr-only">
+              الكمية
+            </p>
+            <QuantitySelector
+              id="product-quantity"
+              value={quantity}
+              onChange={setQuantity}
+            />
+          </div>
           <Button
             type="button"
             size="lg"
             className="w-full cursor-pointer sm:w-auto sm:min-w-48"
-            onClick={() => {}}
+            onClick={addToCart}
           >
             <ShoppingCartIcon data-icon="inline-start" />
             أضف للعربة
@@ -187,7 +204,10 @@ export function ProductDetailsSkeleton() {
           </div>
         </div>
         <div className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center">
-          <Skeleton className="h-11 w-40 rounded-4xl" />
+          <div className="space-y-2 sm:space-y-0">
+            <Skeleton className="h-4 w-14 sm:hidden" />
+            <Skeleton className="h-11 w-full rounded-4xl sm:w-36" />
+          </div>
           <Skeleton className="h-10 w-full rounded-4xl sm:w-48" />
         </div>
         <div className="space-y-3 border-t border-border pt-6">

@@ -107,6 +107,7 @@ The existing scaffold has three concrete deviations from the agreed standards. F
 - [x] **2.2 — Route group skeleton**: `app/(customer)/` and `app/(admin)/` with their own layouts. Route files stay thin (`coding-standards.md` §2).
 - [x] **2.3 — `Navbar`** (`components/shared/`): logo, nav links, cart icon with item count, auth-state-aware account link. Mobile-first: drawer/sheet on small screens. RTL-correct, directional icons flipped.
       🚩 No wishlist icon in the navbar (backlog). No language toggle (Arabic-only MVP, spec decision #1).
+      Live cart badge count wired in **4.8** (replaces the Phase 2 stub).
 - [x] **2.4 — `Footer`** (`components/shared/`): brand blurb, nav links, contact/social links.
 - [x] **2.5 — `PriceTag`** (`components/shared/`): renders a single price, or original-strikethrough + highlighted current price when discounted. One component, used by product card, product details, cart, and admin. Getting this right once prevents four inconsistent price renderings.
 - [x] **2.6 — `StarRating`** (`components/shared/`): display mode + interactive mode (used by the review form). Needs `aria-label` like `"4 من 5 نجوم"` — custom non-native control (`accessibility-rtl.mdc`).
@@ -159,15 +160,29 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 `[branch: feature/cart]` — **`NEW CONCEPT`** (Zustand beyond a toy app)
 
-- **4.1 — Standalone Zustand teaching example first** (per `ai-interactions.md` New Concept Protocol): a tiny store with `persist`, outside the project, before touching real cart code.
-- **4.2 — `features/cart/store.ts`**: `useCartStore` with add / remove / update-quantity / clear. Cart lines are keyed by `product_id + variant_id` — the same perfume in 5ml and 100ml are two distinct lines. Persist to `localStorage` so a guest's cart survives a refresh (guests can add to cart per spec).
-  🚩 Cart is pure client state. Do **not** mirror product data from TanStack Query into this store (`coding-standards.md` §1) — store identifiers + the quantity, and read display data from the query cache.
-- **4.3 — Add-to-Cart wiring** from product details (and card, if applicable) + Sonner success toast.
-- **4.4 — Cart page**: line list (image, name, variant label, quantity control, line total), remove action. Handlers inside `.map()` extracted into named functions (§4).
-- **4.5 — `CartTotals`**: subtotal and total (identical for MVP).
-  🚩 No coupon code input (backlog). No shipping fee line (backlog, spec decision #4). No "estimated delivery" field. Total = sum of line totals, and this is a display value only — Phase 1.5 recalculates it server-side.
-- **4.6 — Empty cart state** with a link back to the catalog.
-- **4.7 — Price-drift handling**: a persisted cart can hold a price that changed since it was stored. Decide the behaviour (re-read current price on render, warn on change, or silently update) — this is a real correctness question, not a polish item.
+- [x] **4.1 — Standalone Zustand teaching example first** (per `ai-interactions.md` New Concept Protocol): a tiny store with `persist`, outside the project, before touching real cart code.
+- [x] **4.2 — `features/cart/store.ts`**: `useCartStore` with add / remove / update-quantity / clear. Cart lines are keyed by `product_id + variant_id` — the same perfume in 5ml and 100ml are two distinct lines. Persist to `localStorage` so a guest's cart survives a refresh (guests can add to cart per spec).
+      🚩 Cart is pure client state. Do **not** mirror product data from TanStack Query into this store (`coding-standards.md` §1) — store identifiers + the quantity, and read display data from the query cache.
+- [x] **4.3 — Add-to-Cart wiring** from product details (and card, if applicable) + Sonner success toast.
+      **Card decision:** single-variant products add immediately from the card; multi-variant products toast + navigate to details to pick a size. Catalog view exposes `display_variant_id` + `variant_count` for this.
+- [x] **4.4 — Cart page**: line list (image, name, variant label, quantity control, line total), remove action. Handlers inside `.map()` extracted into named functions (§4).
+- [x] **4.5 — `CartTotals`**: subtotal and total (identical for MVP).
+      🚩 No coupon code input (backlog). No shipping fee line (backlog, spec decision #4). No "estimated delivery" field. Total = sum of line totals, and this is a display value only — Phase 1.5 recalculates it server-side.
+- [x] **4.6 — Empty cart state** with a link back to the catalog.
+- [x] **4.7 — Price-drift handling**: a persisted cart can hold a price that changed since it was stored. Decide the behaviour (re-read current price on render, warn on change, or silently update) — this is a real correctness question, not a polish item.
+      **Decision:** re-read live prices for display/totals, warn with an inline notice when a line’s `unitPriceSnapshot` differs, then sync the snapshot so the notice doesn’t repeat. Legacy lines missing a snapshot sync silently (no notice).
+- [x] **4.8 — Cart UX polish (same `feature/cart` branch):**
+      - Navbar cart badge reads live `sum(quantity)` from `useCartStore` (replaces Phase 2 stub).
+      - Cart page “إفراغ السلة” clear action wired to store `clear()`.
+      - Product card hover/focus actions: “معاينة” + “أضف” (mobile always visible).
+- [x] **4.9 — Cart test tooling setup**
+      Add a minimal unit-test runner for the app (prefer Vitest if it fits the Next setup). One shared config + `npm test` (or equivalent) script. No feature tests in this task — tooling only.
+- [x] **4.10 — Cart pure-logic unit tests**
+      Unit tests for cart helpers only (no UI / no E2E):
+      - `computeCartSubtotal`
+      - `resolveCartPriceDrift` (drift, no-drift, missing snapshot silent sync)
+      - `getCartItemCount`
+      Keep cases small: empty / one / many lines. Ship before merging `feature/cart` into `main`.
 
 `[commit: feat(cart): zustand store with persist, feat(cart): cart page and totals]`
 

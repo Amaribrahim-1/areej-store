@@ -24,6 +24,9 @@ export type ProductListItem = {
   originalPrice: number;
   averageRating: number | null;
   reviewCount: number;
+  /** Variant used for the catalog display price (lowest current_price, then sort_order). */
+  displayVariantId: string;
+  variantCount: number;
 };
 
 export type ProductsListResult = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MenuIcon, ShoppingCartIcon, UserIcon } from "lucide-react";
 
@@ -12,6 +12,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { getCartItemCount } from "@/features/cart/lib/getCartItemCount";
+import { useCartStore } from "@/features/cart/store";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -20,8 +22,6 @@ const NAV_LINKS = [
   { href: "/about", label: "عنّا" },
   { href: "/contact", label: "تواصل" },
 ] as const;
-
-const CART_COUNT_STUB = 6;
 
 const IS_LOGGED_IN_STUB = false;
 
@@ -55,10 +55,18 @@ function NavLink({
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+  const cartCount = useCartStore((state) => getCartItemCount(state.items));
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   function closeMobileNav() {
     setMobileOpen(false);
   }
+
+  const badgeCount = hasMounted ? cartCount : 0;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80">
@@ -98,14 +106,14 @@ export default function Navbar() {
           <Link
             href="/cart"
             aria-label={
-              CART_COUNT_STUB > 0 ? `السلة، ${CART_COUNT_STUB} عناصر` : "السلة"
+              badgeCount > 0 ? `السلة، ${badgeCount} عناصر` : "السلة"
             }
             className="relative inline-flex size-9 items-center justify-center rounded-4xl text-foreground transition-colors hover:bg-muted hover:text-text-accent"
           >
             <ShoppingCartIcon className="size-5" aria-hidden />
-            {CART_COUNT_STUB > 0 ? (
+            {badgeCount > 0 ? (
               <span className="absolute -top-0.5 -start-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                {CART_COUNT_STUB > 99 ? "99+" : CART_COUNT_STUB}
+                {badgeCount > 99 ? "99+" : badgeCount}
               </span>
             ) : null}
           </Link>
