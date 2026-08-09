@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
@@ -9,9 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { useLogin } from "../api/useLogin";
 import { loginSchema, type LoginType } from "../schema";
 
 export default function LoginForm() {
+  const router = useRouter();
+  const { mutate, isPending } = useLogin();
+
   const {
     register,
     handleSubmit,
@@ -26,8 +31,12 @@ export default function LoginForm() {
   });
 
   const onSubmit: SubmitHandler<LoginType> = (data) => {
-    // Smoke only until 5.7 wires session / sign-in
-    console.log(data);
+    mutate(data, {
+      onSuccess: () => {
+        router.push("/");
+        router.refresh();
+      },
+    });
   };
 
   return (
@@ -73,8 +82,8 @@ export default function LoginForm() {
         <FieldError message={errors.password?.message} />
       </div>
 
-      <Button type="submit" className="w-full" size="lg">
-        دخول
+      <Button type="submit" disabled={isPending} className="w-full" size="lg">
+        {isPending ? "جاري الدخول..." : "دخول"}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">

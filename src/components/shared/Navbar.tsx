@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { MenuIcon, ShoppingCartIcon, UserIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { LogOutIcon, MenuIcon, ShoppingCartIcon, UserIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +13,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { type AuthUser } from "@/features/auth/api/getCurrentUser";
+import { useSignOut } from "@/features/auth/api/useSignout";
 import { getCartItemCount } from "@/features/cart/lib/getCartItemCount";
 import { useCartStore } from "@/features/cart/store";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -22,11 +26,6 @@ const NAV_LINKS = [
   { href: "/about", label: "عنّا" },
   { href: "/contact", label: "تواصل" },
 ] as const;
-
-const IS_LOGGED_IN_STUB = false;
-
-const accountHref = IS_LOGGED_IN_STUB ? "/orders" : "/login";
-const accountLabel = IS_LOGGED_IN_STUB ? "حسابي" : "تسجيل الدخول";
 
 function NavLink({
   href,
@@ -53,7 +52,15 @@ function NavLink({
   );
 }
 
-export default function Navbar() {
+type NavbarProps = {
+  initialUser: AuthUser | null;
+};
+
+export default function Navbar({ initialUser }: NavbarProps) {
+  const router = useRouter();
+  const { mutate: signOut, isPending: isSigningOut } = useSignOut();
+
+  const [user, setUser] = useState(initialUser);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const cartCount = useCartStore((state) => getCartItemCount(state.items));
@@ -62,11 +69,45 @@ export default function Navbar() {
     setHasMounted(true);
   }, []);
 
+  useEffect(() => {
+    setUser(initialUser);
+  }, [initialUser]);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const nextUser = session?.user;
+      setUser(
+        nextUser
+          ? { id: nextUser.id, email: nextUser.email ?? null }
+          : null,
+      );
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   function closeMobileNav() {
     setMobileOpen(false);
   }
 
+  function handleSignOut() {
+    signOut(undefined, {
+      onSuccess: () => {
+        closeMobileNav();
+        router.push("/");
+        router.refresh();
+      },
+    });
+  }
+
   const badgeCount = hasMounted ? cartCount : 0;
+  const isLoggedIn = user !== null;
+  const accountHref = isLoggedIn ? "/orders" : "/login";
+  const accountLabel = isLoggedIn ? "حسابي" : "تسجيل الدخول";
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80">
@@ -94,6 +135,19 @@ export default function Navbar() {
           >
             {accountLabel}
           </Link>
+
+          {isLoggedIn ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="hidden md:inline-flex"
+              disabled={isSigningOut}
+              onClick={handleSignOut}
+            >
+              {isSigningOut ? "جاري الخروج..." : "خروج"}
+            </Button>
+          ) : null}
 
           <Link
             href={accountHref}
@@ -157,7 +211,7 @@ export default function Navbar() {
                 ))}
               </nav>
 
-              <div className="mt-auto border-t border-border p-4">
+              <div className="mt-auto space-y-1 border-t border-border p-4">
                 <Link
                   href={accountHref}
                   onClick={closeMobileNav}
@@ -166,6 +220,18 @@ export default function Navbar() {
                   <UserIcon className="size-5" aria-hidden />
                   {accountLabel}
                 </Link>
+
+                {isLoggedIn ? (
+                  <button
+                    type="button"
+                    disabled={isSigningOut}
+                    onClick={handleSignOut}
+                    className="flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-start text-base font-medium text-foreground/80 transition-colors hover:bg-muted disabled:opacity-50"
+                  >
+                    <LogOutIcon className="size-5" aria-hidden />
+                    {isSigningOut ? "جاري الخروج..." : "تسجيل الخروج"}
+                  </button>
+                ) : null}
               </div>
             </SheetContent>
           </Sheet>
