@@ -188,7 +188,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 - [x] **5.1 — Standalone RHF + Zod example first**: a two-field form with `zodResolver` and error rendering, isolated from the project.
 - [x] **5.2 — `features/auth/schema.ts`**: `loginSchema` and `registerSchema` (Name, Phone, Password, Address = governorate + markaz + free-text description). Egyptian phone-format validation. Password rules agreed explicitly, not invented.
-- **5.3 — Governorate → Markaz data source**: a static local dataset (governorate list, and markaz list per governorate) under `features/auth/` or `lib/`. Decide upfront: full Egypt list, or only Alaa's delivery areas? Spec says she currently delivers to nearby areas only.
+- [x] **5.3 — Governorate → Markaz data source**: a static local dataset (governorate list, and markaz list per governorate) under `features/auth/` or `lib/`. Decide upfront: full Egypt list, or only Alaa's delivery areas? Spec says she currently delivers to nearby areas only.
+      **Decision:** full Egypt (27 governorates + markaz/districts). English keys for storage, Arabic labels for UI. Source: Open Admin Data (CC-BY-4.0). Shipping-fee-by-area stays backlog.
 - **5.4 — Register form**: dependent selects (markaz options depend on selected governorate), free-text location field with the spec's example as hint text (`"محافظة كفر الشيخ – مركز كفر الشيخ – قرية قراجة، جانب موقف الأتوبيس"`). Every input has a real `<label>` — no placeholder-as-label (`accessibility-rtl.mdc`).
 - **5.5 — Login form**.
   🚩 No "Sign in with Google" button (backlog). No "Forgot password?" link (backlog) — leaving the link visible-but-dead is worse than omitting it.
@@ -425,5 +426,5 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 - **Hero + brand imagery** — from Alaa (9.1).
 - **CallMeBot phone verification** on Alaa's number, plus its rate limits — validate before 6.6 is built, not after.
 - **Email fallback provider** for order notifications — choose and confirm it is free at this volume (6.6).
-- **Delivery area scope** — full Egypt governorate/markaz list, or only Alaa's current delivery areas (5.3).
+- **Delivery area scope** — decided in 5.3: full Egypt list (not delivery-area-only). Alaa still coordinates shipping manually; no fee calculation.
 - **Review moderation** — does Alaa need to hide/delete a review (14.4)?
