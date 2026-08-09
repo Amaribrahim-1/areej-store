@@ -171,17 +171,11 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **4.6 — Empty cart state** with a link back to the catalog.
 - [x] **4.7 — Price-drift handling**: a persisted cart can hold a price that changed since it was stored. Decide the behaviour (re-read current price on render, warn on change, or silently update) — this is a real correctness question, not a polish item.
       **Decision:** re-read live prices for display/totals, warn with an inline notice when a line’s `unitPriceSnapshot` differs, then sync the snapshot so the notice doesn’t repeat. Legacy lines missing a snapshot sync silently (no notice).
-- [x] **4.8 — Cart UX polish (same `feature/cart` branch):**
-      - Navbar cart badge reads live `sum(quantity)` from `useCartStore` (replaces Phase 2 stub).
-      - Cart page “إفراغ السلة” clear action wired to store `clear()`.
-      - Product card hover/focus actions: “معاينة” + “أضف” (mobile always visible).
+- [x] **4.8 — Cart UX polish (same `feature/cart` branch):** - Navbar cart badge reads live `sum(quantity)` from `useCartStore` (replaces Phase 2 stub). - Cart page “إفراغ السلة” clear action wired to store `clear()`. - Product card hover/focus actions: “معاينة” + “أضف” (mobile always visible).
 - [x] **4.9 — Cart test tooling setup**
       Add a minimal unit-test runner for the app (prefer Vitest if it fits the Next setup). One shared config + `npm test` (or equivalent) script. No feature tests in this task — tooling only.
 - [x] **4.10 — Cart pure-logic unit tests**
-      Unit tests for cart helpers only (no UI / no E2E):
-      - `computeCartSubtotal`
-      - `resolveCartPriceDrift` (drift, no-drift, missing snapshot silent sync)
-      - `getCartItemCount`
+      Unit tests for cart helpers only (no UI / no E2E): - `computeCartSubtotal` - `resolveCartPriceDrift` (drift, no-drift, missing snapshot silent sync) - `getCartItemCount`
       Keep cases small: empty / one / many lines. Ship before merging `feature/cart` into `main`.
 
 `[commit: feat(cart): zustand store with persist, feat(cart): cart page and totals]`
@@ -192,8 +186,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 `[branch: feature/auth]` — **`NEW CONCEPT`** (React Hook Form + Zod + `zodResolver`)
 
-- **5.1 — Standalone RHF + Zod example first**: a two-field form with `zodResolver` and error rendering, isolated from the project.
-- **5.2 — `features/auth/schema.ts`**: `loginSchema` and `registerSchema` (Name, Phone, Password, Address = governorate + markaz + free-text description). Egyptian phone-format validation. Password rules agreed explicitly, not invented.
+- [x] **5.1 — Standalone RHF + Zod example first**: a two-field form with `zodResolver` and error rendering, isolated from the project.
+- [x] **5.2 — `features/auth/schema.ts`**: `loginSchema` and `registerSchema` (Name, Phone, Password, Address = governorate + markaz + free-text description). Egyptian phone-format validation. Password rules agreed explicitly, not invented.
 - **5.3 — Governorate → Markaz data source**: a static local dataset (governorate list, and markaz list per governorate) under `features/auth/` or `lib/`. Decide upfront: full Egypt list, or only Alaa's delivery areas? Spec says she currently delivers to nearby areas only.
 - **5.4 — Register form**: dependent selects (markaz options depend on selected governorate), free-text location field with the spec's example as hint text (`"محافظة كفر الشيخ – مركز كفر الشيخ – قرية قراجة، جانب موقف الأتوبيس"`). Every input has a real `<label>` — no placeholder-as-label (`accessibility-rtl.mdc`).
 - **5.5 — Login form**.
