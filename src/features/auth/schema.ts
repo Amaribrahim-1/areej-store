@@ -30,5 +30,5 @@ export const loginSchema = z.object({
   password: z.string().min(6, { message: "كلمة المرور ٦ أحرف على الأقل" }),
 });
 
-export type RegisterInput = z.infer<typeof registerSchema>;
-export type LoginInput = z.infer<typeof loginSchema>;
+export type RegisterType = z.infer<typeof registerSchema>;
+export type LoginType = z.infer<typeof loginSchema>;
