@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
+import FieldError from "@/components/shared/FieldError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,15 +29,6 @@ const selectClassName = cn(
 );
 
 const governorates = getGovernorates();
-
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return (
-    <p className="text-sm text-destructive" role="alert">
-      {message}
-    </p>
-  );
-}
 
 export default function RegisterForm() {
   const {
@@ -230,6 +223,16 @@ export default function RegisterForm() {
       <Button type="submit" className="w-full" size="lg">
         إنشاء حساب
       </Button>
+
+      <p className="text-center text-sm text-muted-foreground">
+        عندك حساب؟{" "}
+        <Link
+          href="/login"
+          className="font-medium text-text-accent underline-offset-4 hover:underline"
+        >
+          سجّلي الدخول
+        </Link>
+      </p>
     </form>
   );
 }
