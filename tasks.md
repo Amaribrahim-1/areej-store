@@ -192,8 +192,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
       **Decision:** full Egypt (27 governorates + markaz/districts). English keys for storage, Arabic labels for UI. Source: Open Admin Data (CC-BY-4.0). Shipping-fee-by-area stays backlog.
 - [x] **5.4 — Register form**: dependent selects (markaz options depend on selected governorate), free-text location field with the spec's example as hint text (`"محافظة كفر الشيخ – مركز كفر الشيخ – قرية قراجة، جانب موقف الأتوبيس"`). Every input has a real `<label>` — no placeholder-as-label (`accessibility-rtl.mdc`).
 - [x] **5.5 — Login form**.
-  🚩 No "Sign in with Google" button (backlog). No "Forgot password?" link (backlog) — leaving the link visible-but-dead is worse than omitting it.
-- **5.6 — Signup mutation + profile row creation**. **`SUPABASE`** Keep `auth.users` and `profiles` in sync (trigger, or explicit insert after signup — decide and understand the trade-off).
+      🚩 No "Sign in with Google" button (backlog). No "Forgot password?" link (backlog) — leaving the link visible-but-dead is worse than omitting it.
+- [x] **5.6 — Signup mutation + profile row creation**. **`SUPABASE`** Keep `auth.users` and `profiles` in sync (trigger, or explicit insert after signup — decide and understand the trade-off).
 - **5.7 — Session handling**: auth state available server-side (layouts/server components) and client-side (Navbar). Sign-out action.
 - **5.8 — Re-validate `registerSchema` server-side before the insert** — client validation is UX, not a security boundary (`coding-standards.md` §7).
 - **5.9 — Route protection for customer-only pages** (Order History, checkout confirm) with a redirect that returns the user to where they were.

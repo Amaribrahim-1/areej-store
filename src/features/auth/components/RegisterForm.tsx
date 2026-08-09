@@ -17,6 +17,8 @@ import {
   getMarkazByGovernorate,
 } from "../data/egypt-locations";
 import { registerSchema, type RegisterType } from "../schema";
+import { useRegister } from "../api/useRegister";
+import { useRouter } from "next/navigation";
 
 const ADDRESS_HINT = "قرية قراجة، جانب الموقف";
 
@@ -55,13 +57,20 @@ export default function RegisterForm() {
   const selectedGovernorate = watch("governorate");
   const markazOptions = getMarkazByGovernorate(selectedGovernorate);
 
+  const router = useRouter();
+  const { mutate, isPending } = useRegister();
+
   useEffect(() => {
     setValue("markaz", "", { shouldValidate: false });
   }, [selectedGovernorate, setValue]);
 
   const onSubmit: SubmitHandler<RegisterType> = (data) => {
-    // Smoke only until 5.6 wires signup
-    console.log(data);
+    const { confirmPassword: _, ...input } = data;
+    mutate(input, {
+      onSuccess: (result) => {
+        router.push(result.needsEmailConfirmation ? "/login" : "/");
+      },
+    });
   };
 
   return (
@@ -220,8 +229,8 @@ export default function RegisterForm() {
         </div>
       </fieldset>
 
-      <Button type="submit" className="w-full" size="lg">
-        إنشاء حساب
+      <Button type="submit" disabled={isPending} className="w-full" size="lg">
+        {isPending ? "جاري الإنشاء..." : "إنشاء حساب"}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
