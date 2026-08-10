@@ -25,3 +25,13 @@ Companion to `project-spec.md`. Items here were deliberately scoped out of the M
 ## Borderline — Needs Client Input
 
 No borderline items remain open at this time. Product photo scope, Testimonials data source, discount/Featured logic, admin order notifications, variant representation, and related Phase 1 schema agreements are documented in `project-spec.md`'s Assumptions & Decisions Log.
+
+---
+
+## Open questions (decide after MVP)
+
+Parked on purpose. Current MVP behavior stays as-is until we revisit with real usage.
+
+| Question | Current MVP stance | Why revisit later |
+|---|---|---|
+| **Require email confirmation before first session?** (Supabase Confirm email) | Leave as currently configured in the Supabase project. The app already handles both paths via `needsEmailConfirmation`. | After real checkout friction is visible: confirm ON = better email quality / fewer fake signups; confirm OFF = smoother register → checkout (critical guest path). Decide from live UX + spam/data quality, not during feature build. |
