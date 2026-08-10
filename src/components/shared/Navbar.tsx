@@ -14,7 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { type AuthUser } from "@/features/auth/api/getCurrentUser";
-import { useSignOut } from "@/features/auth/api/useSignout";
+import { useSignOut } from "@/features/auth/api/useSignOut";
 import { getCartItemCount } from "@/features/cart/lib/getCartItemCount";
 import { useCartStore } from "@/features/cart/store";
 import { createClient } from "@/lib/supabase/client";
