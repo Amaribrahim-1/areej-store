@@ -90,9 +90,7 @@ export default function CartPage({
                 className="mt-0.5 size-4 shrink-0 text-brand-700"
                 aria-hidden
               />
-              <p>
-                تم تحديث أسعار بعض المنتجات في السلة وفقًا لأحدث سعر متاح.
-              </p>
+              <p>تم تحديث أسعار بعض المنتجات في السلة وفقًا لأحدث سعر متاح.</p>
             </div>
           ) : null}
           <CartLinesList
@@ -101,6 +99,14 @@ export default function CartPage({
             onRemove={onRemove}
           />
           <CartTotals subtotal={subtotal} total={subtotal} />
+          <div className="pt-2">
+            <Link
+              href="/checkout"
+              className={cn(buttonVariants({ size: "lg" }), "w-full")}
+            >
+              تأكيد الطلب
+            </Link>
+          </div>
         </>
       ) : null}
     </div>

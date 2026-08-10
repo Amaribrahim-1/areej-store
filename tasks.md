@@ -208,7 +208,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 `[branch: feature/checkout]`
 
-- **6.1 — Checkout entry from Cart**: "Confirm Order" action. If not authenticated, route to login/register and return to checkout afterwards (spec decision #7).
+- [x] **6.1 — Checkout entry from Cart**: "Confirm Order" action. If not authenticated, route to login/register and return to checkout afterwards (spec decision #7).
+      **Done:** Cart CTA links to `/checkout`; guest auth + return path already handled by `(protected)` + `requireCustomer` / login `next` (5.9).
 - **6.2 — Order review step**: line items, total, and the delivery address pulled from the customer's profile. Payment method: Cash on Delivery, displayed as fixed.
   🚩 Keep the payment method a swappable concept in the data model and UI copy even though COD is hardcoded (`coding-standards.md` §10) — hardcoding "COD" into control flow is what makes adding a second method a rewrite later.
 - **6.3 — `features/orders/schema.ts`**: `checkoutSchema` for the submitted payload (line items, address, contact) — no total field accepted from the client.
