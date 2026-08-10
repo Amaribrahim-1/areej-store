@@ -171,17 +171,11 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **4.6 — Empty cart state** with a link back to the catalog.
 - [x] **4.7 — Price-drift handling**: a persisted cart can hold a price that changed since it was stored. Decide the behaviour (re-read current price on render, warn on change, or silently update) — this is a real correctness question, not a polish item.
       **Decision:** re-read live prices for display/totals, warn with an inline notice when a line’s `unitPriceSnapshot` differs, then sync the snapshot so the notice doesn’t repeat. Legacy lines missing a snapshot sync silently (no notice).
-- [x] **4.8 — Cart UX polish (same `feature/cart` branch):**
-      - Navbar cart badge reads live `sum(quantity)` from `useCartStore` (replaces Phase 2 stub).
-      - Cart page “إفراغ السلة” clear action wired to store `clear()`.
-      - Product card hover/focus actions: “معاينة” + “أضف” (mobile always visible).
+- [x] **4.8 — Cart UX polish (same `feature/cart` branch):** - Navbar cart badge reads live `sum(quantity)` from `useCartStore` (replaces Phase 2 stub). - Cart page “إفراغ السلة” clear action wired to store `clear()`. - Product card hover/focus actions: “معاينة” + “أضف” (mobile always visible).
 - [x] **4.9 — Cart test tooling setup**
       Add a minimal unit-test runner for the app (prefer Vitest if it fits the Next setup). One shared config + `npm test` (or equivalent) script. No feature tests in this task — tooling only.
 - [x] **4.10 — Cart pure-logic unit tests**
-      Unit tests for cart helpers only (no UI / no E2E):
-      - `computeCartSubtotal`
-      - `resolveCartPriceDrift` (drift, no-drift, missing snapshot silent sync)
-      - `getCartItemCount`
+      Unit tests for cart helpers only (no UI / no E2E): - `computeCartSubtotal` - `resolveCartPriceDrift` (drift, no-drift, missing snapshot silent sync) - `getCartItemCount`
       Keep cases small: empty / one / many lines. Ship before merging `feature/cart` into `main`.
 
 `[commit: feat(cart): zustand store with persist, feat(cart): cart page and totals]`
@@ -192,16 +186,19 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 `[branch: feature/auth]` — **`NEW CONCEPT`** (React Hook Form + Zod + `zodResolver`)
 
-- **5.1 — Standalone RHF + Zod example first**: a two-field form with `zodResolver` and error rendering, isolated from the project.
-- **5.2 — `features/auth/schema.ts`**: `loginSchema` and `registerSchema` (Name, Phone, Password, Address = governorate + markaz + free-text description). Egyptian phone-format validation. Password rules agreed explicitly, not invented.
-- **5.3 — Governorate → Markaz data source**: a static local dataset (governorate list, and markaz list per governorate) under `features/auth/` or `lib/`. Decide upfront: full Egypt list, or only Alaa's delivery areas? Spec says she currently delivers to nearby areas only.
-- **5.4 — Register form**: dependent selects (markaz options depend on selected governorate), free-text location field with the spec's example as hint text (`"محافظة كفر الشيخ – مركز كفر الشيخ – قرية قراجة، جانب موقف الأتوبيس"`). Every input has a real `<label>` — no placeholder-as-label (`accessibility-rtl.mdc`).
-- **5.5 — Login form**.
-  🚩 No "Sign in with Google" button (backlog). No "Forgot password?" link (backlog) — leaving the link visible-but-dead is worse than omitting it.
-- **5.6 — Signup mutation + profile row creation**. **`SUPABASE`** Keep `auth.users` and `profiles` in sync (trigger, or explicit insert after signup — decide and understand the trade-off).
-- **5.7 — Session handling**: auth state available server-side (layouts/server components) and client-side (Navbar). Sign-out action.
-- **5.8 — Re-validate `registerSchema` server-side before the insert** — client validation is UX, not a security boundary (`coding-standards.md` §7).
-- **5.9 — Route protection for customer-only pages** (Order History, checkout confirm) with a redirect that returns the user to where they were.
+- [x] **5.1 — Standalone RHF + Zod example first**: a two-field form with `zodResolver` and error rendering, isolated from the project.
+- [x] **5.2 — `features/auth/schema.ts`**: `loginSchema` and `registerSchema` (Name, Phone, Password, Address = governorate + markaz + free-text description). Egyptian phone-format validation. Password rules agreed explicitly, not invented.
+- [x] **5.3 — Governorate → Markaz data source**: a static local dataset (governorate list, and markaz list per governorate) under `features/auth/` or `lib/`. Decide upfront: full Egypt list, or only Alaa's delivery areas? Spec says she currently delivers to nearby areas only.
+      **Decision:** full Egypt (27 governorates + markaz/districts). English keys for storage, Arabic labels for UI. Source: Open Admin Data (CC-BY-4.0). Shipping-fee-by-area stays backlog.
+- [x] **5.4 — Register form**: dependent selects (markaz options depend on selected governorate), free-text location field with the spec's example as hint text (`"محافظة كفر الشيخ – مركز كفر الشيخ – قرية قراجة، جانب موقف الأتوبيس"`). Every input has a real `<label>` — no placeholder-as-label (`accessibility-rtl.mdc`).
+- [x] **5.5 — Login form**.
+      🚩 No "Sign in with Google" button (backlog). No "Forgot password?" link (backlog) — leaving the link visible-but-dead is worse than omitting it.
+- [x] **5.6 — Signup mutation + profile row creation**. **`SUPABASE`** Keep `auth.users` and `profiles` in sync (trigger, or explicit insert after signup — decide and understand the trade-off).
+- [x] **5.7 — Session handling**: auth state available server-side (layouts/server components) and client-side (Navbar). Sign-out action.
+- [x] **5.8 — Re-validate `registerSchema` server-side before the insert** — client validation is UX, not a security boundary (`coding-standards.md` §7).
+      **Done:** `registerWriteSchema` (shared field rules, no `confirmPassword`) runs via `safeParse` in `registerCustomer` before `auth.signUp`; invalid → `INVALID_REGISTER_PAYLOAD`, no Auth write.
+- [x] **5.9 — Route protection for customer-only pages** (Order History, checkout confirm) with a redirect that returns the user to where they were.
+      **Done:** `(protected)` layout calls `requireCustomer` (reads `x-pathname` from session proxy). Stubs at `/checkout` + `/orders`. Login/register honor safe `next` return path.
 
 `[commit: feat(auth): zod schemas, feat(auth): register and login forms, feat(auth): session and route protection]`
 
@@ -431,5 +428,5 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 - **Hero + brand imagery** — from Alaa (9.1).
 - **CallMeBot phone verification** on Alaa's number, plus its rate limits — validate before 6.6 is built, not after.
 - **Email fallback provider** for order notifications — choose and confirm it is free at this volume (6.6).
-- **Delivery area scope** — full Egypt governorate/markaz list, or only Alaa's current delivery areas (5.3).
+- **Delivery area scope** — decided in 5.3: full Egypt list (not delivery-area-only). Alaa still coordinates shipping manually; no fee calculation.
 - **Review moderation** — does Alaa need to hide/delete a review (14.4)?
