@@ -18,12 +18,14 @@ export function useLogin() {
       const raw = error instanceof Error ? error.message : "";
       const normalized = raw.toLowerCase();
       const message =
-        normalized.includes("invalid login credentials") ||
-        normalized.includes("invalid_credentials")
-          ? "الإيميل أو كلمة المرور غير صحيحة"
-          : normalized.includes("email not confirmed")
-            ? "لازم تؤكدي الإيميل أولًا"
-            : raw || "حصل خطأ، جرّبي تاني";
+        raw === "INVALID_LOGIN_PAYLOAD"
+          ? "بيانات الدخول غير صحيحة"
+          : normalized.includes("invalid login credentials") ||
+              normalized.includes("invalid_credentials")
+            ? "الإيميل أو كلمة المرور غير صحيحة"
+            : normalized.includes("email not confirmed")
+              ? "لازم تؤكدي الإيميل أولًا"
+              : raw || "حصل خطأ، جرّبي تاني";
       toast.error(message);
     },
   });
