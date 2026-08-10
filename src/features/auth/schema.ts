@@ -1,9 +1,36 @@
 import { z } from "zod";
 
+import {
+  isGovernorate,
+  isMarkazForGovernorate,
+} from "./data/egypt-locations";
+
 const egyptianPhoneRegex = /^01[0125]\d{8}$/;
 
-/** Shared register fields — reused by the form schema and pre-write validation. */
-const registerFieldsSchema = z.object({
+function assertValidEgyptLocation(
+  data: { governorate: string; markaz: string },
+  ctx: z.RefinementCtx,
+) {
+  if (!isGovernorate(data.governorate)) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["governorate"],
+      message: "اختر محافظة صحيحة",
+    });
+    return;
+  }
+
+  if (!isMarkazForGovernorate(data.governorate, data.markaz)) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["markaz"],
+      message: "اختر مركزًا صحيحًا لهذه المحافظة",
+    });
+  }
+}
+
+/** Shared register fields — object shape before location / password refinements. */
+const registerFieldsObject = z.object({
   fullName: z
     .string()
     .trim()
@@ -20,21 +47,24 @@ const registerFieldsSchema = z.object({
   }),
 });
 
-/** Client form schema (includes confirmPassword match). */
-export const registerSchema = registerFieldsSchema
-  .extend({
-    confirmPassword: z.string().min(6, { message: "أكّد كلمة المرور" }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "كلمة المرور غير متطابقة",
-    path: ["confirmPassword"],
-  });
-
 /**
  * Payload validated again before Auth signup / profile metadata write.
  * Same field rules as the form, without confirmPassword (UX-only).
  */
-export const registerWriteSchema = registerFieldsSchema;
+export const registerWriteSchema = registerFieldsObject.superRefine(
+  assertValidEgyptLocation,
+);
+
+/** Client form schema (includes confirmPassword match). */
+export const registerSchema = registerFieldsObject
+  .extend({
+    confirmPassword: z.string().min(6, { message: "أكّد كلمة المرور" }),
+  })
+  .superRefine(assertValidEgyptLocation)
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "كلمة المرور غير متطابقة",
+    path: ["confirmPassword"],
+  });
 
 export const loginSchema = z.object({
   email: z.email({ message: "أدخل بريدًا إلكترونيًا صحيحًا" }),
