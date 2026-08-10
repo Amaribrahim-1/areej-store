@@ -13,9 +13,19 @@ import { Label } from "@/components/ui/label";
 import { useLogin } from "../api/useLogin";
 import { loginSchema, type LoginType } from "../schema";
 
-export default function LoginForm() {
+type LoginFormProps = {
+  /** Already-sanitized relative path from the login page. */
+  nextPath?: string;
+};
+
+export default function LoginForm({ nextPath = "/" }: LoginFormProps) {
   const router = useRouter();
   const { mutate, isPending } = useLogin();
+
+  const registerHref =
+    nextPath === "/"
+      ? "/register"
+      : `/register?next=${encodeURIComponent(nextPath)}`;
 
   const {
     register,
@@ -33,7 +43,7 @@ export default function LoginForm() {
   const onSubmit: SubmitHandler<LoginType> = (data) => {
     mutate(data, {
       onSuccess: () => {
-        router.push("/");
+        router.push(nextPath);
         router.refresh();
       },
     });
@@ -89,7 +99,7 @@ export default function LoginForm() {
       <p className="text-center text-sm text-muted-foreground">
         مش عندك حساب؟{" "}
         <Link
-          href="/register"
+          href={registerHref}
           className="font-medium text-text-accent underline-offset-4 hover:underline"
         >
           أنشئي حساب

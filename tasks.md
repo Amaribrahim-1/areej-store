@@ -197,7 +197,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **5.7 — Session handling**: auth state available server-side (layouts/server components) and client-side (Navbar). Sign-out action.
 - [x] **5.8 — Re-validate `registerSchema` server-side before the insert** — client validation is UX, not a security boundary (`coding-standards.md` §7).
       **Done:** `registerWriteSchema` (shared field rules, no `confirmPassword`) runs via `safeParse` in `registerCustomer` before `auth.signUp`; invalid → `INVALID_REGISTER_PAYLOAD`, no Auth write.
-- **5.9 — Route protection for customer-only pages** (Order History, checkout confirm) with a redirect that returns the user to where they were.
+- [x] **5.9 — Route protection for customer-only pages** (Order History, checkout confirm) with a redirect that returns the user to where they were.
+      **Done:** `(protected)` layout calls `requireCustomer` (reads `x-pathname` from session proxy). Stubs at `/checkout` + `/orders`. Login/register honor safe `next` return path.
 
 `[commit: feat(auth): zod schemas, feat(auth): register and login forms, feat(auth): session and route protection]`
 

@@ -4,11 +4,17 @@ import type { Database } from "@/lib/supabase/types";
 
 /**
  * Refreshes the Auth session cookies on every matched request.
- * Does not enforce route protection — that belongs to task 5.9.
+ * Also forwards `x-pathname` so server layouts can build return URLs
+ * (task 5.9). Does not enforce route protection itself.
  */
 export async function updateSession(request: NextRequest) {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
+
   let supabaseResponse = NextResponse.next({
-    request,
+    request: {
+      headers: requestHeaders,
+    },
   });
 
   const supabase = createServerClient<Database>(
@@ -24,7 +30,9 @@ export async function updateSession(request: NextRequest) {
             request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({
-            request,
+            request: {
+              headers: requestHeaders,
+            },
           });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),

@@ -32,7 +32,12 @@ const selectClassName = cn(
 
 const governorates = getGovernorates();
 
-export default function RegisterForm() {
+type RegisterFormProps = {
+  /** Already-sanitized relative path from the register page. */
+  nextPath?: string;
+};
+
+export default function RegisterForm({ nextPath = "/" }: RegisterFormProps) {
   const {
     register,
     handleSubmit,
@@ -60,6 +65,11 @@ export default function RegisterForm() {
   const router = useRouter();
   const { mutate, isPending } = useRegister();
 
+  const loginHref =
+    nextPath === "/"
+      ? "/login"
+      : `/login?next=${encodeURIComponent(nextPath)}`;
+
   useEffect(() => {
     setValue("markaz", "", { shouldValidate: false });
   }, [selectedGovernorate, setValue]);
@@ -68,7 +78,12 @@ export default function RegisterForm() {
     const { confirmPassword: _, ...input } = data;
     mutate(input, {
       onSuccess: (result) => {
-        router.push(result.needsEmailConfirmation ? "/login" : "/");
+        if (result.needsEmailConfirmation) {
+          router.push(loginHref);
+          return;
+        }
+        router.push(nextPath);
+        router.refresh();
       },
     });
   };
@@ -236,7 +251,7 @@ export default function RegisterForm() {
       <p className="text-center text-sm text-muted-foreground">
         عندك حساب؟{" "}
         <Link
-          href="/login"
+          href={loginHref}
           className="font-medium text-text-accent underline-offset-4 hover:underline"
         >
           سجّلي الدخول
