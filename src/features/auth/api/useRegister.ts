@@ -23,7 +23,9 @@ export function useRegister() {
       const message =
         raw === "EMAIL_ALREADY_REGISTERED"
           ? "الإيميل ده مسجّل قبل كده"
-          : raw || "حصل خطأ، جرّبي تاني";
+          : raw === "INVALID_REGISTER_PAYLOAD"
+            ? "بيانات التسجيل غير صحيحة"
+            : raw || "حصل خطأ، جرّبي تاني";
       toast.error(message);
     },
   });

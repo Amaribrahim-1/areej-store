@@ -1,14 +1,11 @@
 import { createClient } from "@/lib/supabase/client";
 
-export type RegisterCustomerInput = {
-  email: string;
-  password: string;
-  fullName: string;
-  phone: string;
-  governorate: string;
-  markaz: string;
-  addressDescription: string;
-};
+import {
+  registerWriteSchema,
+  type RegisterWriteInput,
+} from "../schema";
+
+export type RegisterCustomerInput = RegisterWriteInput;
 
 export type RegisterCustomerResult = {
   userId: string;
@@ -20,22 +17,30 @@ export type RegisterCustomerResult = {
 /**
  * Creates an auth user and relies on `private.handle_new_user` to insert
  * the matching `profiles` row from signup metadata (task 5.6).
+ *
+ * Re-validates with `registerWriteSchema` before any Supabase write (task 5.8).
  */
 export async function registerCustomer(
   input: RegisterCustomerInput,
 ): Promise<RegisterCustomerResult> {
+  const parsed = registerWriteSchema.safeParse(input);
+  if (!parsed.success) {
+    throw new Error("INVALID_REGISTER_PAYLOAD");
+  }
+
+  const payload = parsed.data;
   const supabase = createClient();
 
   const { data, error } = await supabase.auth.signUp({
-    email: input.email.trim(),
-    password: input.password,
+    email: payload.email,
+    password: payload.password,
     options: {
       data: {
-        full_name: input.fullName.trim(),
-        phone: input.phone.trim(),
-        governorate: input.governorate.trim(),
-        markaz: input.markaz.trim(),
-        address_text: input.addressDescription.trim(),
+        full_name: payload.fullName,
+        phone: payload.phone,
+        governorate: payload.governorate,
+        markaz: payload.markaz,
+        address_text: payload.addressDescription,
       },
     },
   });
@@ -57,7 +62,7 @@ export async function registerCustomer(
 
   return {
     userId: user.id,
-    email: user.email ?? input.email.trim(),
+    email: user.email ?? payload.email,
     needsEmailConfirmation: data.session === null,
   };
 }
