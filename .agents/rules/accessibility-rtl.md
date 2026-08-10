@@ -1,0 +1,13 @@
+---
+trigger: glob
+globs: **/*.tsx
+---
+
+# Accessibility & RTL (Arabic-only interface)
+- `<html dir="rtl" lang="ar">` at the root — verify every custom component respects RTL, not just Tailwind defaults.
+- Use Tailwind logical properties (`ps-4`, `pe-4`, `text-start`) instead of `pl-4`/`pr-4`/`text-left`.
+- Directional icons (arrows, chevrons) must visually flip in RTL — check each one, Lucide does not auto-flip.
+- Every image needs a meaningful Arabic `alt`.
+- Every form input has an associated `<label>` — no placeholder-as-label.
+- Custom controls (e.g., star rating) need proper `aria-label` (e.g., "4 من 5 نجوم").
+- Visible focus states on every interactive element — never strip outlines without replacing them.

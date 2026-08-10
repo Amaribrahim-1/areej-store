@@ -1,0 +1,4 @@
+interface:
+  display_name: "Areej Review"
+  short_description: "Areej per-feature checklist (perf, security, RTL, UX, tests?, scale, git)"
+  default_prompt: "Use $areej-review after a feature or task is done to run the Areej per-feature review checklist."
