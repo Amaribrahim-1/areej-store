@@ -58,12 +58,12 @@ export default function CheckoutDeliveryAddress({
         id="checkout-delivery-heading"
         className="font-heading text-lg font-semibold text-foreground"
       >
-        عنوان التوصيل
+        بيانات التوصيل
       </h2>
 
       {!profile || !hasDeliveryFields(profile) ? (
         <p className="text-sm text-muted-foreground" role="status">
-          لا توجد بيانات عنوان محفوظة على الحساب. أكملي بياناتك قبل إتمام الطلب.
+          لا توجد بيانات توصيل محفوظة على الحساب. أكملي بياناتك قبل إتمام الطلب.
         </p>
       ) : (
         <dl className="space-y-2 text-sm">

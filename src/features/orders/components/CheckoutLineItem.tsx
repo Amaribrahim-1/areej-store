@@ -58,9 +58,15 @@ export default function CheckoutLineItem({
             {line.volumeLabel ? (
               <p className="text-sm text-muted-foreground">{line.volumeLabel}</p>
             ) : null}
-            <p className="text-xs text-muted-foreground">
-              الكمية: {line.quantity} · سعر القطعة {formatPrice(line.currentPrice)}
-            </p>
+            <div className="space-y-0.5 text-xs text-muted-foreground">
+              <p>الكمية: {line.quantity}</p>
+              <p className="inline-flex flex-wrap items-baseline gap-x-1.5">
+                <span>سعر القطعة</span>
+                <span className="tabular-nums text-foreground">
+                  {formatPrice(line.currentPrice)}
+                </span>
+              </p>
+            </div>
           </div>
 
           <PriceTag

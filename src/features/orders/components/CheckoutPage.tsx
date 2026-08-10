@@ -48,7 +48,7 @@ export default function CheckoutPage({
           تأكيد الطلب
         </h1>
         <p className="text-sm text-muted-foreground">
-          راجعي منتجاتك وعنوان التوصيل وطريقة الدفع قبل إتمام الطلب.
+          راجعي منتجاتك وبيانات التوصيل وطريقة الدفع قبل إتمام الطلب.
         </p>
       </header>
 
@@ -75,7 +75,7 @@ export default function CheckoutPage({
             aria-labelledby="checkout-lines-heading"
             className="space-y-3"
           >
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <h2
                 id="checkout-lines-heading"
                 className="font-heading text-lg font-semibold text-foreground"
@@ -84,10 +84,7 @@ export default function CheckoutPage({
               </h2>
               <Link
                 href="/cart"
-                className={cn(
-                  buttonVariants({ variant: "link", size: "sm" }),
-                  "h-auto px-0",
-                )}
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
               >
                 تعديل السلة
               </Link>
