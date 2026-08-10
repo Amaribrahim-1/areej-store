@@ -213,7 +213,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **6.2 — Order review step**: line items, total, and the delivery address pulled from the customer's profile. Payment method: Cash on Delivery, displayed as fixed.
   🚩 Keep the payment method a swappable concept in the data model and UI copy even though COD is hardcoded (`coding-standards.md` §10) — hardcoding "COD" into control flow is what makes adding a second method a rewrite later.
       **Done:** Checkout review UI (lines + totals + profile address via `getMyProfile` + `PAYMENT_METHODS`/`cod` label). Place-order submit stays for 6.4.
-- **6.3 — `features/orders/schema.ts`**: `checkoutSchema` for the submitted payload (line items, address, contact) — no total field accepted from the client.
+- [x] **6.3 — `features/orders/schema.ts`**: `checkoutSchema` for the submitted payload (line items, address, contact) — no total field accepted from the client.
+      **Done:** `checkoutSchema` + `CheckoutInput` — contact/address snapshot + `items[{ variantId, quantity }]`; no total/prices; Egypt location refine reused from auth data.
 - **6.4 — Place-order mutation** calling the Phase 1.5 server-side function. Guard against double submission (disable + in-flight state).
 - **6.5 — Post-success**: clear the cart store, show the simple "تم استلام طلبك" confirmation, link to Order History.
 - **6.6 — Admin notification: WhatsApp via CallMeBot + Email fallback.**
