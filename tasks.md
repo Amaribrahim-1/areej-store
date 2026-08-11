@@ -225,9 +225,10 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
   A failed notification must **not** fail the order. The order is committed; notification is best-effort with a logged failure.
   🚩 Order notifications are in MVP. Review notifications are **not** (backlog) — do not generalize this into a notification system.
       **Done:** `POST /api/orders/notify` + CallMeBot then Resend fallback; secrets server-only; `notifyOrderPlaced` fire-and-forget after place-order success. Isolated WA smoke verified.
-- **6.7 — Test the critical flow** (`coding-standards.md` §8 priority 2): add-to-cart → checkout → order row + items created with server-computed totals.
+- [x] **6.7 — Test the critical flow** (`coding-standards.md` §8 priority 2): add-to-cart → checkout → order row + items created with server-computed totals.
+      **Done:** Vitest for `checkoutSchema` + `placeOrder` (no client prices/totals); SQL smoke that `place_order` writes order + items with server totals; manual UI smoke (guest→register→confirm→checkout→order + WhatsApp) verified.
 
-`[commit: feat(checkout): order review step, feat(checkout): place order mutation, feat(checkout): admin whatsapp notification]`
+`[commit: feat(checkout): order review step, feat(checkout): place order mutation, feat(checkout): admin whatsapp notification, test(checkout): cover critical place-order and checkoutSchema]`
 
 ---
 
