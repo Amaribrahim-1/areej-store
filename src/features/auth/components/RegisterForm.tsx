@@ -76,16 +76,19 @@ export default function RegisterForm({ nextPath = "/" }: RegisterFormProps) {
 
   const onSubmit: SubmitHandler<RegisterType> = (data) => {
     const { confirmPassword: _, ...input } = data;
-    mutate(input, {
-      onSuccess: (result) => {
-        if (result.needsEmailConfirmation) {
-          router.push(loginHref);
-          return;
-        }
-        router.push(nextPath);
-        router.refresh();
+    mutate(
+      { ...input, nextPath },
+      {
+        onSuccess: (result) => {
+          if (result.needsEmailConfirmation) {
+            router.push(loginHref);
+            return;
+          }
+          router.push(nextPath);
+          router.refresh();
+        },
       },
-    });
+    );
   };
 
   return (

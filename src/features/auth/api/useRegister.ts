@@ -8,9 +8,14 @@ import {
 
 import { toast } from "sonner";
 
+export type RegisterVariables = RegisterCustomerInput & {
+  nextPath?: string;
+};
+
 export function useRegister() {
   return useMutation({
-    mutationFn: (input: RegisterCustomerInput) => registerCustomer(input),
+    mutationFn: ({ nextPath, ...input }: RegisterVariables) =>
+      registerCustomer(input, { nextPath }),
     onSuccess: (result) => {
       toast.success(
         result.needsEmailConfirmation
