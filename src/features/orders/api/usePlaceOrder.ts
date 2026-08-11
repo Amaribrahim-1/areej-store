@@ -8,9 +8,6 @@ import { placeOrder, type PlaceOrderInput } from "./placeOrder";
 export function usePlaceOrder() {
   return useMutation({
     mutationFn: (input: PlaceOrderInput) => placeOrder(input),
-    onSuccess: () => {
-      toast.success("تم استلام طلبك — هنتواصل معاكي قريبًا لتأكيد التوصيل");
-    },
     onError: (error) => {
       const raw = error instanceof Error ? error.message : "";
       const normalized = raw.toLowerCase();

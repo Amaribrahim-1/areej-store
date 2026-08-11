@@ -217,7 +217,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
       **Done:** `checkoutSchema` + `CheckoutInput` — contact/address snapshot + `items[{ variantId, quantity }]`; no total/prices; Egypt location refine reused from auth data.
 - [x] **6.4 — Place-order mutation** calling the Phase 1.5 server-side function. Guard against double submission (disable + in-flight state).
       **Done:** `placeOrder` + `usePlaceOrder`; checkout submit builds payload from profile + resolved lines; disable/`aria-busy` while in-flight; Sonner toasts on success/error.
-- **6.5 — Post-success**: clear the cart store, show the simple "تم استلام طلبك" confirmation, link to Order History.
+- [x] **6.5 — Post-success**: clear the cart store, show the simple "تم استلام طلبك" confirmation, link to Order History.
+      **Done:** On place-order success: clear cart store, show `CheckoutSuccess` («تم استلام طلبك») with link to `/orders`.
 - **6.6 — Admin notification: WhatsApp via CallMeBot + Email fallback.**
   A route handler (server-side — the CallMeBot key never reaches the client), triggered on successful order creation.
   ⚠️ **Validate this early, in isolation, before wiring it in.** Per spec note #11, CallMeBot needs a one-time phone verification and has rate limits — confirm it actually delivers with Alaa's number before building around it. Decide the email fallback provider and whether it's free at this volume.

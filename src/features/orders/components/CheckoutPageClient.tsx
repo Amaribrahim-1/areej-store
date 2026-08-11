@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { toast } from "sonner";
 
 import type { MyProfile } from "@/features/auth/api/getMyProfile";
@@ -12,6 +13,7 @@ import type { CartLineItemData } from "@/features/cart/types";
 import { usePlaceOrder } from "../api/usePlaceOrder";
 import { DEFAULT_PAYMENT_METHOD } from "../constants";
 import CheckoutPage from "./CheckoutPage";
+import CheckoutSuccess from "./CheckoutSuccess";
 
 type CheckoutPageClientProps = {
   profile: MyProfile | null;
@@ -39,8 +41,10 @@ export default function CheckoutPageClient({
   profile,
 }: CheckoutPageClientProps) {
   const items = useCartStore((state) => state.items);
+  const clearCart = useCartStore((state) => state.clear);
   const { data, isError, isPending, refetch } = useCartLineDetails();
   const { mutate, isPending: isPlacingOrder } = usePlaceOrder();
+  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
   const detailsByKey = new Map(
     (data?.lines ?? []).map((detail) => [
@@ -80,17 +84,29 @@ export default function CheckoutPageClient({
       return;
     }
 
-    mutate({
-      fullName: profile.fullName,
-      phone: profile.phone,
-      governorate: profile.governorate,
-      markaz: profile.markaz,
-      addressText: profile.addressText,
-      items: lines.map((line) => ({
-        variantId: line.variantId,
-        quantity: line.quantity,
-      })),
-    });
+    mutate(
+      {
+        fullName: profile.fullName,
+        phone: profile.phone,
+        governorate: profile.governorate,
+        markaz: profile.markaz,
+        addressText: profile.addressText,
+        items: lines.map((line) => ({
+          variantId: line.variantId,
+          quantity: line.quantity,
+        })),
+      },
+      {
+        onSuccess: () => {
+          clearCart();
+          setIsOrderPlaced(true);
+        },
+      },
+    );
+  }
+
+  if (isOrderPlaced) {
+    return <CheckoutSuccess />;
   }
 
   return (
