@@ -1,11 +1,17 @@
 import { createClient } from "@/lib/supabase/client";
 
+import { buildAuthCallbackUrl } from "../lib/buildAuthCallbackUrl";
 import {
   registerWriteSchema,
   type RegisterWriteInput,
 } from "../schema";
 
 export type RegisterCustomerInput = RegisterWriteInput;
+
+export type RegisterCustomerOptions = {
+  /** Safe relative path to resume after email confirmation (e.g. `/checkout`). */
+  nextPath?: string;
+};
 
 export type RegisterCustomerResult = {
   userId: string;
@@ -19,9 +25,12 @@ export type RegisterCustomerResult = {
  * the matching `profiles` row from signup metadata (task 5.6).
  *
  * Re-validates with `registerWriteSchema` before any Supabase write (task 5.8).
+ * When `nextPath` is provided (browser), sets `emailRedirectTo` so confirm
+ * lands on `/auth/callback?next=...` instead of the site root.
  */
 export async function registerCustomer(
   input: RegisterCustomerInput,
+  options?: RegisterCustomerOptions,
 ): Promise<RegisterCustomerResult> {
   const parsed = registerWriteSchema.safeParse(input);
   if (!parsed.success) {
@@ -30,6 +39,11 @@ export async function registerCustomer(
 
   const payload = parsed.data;
   const supabase = createClient();
+
+  const emailRedirectTo =
+    typeof window !== "undefined"
+      ? buildAuthCallbackUrl(window.location.origin, options?.nextPath)
+      : undefined;
 
   const { data, error } = await supabase.auth.signUp({
     email: payload.email,
@@ -42,6 +56,7 @@ export async function registerCustomer(
         markaz: payload.markaz,
         address_text: payload.addressDescription,
       },
+      ...(emailRedirectTo ? { emailRedirectTo } : {}),
     },
   });
 

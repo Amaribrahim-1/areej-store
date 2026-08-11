@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   isGovernorate,
   isMarkazForGovernorate,
-} from "./data/egypt-locations";
+} from "@/lib/egypt-locations";
 
 const egyptianPhoneRegex = /^01[0125]\d{8}$/;
 

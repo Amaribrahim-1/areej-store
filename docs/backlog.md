@@ -19,6 +19,7 @@ Companion to `project-spec.md`. Items here were deliberately scoped out of the M
 | **Real-time notifications for new reviews** | Order notifications (WhatsApp/Email) were pulled into MVP, but review notifications were not — Alaa will continue checking the admin Reviews page directly for now. |
 | **Per-variant product photos** | MVP uses one photo per product (shared across sizes). Per-size photos can be added later if packaging visuals matter enough to justify storage and admin UX cost. |
 | **Admin-managed categories** | MVP ships four fixed categories in code + DB check. Adding a fifth later is a small change (`features/products/` + migration). A categories table / admin CRUD is unnecessary until Alaa regularly invents new category labels. |
+| **TanStack Query server prefetch + hydrate** (Server Component `prefetchQuery` → `dehydrate` → `HydrationBoundary`, same `queryKey` / `get*` as client `use*`) | MVP fetches catalog/detail data on the client via TanStack Query only; route `page.tsx` files compose UI and do not prefetch. Prefetching on the server improves first paint / SEO without replacing client cache, invalidation, or interactive filters — polish after the purchase flow is solid. |
 
 ---
 

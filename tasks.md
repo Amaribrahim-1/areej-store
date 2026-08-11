@@ -208,20 +208,27 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 `[branch: feature/checkout]`
 
-- **6.1 — Checkout entry from Cart**: "Confirm Order" action. If not authenticated, route to login/register and return to checkout afterwards (spec decision #7).
-- **6.2 — Order review step**: line items, total, and the delivery address pulled from the customer's profile. Payment method: Cash on Delivery, displayed as fixed.
+- [x] **6.1 — Checkout entry from Cart**: "Confirm Order" action. If not authenticated, route to login/register and return to checkout afterwards (spec decision #7).
+      **Done:** Cart CTA links to `/checkout`; guest auth + return path already handled by `(protected)` + `requireCustomer` / login `next` (5.9).
+- [x] **6.2 — Order review step**: line items, total, and the delivery address pulled from the customer's profile. Payment method: Cash on Delivery, displayed as fixed.
   🚩 Keep the payment method a swappable concept in the data model and UI copy even though COD is hardcoded (`coding-standards.md` §10) — hardcoding "COD" into control flow is what makes adding a second method a rewrite later.
-- **6.3 — `features/orders/schema.ts`**: `checkoutSchema` for the submitted payload (line items, address, contact) — no total field accepted from the client.
-- **6.4 — Place-order mutation** calling the Phase 1.5 server-side function. Guard against double submission (disable + in-flight state).
-- **6.5 — Post-success**: clear the cart store, show the simple "تم استلام طلبك" confirmation, link to Order History.
-- **6.6 — Admin notification: WhatsApp via CallMeBot + Email fallback.**
+      **Done:** Checkout review UI (lines + totals + profile address via `getMyProfile` + `PAYMENT_METHODS`/`cod` label). Place-order submit stays for 6.4.
+- [x] **6.3 — `features/orders/schema.ts`**: `checkoutSchema` for the submitted payload (line items, address, contact) — no total field accepted from the client.
+      **Done:** `checkoutSchema` + `CheckoutInput` — contact/address snapshot + `items[{ variantId, quantity }]`; no total/prices; Egypt location refine reused from auth data.
+- [x] **6.4 — Place-order mutation** calling the Phase 1.5 server-side function. Guard against double submission (disable + in-flight state).
+      **Done:** `placeOrder` + `usePlaceOrder`; checkout submit builds payload from profile + resolved lines; disable/`aria-busy` while in-flight; Sonner toasts on success/error.
+- [x] **6.5 — Post-success**: clear the cart store, show the simple "تم استلام طلبك" confirmation, link to Order History.
+      **Done:** On place-order success: clear cart store, show `CheckoutSuccess` («تم استلام طلبك») with link to `/orders`.
+- [x] **6.6 — Admin notification: WhatsApp via CallMeBot + Email fallback.**
   A route handler (server-side — the CallMeBot key never reaches the client), triggered on successful order creation.
   ⚠️ **Validate this early, in isolation, before wiring it in.** Per spec note #11, CallMeBot needs a one-time phone verification and has rate limits — confirm it actually delivers with Alaa's number before building around it. Decide the email fallback provider and whether it's free at this volume.
   A failed notification must **not** fail the order. The order is committed; notification is best-effort with a logged failure.
   🚩 Order notifications are in MVP. Review notifications are **not** (backlog) — do not generalize this into a notification system.
-- **6.7 — Test the critical flow** (`coding-standards.md` §8 priority 2): add-to-cart → checkout → order row + items created with server-computed totals.
+      **Done:** `POST /api/orders/notify` + CallMeBot then Resend fallback; secrets server-only; `notifyOrderPlaced` fire-and-forget after place-order success. Isolated WA smoke verified.
+- [x] **6.7 — Test the critical flow** (`coding-standards.md` §8 priority 2): add-to-cart → checkout → order row + items created with server-computed totals.
+      **Done:** Vitest for `checkoutSchema` + `placeOrder` (no client prices/totals); SQL smoke that `place_order` writes order + items with server totals; manual UI smoke (guest→register→confirm→checkout→order + WhatsApp) verified.
 
-`[commit: feat(checkout): order review step, feat(checkout): place order mutation, feat(checkout): admin whatsapp notification]`
+`[commit: feat(checkout): order review step, feat(checkout): place order mutation, feat(checkout): admin whatsapp notification, test(checkout): cover critical place-order and checkoutSchema]`
 
 ---
 
@@ -420,6 +427,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 | Standalone "List by Categories" page (covered by the catalog filter) | 3.7 (catalog filters)                                                    |
 | Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)             |
 | Admin-managed categories (CRUD)                                      | 1.1 (schema), 13.4 (product form category field)                         |
+| TanStack Query server prefetch + hydrate                             | 3.x (product catalog/detail pages), Providers / QueryClient setup        |
 
 ## Open Dependencies (not blocked on code)
 

@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-
 import {
   getGovernorates,
   getMarkazByGovernorate,
-} from "../data/egypt-locations";
+} from "@/lib/egypt-locations";
+import { cn } from "@/lib/utils";
+
 import { registerSchema, type RegisterType } from "../schema";
 import { useRegister } from "../api/useRegister";
 import { useRouter } from "next/navigation";
@@ -76,16 +76,19 @@ export default function RegisterForm({ nextPath = "/" }: RegisterFormProps) {
 
   const onSubmit: SubmitHandler<RegisterType> = (data) => {
     const { confirmPassword: _, ...input } = data;
-    mutate(input, {
-      onSuccess: (result) => {
-        if (result.needsEmailConfirmation) {
-          router.push(loginHref);
-          return;
-        }
-        router.push(nextPath);
-        router.refresh();
+    mutate(
+      { ...input, nextPath },
+      {
+        onSuccess: (result) => {
+          if (result.needsEmailConfirmation) {
+            router.push(loginHref);
+            return;
+          }
+          router.push(nextPath);
+          router.refresh();
+        },
       },
-    });
+    );
   };
 
   return (

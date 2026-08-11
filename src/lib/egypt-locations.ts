@@ -1,5 +1,5 @@
 /**
- * Static Egypt governorate → markaz/district dataset for auth address selects.
+ * Static Egypt governorate → markaz/district dataset for address selects.
  * Keys (value) are English; UI labels are Arabic.
  *
  * Source: Open Admin Data (CC-BY-4.0)
@@ -919,4 +919,26 @@ export function isMarkazForGovernorate(
   return (MARKAZ_BY_GOVERNORATE[governorate] as readonly string[]).includes(
     markaz,
   );
+}
+
+/** Arabic label for a governorate value, or the raw value if unknown. */
+export function resolveGovernorateLabel(
+  governorate: string | null | undefined,
+): string | null {
+  if (!governorate) return null;
+  if (isGovernorate(governorate)) return GOVERNORATE_LABELS[governorate];
+  return governorate;
+}
+
+/** Arabic label for a markaz value under a governorate, or the raw value. */
+export function resolveMarkazLabel(
+  governorate: string | null | undefined,
+  markaz: string | null | undefined,
+): string | null {
+  if (!markaz) return null;
+  if (!governorate) return markaz;
+  const match = getMarkazByGovernorate(governorate).find(
+    (option) => option.value === markaz,
+  );
+  return match?.label ?? markaz;
 }
