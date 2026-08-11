@@ -219,11 +219,12 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
       **Done:** `placeOrder` + `usePlaceOrder`; checkout submit builds payload from profile + resolved lines; disable/`aria-busy` while in-flight; Sonner toasts on success/error.
 - [x] **6.5 — Post-success**: clear the cart store, show the simple "تم استلام طلبك" confirmation, link to Order History.
       **Done:** On place-order success: clear cart store, show `CheckoutSuccess` («تم استلام طلبك») with link to `/orders`.
-- **6.6 — Admin notification: WhatsApp via CallMeBot + Email fallback.**
+- [x] **6.6 — Admin notification: WhatsApp via CallMeBot + Email fallback.**
   A route handler (server-side — the CallMeBot key never reaches the client), triggered on successful order creation.
   ⚠️ **Validate this early, in isolation, before wiring it in.** Per spec note #11, CallMeBot needs a one-time phone verification and has rate limits — confirm it actually delivers with Alaa's number before building around it. Decide the email fallback provider and whether it's free at this volume.
   A failed notification must **not** fail the order. The order is committed; notification is best-effort with a logged failure.
   🚩 Order notifications are in MVP. Review notifications are **not** (backlog) — do not generalize this into a notification system.
+      **Done:** `POST /api/orders/notify` + CallMeBot then Resend fallback; secrets server-only; `notifyOrderPlaced` fire-and-forget after place-order success. Isolated WA smoke verified.
 - **6.7 — Test the critical flow** (`coding-standards.md` §8 priority 2): add-to-cart → checkout → order row + items created with server-computed totals.
 
 `[commit: feat(checkout): order review step, feat(checkout): place order mutation, feat(checkout): admin whatsapp notification]`

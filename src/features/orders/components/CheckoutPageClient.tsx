@@ -14,14 +14,13 @@ import { usePlaceOrder } from "../api/usePlaceOrder";
 import { DEFAULT_PAYMENT_METHOD } from "../constants";
 import CheckoutPage from "./CheckoutPage";
 import CheckoutSuccess from "./CheckoutSuccess";
+import { notifyOrderPlaced } from "../api/notifyOrderPlaced";
 
 type CheckoutPageClientProps = {
   profile: MyProfile | null;
 };
 
-function hasCompleteProfile(
-  profile: MyProfile | null,
-): profile is MyProfile & {
+function hasCompleteProfile(profile: MyProfile | null): profile is MyProfile & {
   fullName: string;
   phone: string;
   governorate: string;
@@ -30,10 +29,10 @@ function hasCompleteProfile(
 } {
   return Boolean(
     profile?.fullName &&
-      profile.phone &&
-      profile.governorate &&
-      profile.markaz &&
-      profile.addressText,
+    profile.phone &&
+    profile.governorate &&
+    profile.markaz &&
+    profile.addressText,
   );
 }
 
@@ -97,9 +96,10 @@ export default function CheckoutPageClient({
         })),
       },
       {
-        onSuccess: () => {
+        onSuccess: (result) => {
           clearCart();
           setIsOrderPlaced(true);
+          void notifyOrderPlaced(result.orderId);
         },
       },
     );

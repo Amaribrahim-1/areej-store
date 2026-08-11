@@ -62,3 +62,10 @@ export const checkoutSchema = z
   .superRefine(assertValidEgyptLocation);
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
+
+/** Body for POST /api/orders/notify — triggers admin WhatsApp/email (best-effort). */
+export const notifyOrderSchema = z.object({
+  orderId: z.uuid({ message: "معرّف الطلب غير صالح" }),
+});
+
+export type NotifyOrderInput = z.infer<typeof notifyOrderSchema>;
