@@ -3,18 +3,20 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import type { MyProfile } from "@/features/auth/api/getMyProfile";
-import { useCartLineDetails } from "@/features/cart/api/useCartLineDetails";
-import { computeCartSubtotal } from "@/features/cart/lib/computeCartSubtotal";
-import { lineKey } from "@/features/cart/lib/lineKey";
-import { useCartStore } from "@/features/cart/store";
-import type { CartLineItemData } from "@/features/cart/types";
+import {
+  computeCartSubtotal,
+  lineKey,
+  useCartLineDetails,
+  useCartStore,
+} from "@/features/cart/public";
+import type { MyProfile } from "@/types/profile";
 
+import { notifyOrderPlaced } from "../api/notifyOrderPlaced";
 import { usePlaceOrder } from "../api/usePlaceOrder";
 import { DEFAULT_PAYMENT_METHOD } from "../constants";
+import type { CheckoutLineItemData } from "../types";
 import CheckoutPage from "./CheckoutPage";
 import CheckoutSuccess from "./CheckoutSuccess";
-import { notifyOrderPlaced } from "../api/notifyOrderPlaced";
 
 type CheckoutPageClientProps = {
   profile: MyProfile | null;
@@ -52,7 +54,7 @@ export default function CheckoutPageClient({
     ]),
   );
 
-  const lines: CartLineItemData[] = items.flatMap((item) => {
+  const lines: CheckoutLineItemData[] = items.flatMap((item) => {
     const detail = detailsByKey.get(lineKey(item.productId, item.variantId));
     if (!detail) return [];
 

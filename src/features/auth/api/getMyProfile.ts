@@ -1,12 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
+import type { MyProfile } from "@/types/profile";
 
-export type MyProfile = {
-  fullName: string | null;
-  phone: string | null;
-  governorate: string | null;
-  markaz: string | null;
-  addressText: string | null;
-};
+export type { MyProfile };
 
 /**
  * Loads the authenticated customer's profile delivery fields.

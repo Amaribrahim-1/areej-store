@@ -1,32 +1,14 @@
-import type { MyProfile } from "@/features/auth/api/getMyProfile";
+import type { MyProfile } from "@/types/profile";
 import {
-  GOVERNORATE_LABELS,
-  getMarkazByGovernorate,
-  isGovernorate,
-} from "@/features/auth/data/egypt-locations";
+  resolveGovernorateLabel,
+  resolveMarkazLabel,
+} from "@/lib/egypt-locations";
 import { cn } from "@/lib/utils";
 
 type CheckoutDeliveryAddressProps = {
   profile: MyProfile | null;
   className?: string;
 };
-
-function resolveGovernorateLabel(governorate: string | null): string | null {
-  if (!governorate) return null;
-  if (isGovernorate(governorate)) return GOVERNORATE_LABELS[governorate];
-  return governorate;
-}
-
-function resolveMarkazLabel(
-  governorate: string | null,
-  markaz: string | null,
-): string | null {
-  if (!markaz || !governorate) return markaz;
-  const match = getMarkazByGovernorate(governorate).find(
-    (option) => option.value === markaz,
-  );
-  return match?.label ?? markaz;
-}
 
 function hasDeliveryFields(profile: MyProfile): boolean {
   return Boolean(

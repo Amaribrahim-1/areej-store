@@ -4,8 +4,8 @@ import { ShoppingCartIcon } from "lucide-react";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
 import { Button, buttonVariants } from "@/components/ui/button";
-import type { MyProfile } from "@/features/auth/api/getMyProfile";
 import { cn } from "@/lib/utils";
+import type { MyProfile } from "@/types/profile";
 
 import { DEFAULT_PAYMENT_METHOD, type PaymentMethod } from "../constants";
 import type { CheckoutLineItemData } from "../types";

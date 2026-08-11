@@ -43,8 +43,9 @@ async function deliverNotification(
 
 /**
  * Best-effort admin alert after a successful place-order.
- * Delivery failure never throws for the WhatsApp/email path — returns channel "none".
+ * Delivery failure returns channel "none" — never throws for WhatsApp/email.
  * Auth/load failures return ok: false so the route can map HTTP status.
+ * Unexpected delivery errors are handled by the route catch-all.
  */
 export async function notifyAdminNewOrder(
   orderId: string,
@@ -54,13 +55,6 @@ export async function notifyAdminNewOrder(
     return { ok: false, reason: loaded.reason };
   }
 
-  try {
-    const channel = await deliverNotification(loaded.order);
-    return { ok: true, channel };
-  } catch (error) {
-    // Defensive: delivery helpers should not throw past deliverNotification,
-    // but never let notification crash the caller.
-    console.error("[notify] unexpected delivery error", error);
-    return { ok: true, channel: "none" };
-  }
+  const channel = await deliverNotification(loaded.order);
+  return { ok: true, channel };
 }

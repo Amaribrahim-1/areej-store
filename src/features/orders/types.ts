@@ -1,5 +1,5 @@
-import type { MyProfile } from "@/features/auth/api/getMyProfile";
-import type { CartLineItemData } from "@/features/cart/types";
+import type { MyProfile } from "@/types/profile";
+import type { CartLineItemData } from "@/features/cart/public";
 
 import type { PaymentMethod } from "./constants";
 

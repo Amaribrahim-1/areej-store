@@ -1,8 +1,7 @@
 import {
-  GOVERNORATE_LABELS,
-  getMarkazByGovernorate,
-  isGovernorate,
-} from "@/features/auth/data/egypt-locations";
+  resolveGovernorateLabel,
+  resolveMarkazLabel,
+} from "@/lib/egypt-locations";
 
 import { PAYMENT_METHOD_LABELS, type PaymentMethod } from "../constants";
 
@@ -38,21 +37,11 @@ function formatPaymentMethod(paymentMethod: string): string {
   return paymentMethod;
 }
 
-function resolveGovernorateLabel(governorate: string): string {
-  if (isGovernorate(governorate)) return GOVERNORATE_LABELS[governorate];
-  return governorate;
-}
-
-function resolveMarkazLabel(governorate: string, markaz: string): string {
-  const match = getMarkazByGovernorate(governorate).find(
-    (option) => option.value === markaz,
-  );
-  return match?.label ?? markaz;
-}
-
 function formatAddress(order: OrderNotificationPayload): string {
-  const governorate = resolveGovernorateLabel(order.governorate);
-  const markaz = resolveMarkazLabel(order.governorate, order.markaz);
+  const governorate =
+    resolveGovernorateLabel(order.governorate) ?? order.governorate;
+  const markaz =
+    resolveMarkazLabel(order.governorate, order.markaz) ?? order.markaz;
   return `${governorate} – ${markaz} – ${order.addressText}`;
 }
 
