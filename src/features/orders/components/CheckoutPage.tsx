@@ -3,14 +3,11 @@ import { ShoppingCartIcon } from "lucide-react";
 
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import type { MyProfile } from "@/features/auth/api/getMyProfile";
 import { cn } from "@/lib/utils";
 
-import {
-  DEFAULT_PAYMENT_METHOD,
-  type PaymentMethod,
-} from "../constants";
+import { DEFAULT_PAYMENT_METHOD, type PaymentMethod } from "../constants";
 import type { CheckoutLineItemData } from "../types";
 import CheckoutDeliveryAddress from "./CheckoutDeliveryAddress";
 import CheckoutLinesList from "./CheckoutLinesList";
@@ -27,6 +24,9 @@ type CheckoutPageProps = {
   isPending?: boolean;
   isError?: boolean;
   onRetry?: () => void;
+  onPlaceOrder: () => void;
+  isPlacingOrder?: boolean;
+  canPlaceOrder?: boolean;
 };
 
 export default function CheckoutPage({
@@ -38,8 +38,12 @@ export default function CheckoutPage({
   isPending = false,
   isError = false,
   onRetry,
+  onPlaceOrder,
+  isPlacingOrder = false,
+  canPlaceOrder = false,
 }: CheckoutPageProps) {
   const hasLines = lines.length > 0;
+  const isSubmitDisabled = isPlacingOrder || !canPlaceOrder;
 
   return (
     <div className="space-y-8">
@@ -84,7 +88,9 @@ export default function CheckoutPage({
               </h2>
               <Link
                 href="/cart"
-                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "sm" }),
+                )}
               >
                 تعديل السلة
               </Link>
@@ -98,6 +104,17 @@ export default function CheckoutPage({
             <CheckoutDeliveryAddress profile={profile} />
             <CheckoutPaymentMethod paymentMethod={paymentMethod} />
           </div>
+
+          <Button
+            type="button"
+            className="w-full"
+            size="lg"
+            disabled={isSubmitDisabled}
+            aria-busy={isPlacingOrder}
+            onClick={onPlaceOrder}
+          >
+            {isPlacingOrder ? "جاري إتمام الطلب..." : "إتمام الطلب"}
+          </Button>
         </>
       ) : null}
     </div>

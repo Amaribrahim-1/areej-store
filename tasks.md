@@ -215,7 +215,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
       **Done:** Checkout review UI (lines + totals + profile address via `getMyProfile` + `PAYMENT_METHODS`/`cod` label). Place-order submit stays for 6.4.
 - [x] **6.3 — `features/orders/schema.ts`**: `checkoutSchema` for the submitted payload (line items, address, contact) — no total field accepted from the client.
       **Done:** `checkoutSchema` + `CheckoutInput` — contact/address snapshot + `items[{ variantId, quantity }]`; no total/prices; Egypt location refine reused from auth data.
-- **6.4 — Place-order mutation** calling the Phase 1.5 server-side function. Guard against double submission (disable + in-flight state).
+- [x] **6.4 — Place-order mutation** calling the Phase 1.5 server-side function. Guard against double submission (disable + in-flight state).
+      **Done:** `placeOrder` + `usePlaceOrder`; checkout submit builds payload from profile + resolved lines; disable/`aria-busy` while in-flight; Sonner toasts on success/error.
 - **6.5 — Post-success**: clear the cart store, show the simple "تم استلام طلبك" confirmation, link to Order History.
 - **6.6 — Admin notification: WhatsApp via CallMeBot + Email fallback.**
   A route handler (server-side — the CallMeBot key never reaches the client), triggered on successful order creation.
@@ -423,6 +424,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 | Standalone "List by Categories" page (covered by the catalog filter) | 3.7 (catalog filters)                                                    |
 | Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)             |
 | Admin-managed categories (CRUD)                                      | 1.1 (schema), 13.4 (product form category field)                         |
+| TanStack Query server prefetch + hydrate                             | 3.x (product catalog/detail pages), Providers / QueryClient setup        |
 
 ## Open Dependencies (not blocked on code)
 
