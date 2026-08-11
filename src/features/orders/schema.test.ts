@@ -43,85 +43,49 @@ describe("checkoutSchema", () => {
     });
   });
 
-  it("rejects an empty items array", () => {
+  it.each([
+    {
+      name: "empty items",
+      override: { items: [] },
+      path: ["items"] as const,
+    },
+    {
+      name: "non-positive quantity",
+      override: { items: [{ variantId: validVariantId, quantity: 0 }] },
+      path: ["items", 0, "quantity"] as const,
+    },
+    {
+      name: "non-uuid variantId",
+      override: { items: [{ variantId: "not-a-uuid", quantity: 1 }] },
+      path: ["items", 0, "variantId"] as const,
+    },
+    {
+      name: "invalid Egyptian phone",
+      override: { phone: "0212345678" },
+      path: ["phone"] as const,
+    },
+    {
+      name: "markaz not in governorate",
+      override: { governorate: "Cairo", markaz: "Kafr El-Sheikh" },
+      path: ["markaz"] as const,
+    },
+    {
+      name: "too-short address",
+      override: { addressText: "قصير" },
+      path: ["addressText"] as const,
+    },
+  ])("rejects $name", ({ override, path }) => {
     const result = checkoutSchema.safeParse({
       ...validCheckoutBase,
-      items: [],
+      ...override,
     });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.path[0] === "items")).toBe(
-        true,
-      );
-    }
-  });
 
-  it("rejects a non-positive quantity", () => {
-    const result = checkoutSchema.safeParse({
-      ...validCheckoutBase,
-      items: [{ variantId: validVariantId, quantity: 0 }],
-    });
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(
-        result.error.issues.some(
-          (issue) => issue.path[0] === "items" && issue.path[2] === "quantity",
+        result.error.issues.some((issue) =>
+          path.every((segment, index) => issue.path[index] === segment),
         ),
-      ).toBe(true);
-    }
-  });
-
-  it("rejects a non-uuid variantId", () => {
-    const result = checkoutSchema.safeParse({
-      ...validCheckoutBase,
-      items: [{ variantId: "not-a-uuid", quantity: 1 }],
-    });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(
-        result.error.issues.some(
-          (issue) => issue.path[0] === "items" && issue.path[2] === "variantId",
-        ),
-      ).toBe(true);
-    }
-  });
-
-  it("rejects an invalid Egyptian phone number", () => {
-    const result = checkoutSchema.safeParse({
-      ...validCheckoutBase,
-      phone: "0212345678",
-    });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.path[0] === "phone")).toBe(
-        true,
-      );
-    }
-  });
-
-  it("rejects a markaz that does not belong to the governorate", () => {
-    const result = checkoutSchema.safeParse({
-      ...validCheckoutBase,
-      governorate: "Cairo",
-      markaz: "Kafr El-Sheikh",
-    });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.path[0] === "markaz")).toBe(
-        true,
-      );
-    }
-  });
-
-  it("rejects a too-short address", () => {
-    const result = checkoutSchema.safeParse({
-      ...validCheckoutBase,
-      addressText: "قصير",
-    });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(
-        result.error.issues.some((issue) => issue.path[0] === "addressText"),
       ).toBe(true);
     }
   });
