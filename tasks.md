@@ -247,7 +247,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **7.5 — Submit mutation** + query invalidation so the new review appears without a reload.
 - [x] **7.6 — Sanitize the free-text comment** before storage and before render (`coding-standards.md` §7) — this is the app's main stored-XSS surface, alongside the contact form.
       **Done:** `sanitizePlainText` (shared lib + unit tests); wired in `createReview` (before insert), `getProductReviews` (read path), and `ReviewItem` (render).
-- **7.7 — Decide: one review per customer per product?** Enforce in the DB with a unique constraint if yes — a client-side check alone is not enforcement.
+- [x] **7.7 — Decide: one review per customer per product?** Enforce in the DB with a unique constraint if yes — a client-side check alone is not enforcement.
+      **Done:** Decision = yes (locked since Phase 1). DB: `reviews_one_per_customer_per_product`. `createReview` maps `23505` → `REVIEW_ALREADY_EXISTS`. `getMyProductReview` + form UI hide add form when the customer already reviewed (toast remains fallback).
 
 `[commit: feat(reviews): reviews list, feat(reviews): add review form with sanitization]`
 

@@ -12,6 +12,8 @@ export function useCreateReview() {
     mutationFn: (input: CreateReviewInput) => createReview(input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["product-reviews"] });
+      void queryClient.invalidateQueries({ queryKey: ["my-product-review"] });
+      void queryClient.invalidateQueries({ queryKey: ["product"] });
       toast.success("تم إرسال تقييمك");
     },
     onError: (error) => {

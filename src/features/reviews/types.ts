@@ -11,3 +11,16 @@ export type ProductReview = {
   createdAt: string;
   authorName: string;
 };
+
+export type MyProductReviewQueryParams = {
+  slug: string;
+};
+
+/** The signed-in customer's own review for a product (no authorName needed). */
+export type MyProductReview = {
+  id: string;
+  productId: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+};
