@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { sanitizePlainText } from "@/lib/sanitizePlainText";
 
 import { PRODUCT_REVIEWS_DEFAULT_LIMIT } from "../constants";
 import type { ProductReview, ProductReviewsQueryParams } from "../types";
@@ -18,12 +19,19 @@ export async function getProductReviews(
     throw error;
   }
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    productId: row.product_id,
-    rating: Number(row.rating),
-    comment: row.comment,
-    createdAt: row.created_at,
-    authorName: row.author_name,
-  }));
+  return (data ?? []).map((row) => {
+    const sanitized =
+      row.comment != null && row.comment.length > 0
+        ? sanitizePlainText(row.comment)
+        : "";
+
+    return {
+      id: row.id,
+      productId: row.product_id,
+      rating: Number(row.rating),
+      comment: sanitized.length > 0 ? sanitized : null,
+      createdAt: row.created_at,
+      authorName: row.author_name,
+    };
+  });
 }

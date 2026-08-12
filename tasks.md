@@ -241,7 +241,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **7.3 — `reviewSchema`**: rating required (1–5), comment optional.
 - [x] **7.4 — Add-review form**, authenticated customers only (guests see a prompt to log in). Interactive `StarRating` wired through RHF.
 - [x] **7.5 — Submit mutation** + query invalidation so the new review appears without a reload.
-- **7.6 — Sanitize the free-text comment** before storage and before render (`coding-standards.md` §7) — this is the app's main stored-XSS surface, alongside the contact form.
+- [x] **7.6 — Sanitize the free-text comment** before storage and before render (`coding-standards.md` §7) — this is the app's main stored-XSS surface, alongside the contact form.
+      **Done:** `sanitizePlainText` (shared lib + unit tests); wired in `createReview` (before insert), `getProductReviews` (read path), and `ReviewItem` (render).
 - **7.7 — Decide: one review per customer per product?** Enforce in the DB with a unique constraint if yes — a client-side check alone is not enforcement.
 
 `[commit: feat(reviews): reviews list, feat(reviews): add review form with sanitization]`

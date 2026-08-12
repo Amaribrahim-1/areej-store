@@ -1,5 +1,6 @@
 import StarRating from "@/components/shared/StarRating";
 import UserAvatar from "@/components/shared/UserAvatar";
+import { sanitizePlainText } from "@/lib/sanitizePlainText";
 
 import type { ProductReview } from "../../types";
 
@@ -14,6 +15,12 @@ type ReviewItemProps = {
 };
 
 export default function ReviewItem({ review }: ReviewItemProps) {
+  // Defense in depth: API already sanitizes, but never render raw free-text as-is.
+  const safeComment =
+    review.comment != null && review.comment.length > 0
+      ? sanitizePlainText(review.comment)
+      : "";
+
   return (
     <li className="flex gap-3 border-b border-border/70 pb-6 last:border-b-0 last:pb-0 sm:gap-4">
       <UserAvatar
@@ -35,9 +42,9 @@ export default function ReviewItem({ review }: ReviewItemProps) {
 
         <StarRating value={review.rating} size="sm" />
 
-        {review.comment ? (
+        {safeComment ? (
           <p className="text-sm leading-relaxed text-muted-foreground">
-            {review.comment}
+            {safeComment}
           </p>
         ) : null}
       </div>

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { sanitizePlainText } from "@/lib/sanitizePlainText";
 
 import { reviewSchema } from "../schema";
 
@@ -19,6 +20,7 @@ export type CreateReviewResult = {
 /**
  * Inserts a product review for the authenticated customer.
  * Re-validates with `reviewSchema` before any Supabase write.
+ * Sanitizes free-text `comment` with `sanitizePlainText` before insert.
  * Resolves `product_id` from an active product slug — never trusts a client product id.
  */
 export async function createReview(
@@ -60,10 +62,10 @@ export async function createReview(
     throw new Error("PRODUCT_NOT_FOUND");
   }
 
-  const comment =
-    parsed.data.comment && parsed.data.comment.length > 0
-      ? parsed.data.comment
-      : null;
+  const rawComment = parsed.data.comment?.trim() ?? "";
+  const sanitizedComment =
+    rawComment.length > 0 ? sanitizePlainText(rawComment) : "";
+  const comment = sanitizedComment.length > 0 ? sanitizedComment : null;
 
   const { data, error } = await supabase
     .from("reviews")
