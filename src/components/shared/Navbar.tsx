@@ -14,10 +14,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { type AuthUser } from "@/features/auth/api/getCurrentUser";
+import { useCurrentUser } from "@/features/auth/api/useCurrentUser";
 import { useSignOut } from "@/features/auth/api/useSignOut";
 import { getCartItemCount } from "@/features/cart/lib/getCartItemCount";
 import { useCartStore } from "@/features/cart/store";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -59,35 +59,14 @@ type NavbarProps = {
 export default function Navbar({ initialUser }: NavbarProps) {
   const router = useRouter();
   const { mutate: signOut, isPending: isSigningOut } = useSignOut();
+  const user = useCurrentUser(initialUser);
 
-  const [user, setUser] = useState(initialUser);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const cartCount = useCartStore((state) => getCartItemCount(state.items));
 
   useEffect(() => {
     setHasMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setUser(initialUser);
-  }, [initialUser]);
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const nextUser = session?.user;
-      setUser(
-        nextUser
-          ? { id: nextUser.id, email: nextUser.email ?? null }
-          : null,
-      );
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   function closeMobileNav() {
@@ -159,9 +138,7 @@ export default function Navbar({ initialUser }: NavbarProps) {
 
           <Link
             href="/cart"
-            aria-label={
-              badgeCount > 0 ? `السلة، ${badgeCount} عناصر` : "السلة"
-            }
+            aria-label={badgeCount > 0 ? `السلة، ${badgeCount} عناصر` : "السلة"}
             className="relative inline-flex size-9 items-center justify-center rounded-4xl text-foreground transition-colors hover:bg-muted hover:text-text-accent"
           >
             <ShoppingCartIcon className="size-5" aria-hidden />
