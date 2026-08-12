@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 import { StarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -40,19 +42,21 @@ function InteractiveStar({
   filled,
   iconSize,
   disabled,
+  tabIndex,
   onSelect,
+  onKeyDown,
+  buttonRef,
 }: {
   starValue: number;
   selected: boolean;
   filled: boolean;
   iconSize: string;
   disabled: boolean;
+  tabIndex: number;
   onSelect: (value: number) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLButtonElement>, starValue: number) => void;
+  buttonRef: (el: HTMLButtonElement | null) => void;
 }) {
-  function handleClick() {
-    onSelect(starValue);
-  }
-
   return (
     <button
       type="button"
@@ -60,7 +64,10 @@ function InteractiveStar({
       aria-checked={selected}
       aria-label={`${starValue} من ${MAX_STARS} نجوم`}
       disabled={disabled}
-      onClick={handleClick}
+      tabIndex={tabIndex}
+      ref={buttonRef}
+      onClick={() => onSelect(starValue)}
+      onKeyDown={(e) => onKeyDown(e, starValue)}
       className={cn(
         "rounded-md p-0.5 transition-colors outline-none",
         "focus-visible:ring-[3px] focus-visible:ring-ring/50",
@@ -101,6 +108,72 @@ function DisplayStar({
   );
 }
 
+function InteractiveStarRating({
+  value,
+  iconSize,
+  className,
+  disabled,
+  onChange,
+  id,
+}: {
+  value: number;
+  iconSize: string;
+  className?: string;
+  disabled: boolean;
+  onChange: (value: number) => void;
+  id?: string;
+}) {
+  const selected = Math.round(clampRating(value));
+  // When nothing is selected yet, make the first star the tab entry point.
+  const rovingTarget = selected || 1;
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  function handleKeyDown(
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    starValue: number,
+  ) {
+    let next: number | null = null;
+    // dir="ltr" on the group: ArrowRight = increase, ArrowLeft = decrease.
+    if (e.key === "ArrowRight") next = Math.min(MAX_STARS, starValue + 1);
+    if (e.key === "ArrowLeft") next = Math.max(1, starValue - 1);
+    if (next !== null) {
+      e.preventDefault();
+      onChange(next);
+      buttonRefs.current[next - 1]?.focus();
+    }
+  }
+
+  return (
+    <div
+      id={id}
+      role="radiogroup"
+      aria-label="تقييم بالنجوم"
+      className={cn("inline-flex items-center gap-0.5", className)}
+      dir="ltr"
+    >
+      {Array.from({ length: MAX_STARS }, (_, index) => {
+        const starValue = index + 1;
+        return (
+          <InteractiveStar
+            key={starValue}
+            starValue={starValue}
+            selected={starValue === selected}
+            filled={starValue <= selected}
+            iconSize={iconSize}
+            disabled={disabled}
+            tabIndex={starValue === rovingTarget ? 0 : -1}
+            onSelect={onChange}
+            onKeyDown={handleKeyDown}
+            buttonRef={(el) => {
+              buttonRefs.current[index] = el;
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 export default function StarRating({
   value,
   size = "md",
@@ -114,31 +187,15 @@ export default function StarRating({
   const iconSize = sizeClasses[size];
 
   if (interactive && onChange) {
-    const selected = Math.round(rating);
-
     return (
-      <div
+      <InteractiveStarRating
+        value={value}
+        iconSize={iconSize}
+        className={className}
+        disabled={disabled}
+        onChange={onChange}
         id={id}
-        role="radiogroup"
-        aria-label="تقييم بالنجوم"
-        className={cn("inline-flex items-center gap-0.5", className)}
-        dir="ltr"
-      >
-        {Array.from({ length: MAX_STARS }, (_, index) => {
-          const starValue = index + 1;
-          return (
-            <InteractiveStar
-              key={starValue}
-              starValue={starValue}
-              selected={starValue === selected}
-              filled={starValue <= selected}
-              iconSize={iconSize}
-              disabled={disabled}
-              onSelect={onChange}
-            />
-          );
-        })}
-      </div>
+      />
     );
   }
 
