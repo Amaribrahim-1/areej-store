@@ -239,7 +239,7 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **7.1 — `features/reviews/api/useProductReviews.ts`**: reviews for a product, paginated or capped.
 - [x] **7.2 — Reviews list** on the product details page: rating, comment, author name, date. Empty state.
 - [x] **7.3 — `reviewSchema`**: rating required (1–5), comment optional.
-- **7.4 — Add-review form**, authenticated customers only (guests see a prompt to log in). Interactive `StarRating` wired through RHF.
+- [x] **7.4 — Add-review form**, authenticated customers only (guests see a prompt to log in). Interactive `StarRating` wired through RHF.
 - **7.5 — Submit mutation** + query invalidation so the new review appears without a reload.
 - **7.6 — Sanitize the free-text comment** before storage and before render (`coding-standards.md` §7) — this is the app's main stored-XSS surface, alongside the contact form.
 - **7.7 — Decide: one review per customer per product?** Enforce in the DB with a unique constraint if yes — a client-side check alone is not enforcement.
@@ -428,6 +428,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 | Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)             |
 | Admin-managed categories (CRUD)                                      | 1.1 (schema), 13.4 (product form category field)                         |
 | TanStack Query server prefetch + hydrate                             | 3.x (product catalog/detail pages), Providers / QueryClient setup        |
+| Product bundles / packages (multi-item offer at one price)           | 13.4–13.6 (admin product form), 3.x (catalog/detail), 4.x/6.x (cart/checkout line snapshots) |
 
 ## Open Dependencies (not blocked on code)
 

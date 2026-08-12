@@ -13,4 +13,4 @@ export const reviewSchema = z.object({
     .optional(),
 });
 
-export type ReviewInput = z.infer<typeof reviewSchema>;
+export type ReviewSchemaType = z.infer<typeof reviewSchema>;

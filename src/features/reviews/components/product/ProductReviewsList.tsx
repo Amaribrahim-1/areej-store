@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { useProductReviews } from "../../api/useProductReviews";
 import type { ProductReview } from "../../types";
+import AddReviewForm from "./AddReviewForm";
 
 type ProductReviewsListProps = {
   slug: string;
@@ -64,6 +65,8 @@ export default function ProductReviewsList({ slug }: ProductReviewsListProps) {
           ))}
         </ul>
       ) : null}
+
+      <AddReviewForm />
     </section>
   );
 }
