@@ -11,10 +11,14 @@ Ordered breakdown of the full MVP, derived from `docs/project-spec.md` and const
 - **Backend vs frontend ownership** is defined in `docs/ai-interactions.md` (company-style: pure `getProduct`-style helpers vs feature `types` + `use*` hooks + UI). This file lists **what** to build only — not who. Owner split happens in chat during the task workflow.
 - **`NEW CONCEPT`** = the developer has not used this in real code before. A small standalone teaching example comes first, then the real implementation.
 - 🚩 **Backlog guard** = a point where a deferred feature would naturally creep in. Do not build it. Listed so the omission is deliberate, not forgotten.
+- **Phase C / Phase A (MVP gaps)** = catch-up phases for essential MVP work that surfaced during building but was not planned in the numbered feature phases. They are **not** a dumping ground for `backlog.md` items.
+  - **Phase C — Customer MVP gaps:** after the last customer-facing phase (Phase 10), before Admin. Close customer UX holes before starting the admin panel.
+  - **Phase A — Admin MVP gaps:** after the last admin feature phase (Phase 14), before Hardening & Launch. Close admin MVP holes before launch polish / backlog.
+  - **Entry rule:** only add a task here if the customer/admin experience is clearly incomplete without it. Nice-to-haves stay in `backlog.md`.
 
 ## Ordering rationale (why not spec order)
 
-`project-spec.md` lists the Admin Panel first, but building it first would mean starting with the heaviest form in the MVP (multi-variant product + image upload) before React Hook Form + Zod have been used once. Instead: seed a few products manually in Supabase Studio, build the read-only storefront (teaches TanStack Query), then cart (teaches Zustand), then small forms (auth, review, contact), then the admin panel where the heavy form and all the mutations live.
+`project-spec.md` lists the Admin Panel first, but building it first would mean starting with the heaviest form in the MVP (multi-variant product + image upload) before React Hook Form + Zod have been used once. Instead: seed a few products manually in Supabase Studio, build the read-only storefront (teaches TanStack Query), then cart (teaches Zustand), then small forms (auth, review, contact), then **Phase C** (customer MVP gaps), then the admin panel, then **Phase A** (admin MVP gaps), then hardening.
 
 ---
 
@@ -295,6 +299,20 @@ Built after products and reviews exist, because every section on it is driven by
 
 ---
 
+## Phase C — Customer MVP gaps
+
+After customer storefront work (Phases 2–10), before Admin. Park essential customer MVP items that were missed or decided mid-build — not backlog polish.
+
+`[branch: feature/customer-mvp-gaps]` (or extend the relevant feature branch when the gap is tiny and still open)
+
+- **C.1 — Customer can edit their own review** (rating + optional comment). Owner-only; re-validate `reviewSchema` and sanitize comment before update. After success, invalidate product reviews (+ product rating aggregates as needed).
+- **C.2 — Customer can delete their own review.** Owner-only, with a confirm step. After delete, the add-review form is available again for that product (unique constraint still applies while a row exists).
+  🚩 Guests still cannot review. No editing/deleting someone else’s review. Admin delete is Phase A — not here.
+
+`[commit: feat(reviews): customer edit and delete own review]`
+
+---
+
 ## Phase 11 — Admin: Auth Shell & Dashboard
 
 `[branch: feature/admin-shell]`
@@ -360,9 +378,22 @@ Built after products and reviews exist, because every section on it is driven by
 - **14.2 — Reviews list**: product label, star rating, comment, customer, date.
 - **14.3 — Decide the scope of "new"**: the spec says "new reviews." Either a read/unread flag on `reviews`, or simply newest-first with no state. Pick the simpler one that satisfies Alaa's actual need — she wants to avoid checking each product page.
   🚩 No real-time notifications for new reviews (backlog) — Alaa checks this page. Do not extend the Phase 6.6 notification channel to reviews.
-- **14.4 — Moderation actions (hide/delete a review)?** Not in the spec. Raise it with Alaa before building — stored user text with no removal path is a real risk, so this is worth asking about rather than silently skipping.
+- **14.4 — Admin review moderation (decided):** Alaa can **delete** any review; she cannot **edit** customer reviews (no rewriting someone else’s rating/comment). Wire the delete action in **Phase A** after this list UI exists — Phase 14 stays read/list-first.
 
 `[commit: feat(admin-reviews): all reviews list]`
+
+---
+
+## Phase A — Admin MVP gaps
+
+After admin feature work (Phases 11–14), before Hardening & Launch. Park essential admin MVP items decided mid-build — not backlog polish.
+
+`[branch: feature/admin-mvp-gaps]` (or extend the relevant admin feature branch when the gap is tiny and still open)
+
+- **A.1 — Admin can delete any review** (moderation). Delete only — no admin edit of rating/comment. RLS: admin-only delete (customers keep owner edit/delete from Phase C). Confirm step + toast; invalidate admin reviews list and affected product review queries.
+  🚩 No hide/unread-only soft-moderation beyond what 14.3 already chose. No real-time review notifications (backlog).
+
+`[commit: feat(admin-reviews): admin delete review]`
 
 ---
 
@@ -399,8 +430,8 @@ Built after products and reviews exist, because every section on it is driven by
   instructions, and the live deploy link (15.9).
   Depends on 15.9 (deploy) being done first — the live link and a couple
   of real screenshots/GIFs belong in the README, and those should already
-  exist from having been captured feature-by-feature during Phases 2–14,
-  not staged retroactively here.
+  exist from having been captured feature-by-feature during Phases 2–14
+  (plus Phase C / Phase A gaps), not staged retroactively here.
 
 `[commit: chore(a11y): rtl audit fixes, chore(security): rls verification fixes, chore(release): production deploy config, docs(readme): portfolio project writeup]`
 
@@ -439,4 +470,3 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 - **CallMeBot phone verification** on Alaa's number, plus its rate limits — validate before 6.6 is built, not after.
 - **Email fallback provider** for order notifications — choose and confirm it is free at this volume (6.6).
 - **Delivery area scope** — decided in 5.3: full Egypt list (not delivery-area-only). Alaa still coordinates shipping manually; no fee calculation.
-- **Review moderation** — does Alaa need to hide/delete a review (14.4)?
