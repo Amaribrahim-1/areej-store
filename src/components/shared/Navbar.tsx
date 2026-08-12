@@ -3,54 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOutIcon, MenuIcon, ShoppingCartIcon, UserIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { type AuthUser } from "@/features/auth/api/getCurrentUser";
+import { useCurrentUser } from "@/features/auth/api/useCurrentUser";
 import { useSignOut } from "@/features/auth/api/useSignOut";
 import { getCartItemCount } from "@/features/cart/lib/getCartItemCount";
 import { useCartStore } from "@/features/cart/store";
-import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
 
-const NAV_LINKS = [
-  { href: "/", label: "الرئيسية" },
-  { href: "/products", label: "المنتجات" },
-  { href: "/about", label: "عنّا" },
-  { href: "/contact", label: "تواصل" },
-] as const;
-
-function NavLink({
-  href,
-  label,
-  className,
-  onNavigate,
-}: {
-  href: string;
-  label: string;
-  className?: string;
-  onNavigate?: () => void;
-}) {
-  return (
-    <Link
-      href={href}
-      onClick={onNavigate}
-      className={cn(
-        "text-sm font-medium text-foreground/80 transition-colors hover:text-text-accent",
-        className,
-      )}
-    >
-      {label}
-    </Link>
-  );
-}
+import NavLink from "./navbar/NavLink";
+import NavbarAccountActions from "./navbar/NavbarAccountActions";
+import NavbarCartLink from "./navbar/NavbarCartLink";
+import NavbarMobileMenu from "./navbar/NavbarMobileMenu";
+import { NAV_LINKS } from "./navbar/nav-links";
 
 type NavbarProps = {
   initialUser: AuthUser | null;
@@ -59,35 +23,14 @@ type NavbarProps = {
 export default function Navbar({ initialUser }: NavbarProps) {
   const router = useRouter();
   const { mutate: signOut, isPending: isSigningOut } = useSignOut();
+  const user = useCurrentUser(initialUser);
 
-  const [user, setUser] = useState(initialUser);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const cartCount = useCartStore((state) => getCartItemCount(state.items));
 
   useEffect(() => {
     setHasMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setUser(initialUser);
-  }, [initialUser]);
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const nextUser = session?.user;
-      setUser(
-        nextUser
-          ? { id: nextUser.id, email: nextUser.email ?? null }
-          : null,
-      );
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   function closeMobileNav() {
@@ -129,112 +72,26 @@ export default function Navbar({ initialUser }: NavbarProps) {
         </nav>
 
         <div className="ms-auto flex items-center gap-1 sm:gap-2">
-          <Link
-            href={accountHref}
-            className="hidden text-sm font-medium text-foreground/80 transition-colors hover:text-text-accent md:inline"
-          >
-            {accountLabel}
-          </Link>
+          <NavbarAccountActions
+            isLoggedIn={isLoggedIn}
+            accountHref={accountHref}
+            accountLabel={accountLabel}
+            isSigningOut={isSigningOut}
+            onSignOut={handleSignOut}
+          />
 
-          {isLoggedIn ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="hidden md:inline-flex"
-              disabled={isSigningOut}
-              onClick={handleSignOut}
-            >
-              {isSigningOut ? "جاري الخروج..." : "خروج"}
-            </Button>
-          ) : null}
+          <NavbarCartLink badgeCount={badgeCount} />
 
-          <Link
-            href={accountHref}
-            aria-label={accountLabel}
-            className="inline-flex size-9 items-center justify-center rounded-4xl text-foreground transition-colors hover:bg-muted hover:text-text-accent md:hidden"
-          >
-            <UserIcon className="size-5" aria-hidden />
-          </Link>
-
-          <Link
-            href="/cart"
-            aria-label={
-              badgeCount > 0 ? `السلة، ${badgeCount} عناصر` : "السلة"
-            }
-            className="relative inline-flex size-9 items-center justify-center rounded-4xl text-foreground transition-colors hover:bg-muted hover:text-text-accent"
-          >
-            <ShoppingCartIcon className="size-5" aria-hidden />
-            {badgeCount > 0 ? (
-              <span className="absolute -top-0.5 -start-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                {badgeCount > 99 ? "99+" : badgeCount}
-              </span>
-            ) : null}
-          </Link>
-
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  aria-label="فتح القائمة"
-                />
-              }
-            >
-              <MenuIcon className="size-5" aria-hidden />
-            </SheetTrigger>
-
-            <SheetContent
-              side="left"
-              className="w-[min(100%,20rem)] bg-background"
-            >
-              <SheetHeader className="border-b border-border text-start">
-                <SheetTitle className="font-heading text-lg text-brand">
-                  أريج
-                </SheetTitle>
-              </SheetHeader>
-
-              <nav
-                className="flex flex-col gap-1 px-4 py-4"
-                aria-label="تنقل الموبايل"
-              >
-                {NAV_LINKS.map((link) => (
-                  <NavLink
-                    key={link.href}
-                    href={link.href}
-                    label={link.label}
-                    onNavigate={closeMobileNav}
-                    className="rounded-2xl px-3 py-3 text-base hover:bg-muted"
-                  />
-                ))}
-              </nav>
-
-              <div className="mt-auto space-y-1 border-t border-border p-4">
-                <Link
-                  href={accountHref}
-                  onClick={closeMobileNav}
-                  className="flex items-center gap-2 rounded-2xl px-3 py-3 text-base font-medium text-text-accent transition-colors hover:bg-muted"
-                >
-                  <UserIcon className="size-5" aria-hidden />
-                  {accountLabel}
-                </Link>
-
-                {isLoggedIn ? (
-                  <button
-                    type="button"
-                    disabled={isSigningOut}
-                    onClick={handleSignOut}
-                    className="flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-start text-base font-medium text-foreground/80 transition-colors hover:bg-muted disabled:opacity-50"
-                  >
-                    <LogOutIcon className="size-5" aria-hidden />
-                    {isSigningOut ? "جاري الخروج..." : "تسجيل الخروج"}
-                  </button>
-                ) : null}
-              </div>
-            </SheetContent>
-          </Sheet>
+          <NavbarMobileMenu
+            open={mobileOpen}
+            onOpenChange={setMobileOpen}
+            accountHref={accountHref}
+            accountLabel={accountLabel}
+            isLoggedIn={isLoggedIn}
+            isSigningOut={isSigningOut}
+            onSignOut={handleSignOut}
+            onNavigate={closeMobileNav}
+          />
         </div>
       </div>
     </header>

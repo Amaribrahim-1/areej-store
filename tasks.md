@@ -11,10 +11,14 @@ Ordered breakdown of the full MVP, derived from `docs/project-spec.md` and const
 - **Backend vs frontend ownership** is defined in `docs/ai-interactions.md` (company-style: pure `getProduct`-style helpers vs feature `types` + `use*` hooks + UI). This file lists **what** to build only — not who. Owner split happens in chat during the task workflow.
 - **`NEW CONCEPT`** = the developer has not used this in real code before. A small standalone teaching example comes first, then the real implementation.
 - 🚩 **Backlog guard** = a point where a deferred feature would naturally creep in. Do not build it. Listed so the omission is deliberate, not forgotten.
+- **Phase C / Phase A (MVP gaps)** = catch-up phases for essential MVP work that surfaced during building but was not planned in the numbered feature phases. They are **not** a dumping ground for `backlog.md` items.
+  - **Phase C — Customer MVP gaps:** after the last customer-facing phase (Phase 10), before Admin. Close customer UX holes before starting the admin panel.
+  - **Phase A — Admin MVP gaps:** after the last admin feature phase (Phase 14), before Hardening & Launch. Close admin MVP holes before launch polish / backlog.
+  - **Entry rule:** only add a task here if the customer/admin experience is clearly incomplete without it. Nice-to-haves stay in `backlog.md`.
 
 ## Ordering rationale (why not spec order)
 
-`project-spec.md` lists the Admin Panel first, but building it first would mean starting with the heaviest form in the MVP (multi-variant product + image upload) before React Hook Form + Zod have been used once. Instead: seed a few products manually in Supabase Studio, build the read-only storefront (teaches TanStack Query), then cart (teaches Zustand), then small forms (auth, review, contact), then the admin panel where the heavy form and all the mutations live.
+`project-spec.md` lists the Admin Panel first, but building it first would mean starting with the heaviest form in the MVP (multi-variant product + image upload) before React Hook Form + Zod have been used once. Instead: seed a few products manually in Supabase Studio, build the read-only storefront (teaches TanStack Query), then cart (teaches Zustand), then small forms (auth, review, contact), then **Phase C** (customer MVP gaps), then the admin panel, then **Phase A** (admin MVP gaps), then hardening.
 
 ---
 
@@ -211,7 +215,7 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **6.1 — Checkout entry from Cart**: "Confirm Order" action. If not authenticated, route to login/register and return to checkout afterwards (spec decision #7).
       **Done:** Cart CTA links to `/checkout`; guest auth + return path already handled by `(protected)` + `requireCustomer` / login `next` (5.9).
 - [x] **6.2 — Order review step**: line items, total, and the delivery address pulled from the customer's profile. Payment method: Cash on Delivery, displayed as fixed.
-  🚩 Keep the payment method a swappable concept in the data model and UI copy even though COD is hardcoded (`coding-standards.md` §10) — hardcoding "COD" into control flow is what makes adding a second method a rewrite later.
+      🚩 Keep the payment method a swappable concept in the data model and UI copy even though COD is hardcoded (`coding-standards.md` §10) — hardcoding "COD" into control flow is what makes adding a second method a rewrite later.
       **Done:** Checkout review UI (lines + totals + profile address via `getMyProfile` + `PAYMENT_METHODS`/`cod` label). Place-order submit stays for 6.4.
 - [x] **6.3 — `features/orders/schema.ts`**: `checkoutSchema` for the submitted payload (line items, address, contact) — no total field accepted from the client.
       **Done:** `checkoutSchema` + `CheckoutInput` — contact/address snapshot + `items[{ variantId, quantity }]`; no total/prices; Egypt location refine reused from auth data.
@@ -220,10 +224,10 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 - [x] **6.5 — Post-success**: clear the cart store, show the simple "تم استلام طلبك" confirmation, link to Order History.
       **Done:** On place-order success: clear cart store, show `CheckoutSuccess` («تم استلام طلبك») with link to `/orders`.
 - [x] **6.6 — Admin notification: WhatsApp via CallMeBot + Email fallback.**
-  A route handler (server-side — the CallMeBot key never reaches the client), triggered on successful order creation.
-  ⚠️ **Validate this early, in isolation, before wiring it in.** Per spec note #11, CallMeBot needs a one-time phone verification and has rate limits — confirm it actually delivers with Alaa's number before building around it. Decide the email fallback provider and whether it's free at this volume.
-  A failed notification must **not** fail the order. The order is committed; notification is best-effort with a logged failure.
-  🚩 Order notifications are in MVP. Review notifications are **not** (backlog) — do not generalize this into a notification system.
+      A route handler (server-side — the CallMeBot key never reaches the client), triggered on successful order creation.
+      ⚠️ **Validate this early, in isolation, before wiring it in.** Per spec note #11, CallMeBot needs a one-time phone verification and has rate limits — confirm it actually delivers with Alaa's number before building around it. Decide the email fallback provider and whether it's free at this volume.
+      A failed notification must **not** fail the order. The order is committed; notification is best-effort with a logged failure.
+      🚩 Order notifications are in MVP. Review notifications are **not** (backlog) — do not generalize this into a notification system.
       **Done:** `POST /api/orders/notify` + CallMeBot then Resend fallback; secrets server-only; `notifyOrderPlaced` fire-and-forget after place-order success. Isolated WA smoke verified.
 - [x] **6.7 — Test the critical flow** (`coding-standards.md` §8 priority 2): add-to-cart → checkout → order row + items created with server-computed totals.
       **Done:** Vitest for `checkoutSchema` + `placeOrder` (no client prices/totals); SQL smoke that `place_order` writes order + items with server totals; manual UI smoke (guest→register→confirm→checkout→order + WhatsApp) verified.
@@ -236,13 +240,15 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 `[branch: feature/reviews]`
 
-- **7.1 — `features/reviews/api/useProductReviews.ts`**: reviews for a product, paginated or capped.
-- **7.2 — Reviews list** on the product details page: rating, comment, author name, date. Empty state.
-- **7.3 — `reviewSchema`**: rating required (1–5), comment optional.
-- **7.4 — Add-review form**, authenticated customers only (guests see a prompt to log in). Interactive `StarRating` wired through RHF.
-- **7.5 — Submit mutation** + query invalidation so the new review appears without a reload.
-- **7.6 — Sanitize the free-text comment** before storage and before render (`coding-standards.md` §7) — this is the app's main stored-XSS surface, alongside the contact form.
-- **7.7 — Decide: one review per customer per product?** Enforce in the DB with a unique constraint if yes — a client-side check alone is not enforcement.
+- [x] **7.1 — `features/reviews/api/useProductReviews.ts`**: reviews for a product, paginated or capped.
+- [x] **7.2 — Reviews list** on the product details page: rating, comment, author name, date. Empty state.
+- [x] **7.3 — `reviewSchema`**: rating required (1–5), comment optional.
+- [x] **7.4 — Add-review form**, authenticated customers only (guests see a prompt to log in). Interactive `StarRating` wired through RHF.
+- [x] **7.5 — Submit mutation** + query invalidation so the new review appears without a reload.
+- [x] **7.6 — Sanitize the free-text comment** before storage and before render (`coding-standards.md` §7) — this is the app's main stored-XSS surface, alongside the contact form.
+      **Done:** `sanitizePlainText` (shared lib + unit tests); wired in `createReview` (before insert), `getProductReviews` (read path), and `ReviewItem` (render).
+- [x] **7.7 — Decide: one review per customer per product?** Enforce in the DB with a unique constraint if yes — a client-side check alone is not enforcement.
+      **Done:** Decision = yes (locked since Phase 1). DB: `reviews_one_per_customer_per_product`. `createReview` maps `23505` → `REVIEW_ALREADY_EXISTS`. `getMyProductReview` + form UI hide add form when the customer already reviewed (toast remains fallback).
 
 `[commit: feat(reviews): reviews list, feat(reviews): add review form with sanitization]`
 
@@ -291,6 +297,20 @@ Built after products and reviews exist, because every section on it is driven by
   🚩 The contact form stores messages for Alaa to read; it does not need to send email. Adding email delivery here pulls in the same integration that "Forgot Password" was deferred for (backlog).
 
 `[commit: feat(pages): about page, feat(contact): contact form]`
+
+---
+
+## Phase C — Customer MVP gaps
+
+After customer storefront work (Phases 2–10), before Admin. Park essential customer MVP items that were missed or decided mid-build — not backlog polish.
+
+`[branch: feature/customer-mvp-gaps]` (or extend the relevant feature branch when the gap is tiny and still open)
+
+- **C.1 — Customer can edit their own review** (rating + optional comment). Owner-only; re-validate `reviewSchema` and sanitize comment before update. After success, invalidate product reviews (+ product rating aggregates as needed).
+- **C.2 — Customer can delete their own review.** Owner-only, with a confirm step. After delete, the add-review form is available again for that product (unique constraint still applies while a row exists).
+  🚩 Guests still cannot review. No editing/deleting someone else’s review. Admin delete is Phase A — not here.
+
+`[commit: feat(reviews): customer edit and delete own review]`
 
 ---
 
@@ -359,9 +379,22 @@ Built after products and reviews exist, because every section on it is driven by
 - **14.2 — Reviews list**: product label, star rating, comment, customer, date.
 - **14.3 — Decide the scope of "new"**: the spec says "new reviews." Either a read/unread flag on `reviews`, or simply newest-first with no state. Pick the simpler one that satisfies Alaa's actual need — she wants to avoid checking each product page.
   🚩 No real-time notifications for new reviews (backlog) — Alaa checks this page. Do not extend the Phase 6.6 notification channel to reviews.
-- **14.4 — Moderation actions (hide/delete a review)?** Not in the spec. Raise it with Alaa before building — stored user text with no removal path is a real risk, so this is worth asking about rather than silently skipping.
+- **14.4 — Admin review moderation (decided):** Alaa can **delete** any review; she cannot **edit** customer reviews (no rewriting someone else’s rating/comment). Wire the delete action in **Phase A** after this list UI exists — Phase 14 stays read/list-first.
 
 `[commit: feat(admin-reviews): all reviews list]`
+
+---
+
+## Phase A — Admin MVP gaps
+
+After admin feature work (Phases 11–14), before Hardening & Launch. Park essential admin MVP items decided mid-build — not backlog polish.
+
+`[branch: feature/admin-mvp-gaps]` (or extend the relevant admin feature branch when the gap is tiny and still open)
+
+- **A.1 — Admin can delete any review** (moderation). Delete only — no admin edit of rating/comment. RLS: admin-only delete (customers keep owner edit/delete from Phase C). Confirm step + toast; invalidate admin reviews list and affected product review queries.
+  🚩 No hide/unread-only soft-moderation beyond what 14.3 already chose. No real-time review notifications (backlog).
+
+`[commit: feat(admin-reviews): admin delete review]`
 
 ---
 
@@ -398,8 +431,8 @@ Built after products and reviews exist, because every section on it is driven by
   instructions, and the live deploy link (15.9).
   Depends on 15.9 (deploy) being done first — the live link and a couple
   of real screenshots/GIFs belong in the README, and those should already
-  exist from having been captured feature-by-feature during Phases 2–14,
-  not staged retroactively here.
+  exist from having been captured feature-by-feature during Phases 2–14
+  (plus Phase C / Phase A gaps), not staged retroactively here.
 
 `[commit: chore(a11y): rtl audit fixes, chore(security): rls verification fixes, chore(release): production deploy config, docs(readme): portfolio project writeup]`
 
@@ -428,6 +461,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 | Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)             |
 | Admin-managed categories (CRUD)                                      | 1.1 (schema), 13.4 (product form category field)                         |
 | TanStack Query server prefetch + hydrate                             | 3.x (product catalog/detail pages), Providers / QueryClient setup        |
+| Product bundles / packages (multi-item offer at one price)           | 13.4–13.6 (admin product form), 3.x (catalog/detail), 4.x/6.x (cart/checkout line snapshots) |
 
 ## Open Dependencies (not blocked on code)
 
@@ -437,4 +471,3 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 - **CallMeBot phone verification** on Alaa's number, plus its rate limits — validate before 6.6 is built, not after.
 - **Email fallback provider** for order notifications — choose and confirm it is free at this volume (6.6).
 - **Delivery area scope** — decided in 5.3: full Egypt list (not delivery-area-only). Alaa still coordinates shipping manually; no fee calculation.
-- **Review moderation** — does Alaa need to hide/delete a review (14.4)?
