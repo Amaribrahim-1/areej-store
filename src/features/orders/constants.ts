@@ -17,3 +17,6 @@ export const DEFAULT_PAYMENT_METHOD: PaymentMethod = "cod";
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   cod: "الدفع عند الاستلام",
 };
+
+/** Order history is personal, near-real-time data — shorter than the catalog's 5 min. */
+export const MY_ORDERS_STALE_TIME_MS = 2 * 60 * 1000;
