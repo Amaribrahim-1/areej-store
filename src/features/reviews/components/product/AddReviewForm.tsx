@@ -14,8 +14,9 @@ import { useCurrentUser } from "@/features/auth/api/useCurrentUser";
 import { cn } from "@/lib/utils";
 
 import { reviewSchema, type ReviewSchemaType } from "../../schema";
+import { useCreateReview } from "../../api/useCreateReview";
 
-export default function AddReviewForm() {
+export default function AddReviewForm({ slug }: { slug: string }) {
   const user = useCurrentUser();
   const pathname = usePathname();
   const loginHref = `/login?next=${encodeURIComponent(pathname)}`;
@@ -24,6 +25,7 @@ export default function AddReviewForm() {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ReviewSchemaType>({
     mode: "onBlur",
@@ -34,8 +36,21 @@ export default function AddReviewForm() {
     },
   });
 
-  const onSubmit: SubmitHandler<ReviewSchemaType> = () => {
-    // 7.5 — submit mutation
+  const { mutate, isPending } = useCreateReview();
+
+  const onSubmit: SubmitHandler<ReviewSchemaType> = (data) => {
+    mutate(
+      {
+        productSlug: slug,
+        rating: data.rating,
+        comment: data.comment,
+      },
+      {
+        onSuccess: () => {
+          reset({ rating: 0, comment: "" });
+        },
+      },
+    );
   };
 
   if (!user) {
@@ -105,8 +120,13 @@ export default function AddReviewForm() {
         <FieldError message={errors.comment?.message} />
       </div>
 
-      <Button type="submit" size="lg" className="w-full sm:w-auto sm:min-w-40">
-        إرسال التقييم
+      <Button
+        type="submit"
+        disabled={isPending}
+        size="lg"
+        className="w-full sm:w-auto sm:min-w-40"
+      >
+        {isPending ? "جاري الإرسال..." : "إرسال التقييم"}
       </Button>
     </form>
   );
