@@ -48,7 +48,7 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
         <ProductDetailsContent product={product} />
       ) : null}
 
-      <ProductReviewsList slug={slug} />
+      {product || isLoading ? <ProductReviewsList slug={slug} /> : null}
     </>
   );
 }

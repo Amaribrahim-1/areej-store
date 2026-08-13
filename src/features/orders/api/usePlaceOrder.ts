@@ -1,13 +1,19 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { placeOrder, type PlaceOrderInput } from "./placeOrder";
+import { customerOrdersQueryKey } from "./useCustomerOrders";
 
 export function usePlaceOrder() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (input: PlaceOrderInput) => placeOrder(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: customerOrdersQueryKey() });
+    },
     onError: (error) => {
       const raw = error instanceof Error ? error.message : "";
       const normalized = raw.toLowerCase();

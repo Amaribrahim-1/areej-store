@@ -258,11 +258,16 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 `[branch: feature/order-history]`
 
-- **8.1 — `api/useMyOrders.ts`**: the authenticated customer's orders, newest first. RLS enforces ownership; the query should not be the only guard.
-- **8.2 — Orders list**: order number, date, total, status badge (shared status-badge component, reused by the admin orders table).
-- **8.3 — Expandable line items or a details view** — decide based on how much the customer needs to see.
-- **8.4 — Empty state** for a customer with no orders.
-  🚩 No "cancel my order" or "reorder" action — neither is in the spec. Status changes are admin-only.
+- [x] **8.1 — `api/useCustomerOrders.ts`**: the authenticated customer's orders, newest first. RLS enforces ownership; the query should not be the only guard.
+      **Done:** `getCustomerOrders` (explicit `user_id` filter + RLS; `getUser()` error throws; no-session → `[]`) + `useCustomerOrders` (`customerOrdersQueryKey`, `CUSTOMER_ORDERS_STALE_TIME_MS`); `usePlaceOrder` invalidates the key on a successful order.
+- [x] **8.2 — Orders list**: order number, date, total, status badge (shared status-badge component, reused by the admin orders table).
+      **Done:** `CustomerOrdersPage` (`useCustomerOrders` + skeleton/empty/error, heading lives in the feature page like Cart/Checkout) renders `CustomerOrderCard` per order — collapsed summary (product preview thumbs, name(s), status, date, total) with a native `<details>` expand for full line items (image, variant, qty × price, line total). `OrderStatusBadge` shipped in `components/shared/` for Phase 12 reuse. `getCustomerOrders` also joins live `products.image_url` / `slug` for display (null-safe if a product went inactive).
+- [x] **8.3 — Expandable line items or a details view** — decide based on how much the customer needs to see.
+      **Done:** Locked **expandable on the list** (`CustomerOrderCard` native `<details>` from 8.2) — no customer `/orders/[id]` page. Expand shows line items, payment method, and totals only. Delivery-address snapshot stays off this screen (Alaa needs it on admin order details in Phase 12). No extra customer fields in `getCustomerOrders` for 8.3.
+      🚩 No customer cancel / edit / reorder in MVP. Status changes stay admin-only. Whether a customer may cancel or edit later, and under what constraints, is parked in `docs/backlog.md` (Open questions).
+- [x] **8.4 — Empty state** for a customer with no orders.
+      **Done:** `CustomerOrdersPage` already renders shared `EmptyState` when `getCustomerOrders` returns `[]` (title + catalog CTA). Shipped with 8.2; no extra UI in this task.
+      🚩 Same as 8.3: no cancel / reorder on the empty or filled list.
 
 `[commit: feat(order-history): customer orders list]`
 
@@ -335,6 +340,7 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 `[branch: feature/admin-orders]`
 
 - **12.1 — `api/useAdminOrders.ts`**: all orders. Shorter `staleTime` / more aggressive refetch than the catalog — Alaa acts on these in near-real-time (`coding-standards.md` §5).
+  🚩 If this hook (or an admin status-update mutation) needs to invalidate the customer's `customerOrdersQueryKey` (from 8.1) — or vice versa — that is the trigger to move `orders` feature query keys into a shared `queryKeys.ts` instead of hooks importing each other's key builders directly.
 - **12.2 — Orders table**: Customer Name, Address, Total, Status, Date, Phone, Details button. Mobile-first: a table this wide needs a card layout or horizontal scroll on phones — decide, don't let it break.
 - **12.3 — Order details page**: back button, line-items table (Product, Price, Quantity, Line Total), customer + address block.
 - **12.4 — Update-status control**: `Pending → Shipping → Delivered → Cancelled`, values from `constants.ts`, never retyped inline (§4).

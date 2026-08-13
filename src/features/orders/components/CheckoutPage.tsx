@@ -66,9 +66,7 @@ export default function CheckoutPage({
           title="السلة فارغة"
           description="مفيش منتجات لتأكيدها. ارجعي للسلة أو تصفّحي المتجر."
           action={
-            <Link href="/cart" className={cn(buttonVariants())}>
-              العودة إلى السلة
-            </Link>
+            <Button render={<Link href="/cart" />}>العودة إلى السلة</Button>
           }
         />
       ) : null}

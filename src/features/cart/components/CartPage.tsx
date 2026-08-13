@@ -72,9 +72,7 @@ export default function CartPage({
           title="السلة فارغة"
           description="لم تضيفي أي منتجات بعد. تصفّحي المتجر وأضيفي ما يناسبك."
           action={
-            <Link href="/products" className={cn(buttonVariants())}>
-              تصفح المنتجات
-            </Link>
+            <Button render={<Link href="/products" />}>تصفح المنتجات</Button>
           }
         />
       ) : null}
