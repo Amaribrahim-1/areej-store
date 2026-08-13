@@ -20,7 +20,7 @@ export type CheckoutReviewData = {
  * `imageUrl` / `slug` are live product fields (null if the product is
  * inactive or no longer readable under RLS) — display-only, not the charge.
  */
-export type MyOrderLineItem = {
+export type CustomerOrderLineItem = {
   id: string;
   productId: string;
   variantId: string;
@@ -34,11 +34,11 @@ export type MyOrderLineItem = {
 };
 
 /** One order in the authenticated customer's order history, newest first. */
-export type MyOrder = {
+export type CustomerOrder = {
   id: string;
   status: OrderStatus;
   total: number;
   paymentMethod: PaymentMethod;
   createdAt: string;
-  items: MyOrderLineItem[];
+  items: CustomerOrderLineItem[];
 };

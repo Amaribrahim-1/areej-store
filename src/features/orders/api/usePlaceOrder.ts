@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { placeOrder, type PlaceOrderInput } from "./placeOrder";
-import { myOrdersQueryKey } from "./useMyOrders";
+import { customerOrdersQueryKey } from "./useCustomerOrders";
 
 export function usePlaceOrder() {
   const queryClient = useQueryClient();
@@ -12,7 +12,7 @@ export function usePlaceOrder() {
   return useMutation({
     mutationFn: (input: PlaceOrderInput) => placeOrder(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: myOrdersQueryKey() });
+      queryClient.invalidateQueries({ queryKey: customerOrdersQueryKey() });
     },
     onError: (error) => {
       const raw = error instanceof Error ? error.message : "";
