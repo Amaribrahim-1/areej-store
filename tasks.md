@@ -262,9 +262,11 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
       **Done:** `getMyOrders` (explicit `user_id` filter + RLS, no-session → `[]`) + `useMyOrders` (`myOrdersQueryKey`, `MY_ORDERS_STALE_TIME_MS`); `usePlaceOrder` invalidates the key on a successful order.
 - [x] **8.2 — Orders list**: order number, date, total, status badge (shared status-badge component, reused by the admin orders table).
       **Done:** `MyOrdersList` (`useMyOrders` + skeleton/empty/error) renders `MyOrderCard` per order — collapsed summary (product preview thumbs, name(s), status, date, total) with a native `<details>` expand for full line items (image, variant, qty × price, line total). `OrderStatusBadge` shipped in `components/shared/` for Phase 12 reuse. `getMyOrders` now also joins live `products.image_url` / `slug` for display (null-safe if a product went inactive).
-- **8.3 — Expandable line items or a details view** — decide based on how much the customer needs to see.
+- [x] **8.3 — Expandable line items or a details view** — decide based on how much the customer needs to see.
+      **Done:** Locked **expandable on the list** (`MyOrderCard` native `<details>` from 8.2) — no customer `/orders/[id]` page. Expand shows line items, payment method, and totals only. Delivery-address snapshot stays off this screen (Alaa needs it on admin order details in Phase 12). No extra customer fields in `getMyOrders` for 8.3.
+      🚩 No customer cancel / edit / reorder in MVP. Status changes stay admin-only. Whether a customer may cancel or edit later, and under what constraints, is parked in `docs/backlog.md` (Open questions).
 - **8.4 — Empty state** for a customer with no orders.
-  🚩 No "cancel my order" or "reorder" action — neither is in the spec. Status changes are admin-only.
+  🚩 Same as 8.3: no cancel / reorder on the empty or filled list.
 
 `[commit: feat(order-history): customer orders list]`
 
