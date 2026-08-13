@@ -45,6 +45,7 @@ export default function ProductReviewsList({ slug }: ProductReviewsListProps) {
       {!isLoading && !isError && reviews?.length === 0 ? (
         <EmptyState
           icon={<MessageSquareIcon />}
+          titleAs="p"
           title="لا توجد تقييمات بعد"
           description="كن أول من يقيّم هذا المنتج."
           className="py-8"

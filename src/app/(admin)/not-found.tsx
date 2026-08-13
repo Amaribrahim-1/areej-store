@@ -1,19 +1,17 @@
 import Link from "next/link";
 
 import EmptyState from "@/components/shared/EmptyState";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export default function AdminNotFound() {
   return (
     <EmptyState
+      titleAs="h1"
       title="الصفحة غير موجودة"
       description="الصفحة دي مش موجودة في لوحة التحكم."
       className="min-h-[50vh]"
       action={
-        <Link href="/admin" className={cn(buttonVariants())}>
-          العودة للوحة التحكم
-        </Link>
+        <Button render={<Link href="/admin" />}>العودة للوحة التحكم</Button>
       }
     />
   );
