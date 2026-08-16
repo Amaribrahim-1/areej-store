@@ -28,10 +28,10 @@ bun.lockb
 *.key
 
 # Media & Binary Assets (الصور والفيديوهات والملفات الثقيلة)
-*.png
-*.jpg
-*.jpeg
-*.webp
+# *.png
+# *.jpg
+# *.jpeg
+# *.webp
 *.gif
 *.ico
 *.mp4
