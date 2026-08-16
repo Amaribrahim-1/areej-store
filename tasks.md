@@ -280,7 +280,7 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 Built after products and reviews exist, because every section on it is driven by their data.
 
 - [x] **9.1 — Hero**: full-width brand image, `next/image` with `priority`, Arabic `alt`.
-      **Done:** Full-bleed `Hero` in `app/(customer)/_components/` with `public/home_hero.jpg`, overlay copy + CTA, mobile/desktop washes, `priority` + Arabic `alt`. Wired on `/`.
+      **Done:** Full-bleed `Hero` in `app/(customer)/_components/` with `public/home_hero.jpg`, overlay copy + CTA, mobile/desktop washes, `priority` + Arabic `alt`. Wired on `/`. Overlay navbar (Home-at-top only) is parked at **C.3**.
 - [x] **9.2 — Features section**: static value props (shipping, quality, COD) — content from Alaa.
       **Done:** Static three-item strip in `app/(customer)/_components/Features.tsx` (shipping / quality / COD), Lucide icons, RTL, placeholder copy until Alaa’s final text. Wired on `/` under Hero.
 - [x] **9.3 — "Latest" section**: newest active products, reusing `ProductCard`.
@@ -302,9 +302,12 @@ Built after products and reviews exist, because every section on it is driven by
 
 `[branch: feature/static-pages]`
 
-- **10.1 — About page**: brand story. ⚠️ Blocked on content from Alaa (spec) — build the layout with placeholder copy, flag the dependency.
-- **10.2 — Contact page + form**: `contactSchema` (name, phone/email, message), insert into `contact_messages`.
-- **10.3 — Sanitize the contact message** before storage/render (§7), and rate-limit or otherwise guard the endpoint — a public insert endpoint is a spam target.
+- [x] **10.1 — About page**: brand story. ⚠️ Blocked on content from Alaa (spec) — build the layout with placeholder copy, flag the dependency.
+      **Done:** `/about` with `AboutContent` (catalog + how-we-work + CTAs). Interim copy in the brand voice until Alaa’s story lands. Navbar/Footer links already pointed here.
+- [x] **10.2 — Contact page + form**: `contactSchema` (name, phone, message), insert into `contact_messages`.
+      **Done:** `/contact` + `contactSchema` (phone-only — no email column) + `createContactMessage` / `useCreateContactMessage` calling `submit_contact_message`. Guest-accessible. No email delivery.
+- [x] **10.3 — Sanitize the contact message** before storage/render (§7), and rate-limit or otherwise guard the endpoint — a public insert endpoint is a spam target.
+      **Done:** `sanitizePlainText` before the RPC; RPC strips tags, re-validates, and rate-limits 3/phone/hour. Dropped `contact_messages_insert_anyone`; INSERT revoked from anon/authenticated. Honeypot on the form. No email send (backlog).
   🚩 The contact form stores messages for Alaa to read; it does not need to send email. Adding email delivery here pulls in the same integration that "Forgot Password" was deferred for (backlog).
 
 `[commit: feat(pages): about page, feat(contact): contact form]`
@@ -320,8 +323,10 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 - **C.1 — Customer can edit their own review** (rating + optional comment). Owner-only; re-validate `reviewSchema` and sanitize comment before update. After success, invalidate product reviews (+ product rating aggregates as needed).
 - **C.2 — Customer can delete their own review.** Owner-only, with a confirm step. After delete, the add-review form is available again for that product (unique constraint still applies while a row exists).
   🚩 Guests still cannot review. No editing/deleting someone else’s review. Admin delete is Phase A — not here.
+- **C.3 — Overlay navbar on the Home Hero**: on `/` at the top of the page, the customer navbar sits over the Hero (transparent, no solid bar) so they read as one visual unit. After scroll, and on every other customer page, keep the current solid sticky bar (`bg-background` + blur + border). Navbar stays in the customer layout — do not duplicate a Home-only nav.
+  🚩 Overlay is Home-at-top only. Do not make the navbar transparent site-wide. Logo, links, cart badge, and mobile menu icon must stay readable on the photo (add a top wash on the Hero if needed). If Alaa swaps the Hero image, re-check contrast. Admin navbar (11.3) is out of scope.
 
-`[commit: feat(reviews): customer edit and delete own review]`
+`[commit: feat(reviews): customer edit and delete own review, feat(shell): overlay navbar on home hero]`
 
 ---
 
@@ -479,7 +484,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 
 - **About page content** — from Alaa (10.1).
 - **Home Features section copy** — from Alaa (9.2).
-- **Hero + brand imagery** — interim image shipped in 9.1; Alaa may still swap the final brand photo.
+- **Hero + brand imagery** — interim image shipped in 9.1; Alaa may still swap the final brand photo. Overlay navbar contrast (C.3) must be re-checked if the photo changes.
 - **CallMeBot phone verification** on Alaa's number, plus its rate limits — validate before 6.6 is built, not after.
 - **Email fallback provider** for order notifications — choose and confirm it is free at this volume (6.6).
 - **Delivery area scope** — decided in 5.3: full Egypt list (not delivery-area-only). Alaa still coordinates shipping manually; no fee calculation.
