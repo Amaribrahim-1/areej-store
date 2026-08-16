@@ -279,7 +279,8 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 Built after products and reviews exist, because every section on it is driven by their data.
 
-- **9.1 — Hero**: full-width brand image, `next/image` with `priority`, Arabic `alt`.
+- [x] **9.1 — Hero**: full-width brand image, `next/image` with `priority`, Arabic `alt`.
+      **Done:** Full-bleed `Hero` in `app/(customer)/_components/` with `public/home_hero.jpg`, overlay copy + CTA, mobile/desktop washes, `priority` + Arabic `alt`. Wired on `/`.
 - **9.2 — Features section**: static value props (shipping, quality, COD) — content from Alaa.
 - **9.3 — "Latest" section**: newest active products, reusing `ProductCard`.
 - **9.4 — "Featured / Top Sales" section**: active products where `current_price < original_price`, sorted by discount depth or recency (spec decision #10). Static grid.
@@ -473,7 +474,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 
 - **About page content** — from Alaa (10.1).
 - **Home Features section copy** — from Alaa (9.2).
-- **Hero + brand imagery** — from Alaa (9.1).
+- **Hero + brand imagery** — interim image shipped in 9.1; Alaa may still swap the final brand photo.
 - **CallMeBot phone verification** on Alaa's number, plus its rate limits — validate before 6.6 is built, not after.
 - **Email fallback provider** for order notifications — choose and confirm it is free at this volume (6.6).
 - **Delivery area scope** — decided in 5.3: full Egypt list (not delivery-area-only). Alaa still coordinates shipping manually; no fee calculation.
