@@ -12,6 +12,21 @@ export type ProductReview = {
   authorName: string;
 };
 
+export type HomeTestimonialsParams = {
+  pageSize?: number;
+};
+
+export type HomeTestimonial = {
+  id: string;
+  productId: string;
+  productName: string;
+  productSlug: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  authorName: string;
+};
+
 export type MyProductReviewQueryParams = {
   slug: string;
 };

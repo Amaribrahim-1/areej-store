@@ -13,6 +13,14 @@ export type ProductsQueryParams = {
   pageSize?: number;
 };
 
+export type FeaturedProductsParams = {
+  pageSize?: number;
+};
+
+export type LatestProductsParams = {
+  pageSize?: number;
+};
+
 export type ProductListItem = {
   id: string;
   name: string;
@@ -24,7 +32,7 @@ export type ProductListItem = {
   originalPrice: number;
   averageRating: number | null;
   reviewCount: number;
-  /** Variant used for the catalog display price (lowest current_price, then sort_order). */
+  /** Variant for card price + add-to-cart. Catalog: cheapest. Featured: deepest discount. */
   displayVariantId: string;
   variantCount: number;
 };

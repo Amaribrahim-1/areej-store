@@ -1,12 +1,20 @@
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/types";
 import {
+  HOME_FEATURED_PAGE_SIZE,
+  HOME_LATEST_PAGE_SIZE,
   PRODUCT_CATEGORIES,
   PRODUCTS_PAGE_SIZE,
   type ProductCategory,
 } from "../constants";
 import { normalizeArabic } from "../lib/normalizeArabic";
+import {
+  resolveFeaturedDisplayVariant,
+  type FeaturedPriceVariant,
+} from "../lib/resolveFeaturedDisplayVariant";
 import type {
+  FeaturedProductsParams,
+  LatestProductsParams,
   ProductListItem,
   ProductSort,
   ProductsListResult,
@@ -48,7 +56,7 @@ function requireCatalogField<T>(
   field: string,
 ): T {
   if (value === null || value === undefined) {
-    throw new Error(`catalog_products row missing required field: ${field}`);
+    throw new Error(`product list row missing required field: ${field}`);
   }
   return value;
 }
@@ -157,4 +165,111 @@ export async function getProducts(
     items: (data ?? []).map(mapCatalogRow),
     total: count ?? 0,
   };
+}
+
+type FeaturedVariantRow = {
+  id: string;
+  product_id: string;
+  current_price: number;
+  original_price: number;
+  sort_order: number;
+};
+
+function groupFeaturedVariants(
+  variantRows: FeaturedVariantRow[],
+): Map<string, FeaturedPriceVariant[]> {
+  const variantsByProductId = new Map<string, FeaturedPriceVariant[]>();
+
+  for (const row of variantRows) {
+    const variants = variantsByProductId.get(row.product_id) ?? [];
+    variants.push({
+      id: row.id,
+      currentPrice: Number(row.current_price),
+      originalPrice: Number(row.original_price),
+      sortOrder: Number(row.sort_order),
+    });
+    variantsByProductId.set(row.product_id, variants);
+  }
+
+  return variantsByProductId;
+}
+
+function applyFeaturedDisplayPrices(
+  products: ProductListItem[],
+  variantRows: FeaturedVariantRow[],
+): ProductListItem[] {
+  const variantsByProductId = groupFeaturedVariants(variantRows);
+
+  return products.map((product) => {
+    const variants = variantsByProductId.get(product.id);
+    if (!variants || variants.length === 0) {
+      throw new Error(`featured product missing variants: ${product.id}`);
+    }
+    const featured = resolveFeaturedDisplayVariant(variants);
+    return {
+      ...product,
+      currentPrice: featured.currentPrice,
+      originalPrice: featured.originalPrice,
+      displayVariantId: featured.id,
+    };
+  });
+}
+
+export async function getLatestProducts(
+  params: LatestProductsParams = {},
+): Promise<ProductListItem[]> {
+  const pageSize = params.pageSize ?? HOME_LATEST_PAGE_SIZE;
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("catalog_products")
+    .select("*")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .range(0, pageSize - 1);
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map(mapCatalogRow);
+}
+
+export async function getFeaturedProducts(
+  params: FeaturedProductsParams = {},
+): Promise<ProductListItem[]> {
+  const pageSize = params.pageSize ?? HOME_FEATURED_PAGE_SIZE;
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("catalog_products")
+    .select("*")
+    .eq("status", "active")
+    .eq("has_discount", true)
+    .order("discount_depth", { ascending: false })
+    .order("created_at", { ascending: false })
+    .range(0, pageSize - 1);
+
+  if (error) {
+    throw error;
+  }
+
+  const products = (data ?? []).map(mapCatalogRow);
+  if (products.length === 0) {
+    return [];
+  }
+
+  const { data: variantRows, error: variantError } = await supabase
+    .from("product_variants")
+    .select("id, product_id, current_price, original_price, sort_order")
+    .in(
+      "product_id",
+      products.map((product) => product.id),
+    );
+
+  if (variantError) {
+    throw variantError;
+  }
+
+  return applyFeaturedDisplayPrices(products, variantRows ?? []);
 }

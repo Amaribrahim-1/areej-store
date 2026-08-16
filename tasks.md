@@ -279,16 +279,22 @@ Read-only path first: it teaches TanStack Query against real seeded data with no
 
 Built after products and reviews exist, because every section on it is driven by their data.
 
-- **9.1 — Hero**: full-width brand image, `next/image` with `priority`, Arabic `alt`.
-- **9.2 — Features section**: static value props (shipping, quality, COD) — content from Alaa.
-- **9.3 — "Latest" section**: newest active products, reusing `ProductCard`.
-- **9.4 — "Featured / Top Sales" section**: active products where `current_price < original_price`, sorted by discount depth or recency (spec decision #10). Static grid.
+- [x] **9.1 — Hero**: full-width brand image, `next/image` with `priority`, Arabic `alt`.
+      **Done:** Full-bleed `Hero` in `app/(customer)/_components/` with `public/home_hero.jpg`, overlay copy + CTA, mobile/desktop washes, `priority` + Arabic `alt`. Wired on `/`.
+- [x] **9.2 — Features section**: static value props (shipping, quality, COD) — content from Alaa.
+      **Done:** Static three-item strip in `app/(customer)/_components/Features.tsx` (shipping / quality / COD), Lucide icons, RTL, placeholder copy until Alaa’s final text. Wired on `/` under Hero.
+- [x] **9.3 — "Latest" section**: newest active products, reusing `ProductCard`.
+      **Done:** `LatestProducts` on `/` under Features; `getProducts({ sort: "newest", pageSize: 4 })` via `useProducts`, reuses `ProductCard`, with loading/error/empty and a catalog link.
+- [x] **9.4 — "Featured / Top Sales" section**: active products where `current_price < original_price`, sorted by discount depth or recency (spec decision #10). Static grid.
+  **Done:** `catalog_products` now exposes `has_discount` (any variant `current_price < original_price`) and `discount_depth`. `getFeaturedProducts` returns active discounted products sorted by depth then recency. `FeaturedProducts` static grid on `/` reuses `ProductCard`, with loading/error/empty. No carousel; no `is_featured`.
   🚩 Static grid only — no auto-advancing carousel, no arrow navigation (backlog, spec decision #3). And no manual `is_featured` toggle in admin; the discount drives it.
-- **9.5 — Testimonials section**: top-rated reviews that contain a text comment, across all products, each labelled with its product (spec decision #9). Static grid.
+- [x] **9.5 — Testimonials section**: top-rated reviews that contain a text comment, across all products, each labelled with its product (spec decision #9). Static grid.
+  **Done:** `list_home_testimonials` RPC + `getHomeTestimonials` (comment required, active products, rating then recency). `HomeTestimonials` static grid on `/` reuses `StarRating`, labels each quote with a product link, with loading/error/empty. No carousel; no `testimonials` table.
   🚩 Static grid, no carousel (backlog). No separate admin testimonial-entry screen (spec decision #9).
-- **9.6 — Lazy-load Testimonials and Featured** if they pull extra data (`coding-standards.md` §5), and fetch Home's sections in parallel, not as a waterfall.
+- [x] **9.6 — Lazy-load Testimonials and Featured** if they pull extra data (`coding-standards.md` §5), and fetch Home's sections in parallel, not as a waterfall.
+      **Done:** `next/dynamic` for `FeaturedProducts` and `HomeTestimonials` on `/`; Latest stays in the initial bundle. Both deferred sections render unconditionally so their queries start independently (no data waterfall). No carousel; no server prefetch (backlog).
 
-`[commit: feat(home): hero and features, feat(home): latest and featured sections, feat(home): testimonials]`
+`[commit: feat(home): hero and features, feat(home): latest and featured sections, feat(home): testimonials, feat(home): lazy-load featured and testimonials]`
 
 ---
 
@@ -473,7 +479,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 
 - **About page content** — from Alaa (10.1).
 - **Home Features section copy** — from Alaa (9.2).
-- **Hero + brand imagery** — from Alaa (9.1).
+- **Hero + brand imagery** — interim image shipped in 9.1; Alaa may still swap the final brand photo.
 - **CallMeBot phone verification** on Alaa's number, plus its rate limits — validate before 6.6 is built, not after.
 - **Email fallback provider** for order notifications — choose and confirm it is free at this volume (6.6).
 - **Delivery area scope** — decided in 5.3: full Egypt list (not delivery-area-only). Alaa still coordinates shipping manually; no fee calculation.
