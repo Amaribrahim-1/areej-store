@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
 import FieldError from "@/components/shared/FieldError";
+import PasswordInput from "@/components/shared/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -152,12 +153,9 @@ export default function RegisterForm({ nextPath = "/" }: RegisterFormProps) {
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="register-password">كلمة المرور</Label>
-          <Input
+          <PasswordInput
             id="register-password"
-            type="password"
             autoComplete="new-password"
-            dir="ltr"
-            className="text-start"
             aria-invalid={!!errors.password}
             {...register("password")}
           />
@@ -166,12 +164,9 @@ export default function RegisterForm({ nextPath = "/" }: RegisterFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="register-confirm-password">تأكيد كلمة المرور</Label>
-          <Input
+          <PasswordInput
             id="register-confirm-password"
-            type="password"
             autoComplete="new-password"
-            dir="ltr"
-            className="text-start"
             aria-invalid={!!errors.confirmPassword}
             {...register("confirmPassword")}
           />
