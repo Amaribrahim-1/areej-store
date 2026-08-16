@@ -281,8 +281,10 @@ Built after products and reviews exist, because every section on it is driven by
 
 - [x] **9.1 — Hero**: full-width brand image, `next/image` with `priority`, Arabic `alt`.
       **Done:** Full-bleed `Hero` in `app/(customer)/_components/` with `public/home_hero.jpg`, overlay copy + CTA, mobile/desktop washes, `priority` + Arabic `alt`. Wired on `/`.
-- **9.2 — Features section**: static value props (shipping, quality, COD) — content from Alaa.
-- **9.3 — "Latest" section**: newest active products, reusing `ProductCard`.
+- [x] **9.2 — Features section**: static value props (shipping, quality, COD) — content from Alaa.
+      **Done:** Static three-item strip in `app/(customer)/_components/Features.tsx` (shipping / quality / COD), Lucide icons, RTL, placeholder copy until Alaa’s final text. Wired on `/` under Hero.
+- [x] **9.3 — "Latest" section**: newest active products, reusing `ProductCard`.
+      **Done:** `LatestProducts` on `/` under Features; `getProducts({ sort: "newest", pageSize: 4 })` via `useProducts`, reuses `ProductCard`, with loading/error/empty and a catalog link.
 - **9.4 — "Featured / Top Sales" section**: active products where `current_price < original_price`, sorted by discount depth or recency (spec decision #10). Static grid.
   🚩 Static grid only — no auto-advancing carousel, no arrow navigation (backlog, spec decision #3). And no manual `is_featured` toggle in admin; the discount drives it.
 - **9.5 — Testimonials section**: top-rated reviews that contain a text comment, across all products, each labelled with its product (spec decision #9). Static grid.
