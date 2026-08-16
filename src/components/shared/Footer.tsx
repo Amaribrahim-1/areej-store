@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { PhoneIcon } from "lucide-react";
 
+import BrandLogo from "@/components/shared/BrandLogo";
+
 const FOOTER_NAV_LINKS = [
   { href: "/", label: "الرئيسية" },
   { href: "/products", label: "المنتجات" },
@@ -48,12 +50,7 @@ export default function Footer() {
     <footer className="mt-auto border-t border-border bg-bg-accent">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 md:grid-cols-3 md:gap-8 md:py-12">
         <div className="space-y-3">
-          <Link
-            href="/"
-            className="font-heading text-xl font-bold tracking-tight text-brand"
-          >
-            أريج
-          </Link>
+          <BrandLogo className="size-16" />
           <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
             متجر أريج للعطور والمسك والمخمرية وزيوت الشعر — عطور تلامس الحواس
             بجودة تليق بكِ.

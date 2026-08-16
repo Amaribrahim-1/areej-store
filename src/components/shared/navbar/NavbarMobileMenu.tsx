@@ -10,6 +10,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+import BrandLogo from "@/components/shared/BrandLogo";
+
 import NavLink from "./NavLink";
 import { NAV_LINKS } from "./nav-links";
 
@@ -51,8 +53,8 @@ export default function NavbarMobileMenu({
 
       <SheetContent side="left" className="w-[min(100%,20rem)] bg-background">
         <SheetHeader className="border-b border-border text-start">
-          <SheetTitle className="font-heading text-lg text-brand">
-            أريج
+          <SheetTitle className="flex items-center">
+            <BrandLogo className="size-12" onClick={onNavigate} />
           </SheetTitle>
         </SheetHeader>
 
