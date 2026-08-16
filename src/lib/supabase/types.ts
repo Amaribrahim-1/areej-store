@@ -394,6 +394,10 @@ export type Database = {
         }
         Returns: string
       }
+      submit_contact_message: {
+        Args: { p_message: string; p_name: string; p_phone: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
