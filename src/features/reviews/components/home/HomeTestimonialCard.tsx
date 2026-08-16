@@ -1,11 +1,9 @@
 import Link from "next/link";
-import { QuoteIcon } from "lucide-react";
 
 import StarRating from "@/components/shared/StarRating";
 import UserAvatar from "@/components/shared/UserAvatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { sanitizePlainText } from "@/lib/sanitizePlainText";
-import { cn } from "@/lib/utils";
 
 import type { HomeTestimonial } from "../../types";
 
@@ -39,9 +37,7 @@ export default function HomeTestimonialCard({
 
         <blockquote className="min-h-0 flex-1">
           <p className="line-clamp-5 text-sm leading-relaxed text-foreground">
-            {/* <QuoteMark /> */}
             {safeComment}
-            {/* <QuoteMark close /> */}
           </p>
         </blockquote>
 
@@ -53,17 +49,5 @@ export default function HomeTestimonialCard({
         </footer>
       </CardContent>
     </Card>
-  );
-}
-
-function QuoteMark({ close = false }: { close?: boolean }) {
-  return (
-    <QuoteIcon
-      className={cn(
-        "inline size-3.5 -translate-y-0.5 text-brand-400 rtl:-scale-x-100",
-        close ? "ms-1 rotate-180" : "me-1",
-      )}
-      aria-hidden
-    />
   );
 }

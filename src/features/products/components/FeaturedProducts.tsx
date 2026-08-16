@@ -38,7 +38,7 @@ export default function FeaturedProducts() {
             href="/products"
             className={cn(buttonVariants({ variant: "link" }))}
           >
-            عرض الكل
+            تسوّقي المنتجات
           </Link>
         </header>
 

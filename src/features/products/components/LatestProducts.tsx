@@ -9,7 +9,7 @@ import ErrorState from "@/components/shared/ErrorState";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { useProducts } from "../api/useProducts";
+import { useLatestProducts } from "../api/useLatestProducts";
 import { HOME_LATEST_PAGE_SIZE } from "../constants";
 import ProductCard from "./ProductCard";
 
@@ -17,9 +17,7 @@ const LATEST_GRID_CLASS =
   "grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4";
 
 export default function LatestProducts() {
-  const { data, isPending, isError, refetch } = useProducts({
-    sort: "newest",
-    page: 1,
+  const { data, isPending, isError, refetch } = useLatestProducts({
     pageSize: HOME_LATEST_PAGE_SIZE,
   });
 
@@ -55,7 +53,7 @@ export default function LatestProducts() {
             description="تعذّر جلب أحدث المنتجات. حاول مرة أخرى."
             onRetry={() => refetch()}
           />
-        ) : !data || data.items.length === 0 ? (
+        ) : !data || data.length === 0 ? (
           <EmptyState
             icon={<PackageSearchIcon />}
             title="لا توجد منتجات بعد"
@@ -64,7 +62,7 @@ export default function LatestProducts() {
           />
         ) : (
           <ul className={cn("list-none", LATEST_GRID_CLASS)}>
-            {data.items.map((product) => (
+            {data.map((product) => (
               <li key={product.id}>
                 <ProductCard product={product} />
               </li>
