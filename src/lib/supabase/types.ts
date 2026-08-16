@@ -333,9 +333,11 @@ export type Database = {
           category: string | null
           created_at: string | null
           description: string | null
+          discount_depth: number | null
           display_current_price: number | null
           display_original_price: number | null
           display_variant_id: string | null
+          has_discount: boolean | null
           id: string | null
           image_url: string | null
           name: string | null

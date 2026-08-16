@@ -285,7 +285,8 @@ Built after products and reviews exist, because every section on it is driven by
       **Done:** Static three-item strip in `app/(customer)/_components/Features.tsx` (shipping / quality / COD), Lucide icons, RTL, placeholder copy until Alaa’s final text. Wired on `/` under Hero.
 - [x] **9.3 — "Latest" section**: newest active products, reusing `ProductCard`.
       **Done:** `LatestProducts` on `/` under Features; `getProducts({ sort: "newest", pageSize: 4 })` via `useProducts`, reuses `ProductCard`, with loading/error/empty and a catalog link.
-- **9.4 — "Featured / Top Sales" section**: active products where `current_price < original_price`, sorted by discount depth or recency (spec decision #10). Static grid.
+- [x] **9.4 — "Featured / Top Sales" section**: active products where `current_price < original_price`, sorted by discount depth or recency (spec decision #10). Static grid.
+  **Done:** `catalog_products` now exposes `has_discount` (any variant `current_price < original_price`) and `discount_depth`. `getFeaturedProducts` returns active discounted products sorted by depth then recency. `FeaturedProducts` static grid on `/` reuses `ProductCard`, with loading/error/empty. No carousel; no `is_featured`.
   🚩 Static grid only — no auto-advancing carousel, no arrow navigation (backlog, spec decision #3). And no manual `is_featured` toggle in admin; the discount drives it.
 - **9.5 — Testimonials section**: top-rated reviews that contain a text comment, across all products, each labelled with its product (spec decision #9). Static grid.
   🚩 Static grid, no carousel (backlog). No separate admin testimonial-entry screen (spec decision #9).

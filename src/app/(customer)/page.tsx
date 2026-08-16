@@ -1,3 +1,4 @@
+import FeaturedProducts from "@/features/products/components/FeaturedProducts";
 import LatestProducts from "@/features/products/components/LatestProducts";
 
 import Features from "./_components/Features";
@@ -9,6 +10,7 @@ export default function Home() {
       <Hero />
       <Features />
       <LatestProducts />
+      <FeaturedProducts />
     </>
   );
 }

@@ -16,5 +16,6 @@ export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
 
 export const PRODUCTS_PAGE_SIZE = 12;
 export const HOME_LATEST_PAGE_SIZE = 4;
+export const HOME_FEATURED_PAGE_SIZE = 4;
 
 export const PRODUCTS_STALE_TIME_MS = 5 * 60 * 1000;

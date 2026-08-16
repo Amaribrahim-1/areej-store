@@ -13,6 +13,10 @@ export type ProductsQueryParams = {
   pageSize?: number;
 };
 
+export type FeaturedProductsParams = {
+  pageSize?: number;
+};
+
 export type ProductListItem = {
   id: string;
   name: string;

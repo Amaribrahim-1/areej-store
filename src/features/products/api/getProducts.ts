@@ -1,12 +1,14 @@
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/types";
 import {
+  HOME_FEATURED_PAGE_SIZE,
   PRODUCT_CATEGORIES,
   PRODUCTS_PAGE_SIZE,
   type ProductCategory,
 } from "../constants";
 import { normalizeArabic } from "../lib/normalizeArabic";
 import type {
+  FeaturedProductsParams,
   ProductListItem,
   ProductSort,
   ProductsListResult,
@@ -157,4 +159,26 @@ export async function getProducts(
     items: (data ?? []).map(mapCatalogRow),
     total: count ?? 0,
   };
+}
+
+export async function getFeaturedProducts(
+  params: FeaturedProductsParams = {},
+): Promise<ProductListItem[]> {
+  const pageSize = params.pageSize ?? HOME_FEATURED_PAGE_SIZE;
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("catalog_products")
+    .select("*")
+    .eq("status", "active")
+    .eq("has_discount", true)
+    .order("discount_depth", { ascending: false })
+    .order("created_at", { ascending: false })
+    .range(0, pageSize - 1);
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map(mapCatalogRow);
 }
