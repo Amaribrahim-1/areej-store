@@ -98,6 +98,13 @@ export type Database = {
             foreignKeyName: "order_items_variant_id_fkey"
             columns: ["variant_id"]
             isOneToOne: false
+            referencedRelation: "catalog_products"
+            referencedColumns: ["display_variant_id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
             referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
@@ -352,6 +359,19 @@ export type Database = {
       }
     }
     Functions: {
+      list_home_testimonials: {
+        Args: { p_limit?: number }
+        Returns: {
+          author_name: string
+          comment: string
+          created_at: string
+          id: string
+          product_id: string
+          product_name: string
+          product_slug: string
+          rating: number
+        }[]
+      }
       list_product_reviews: {
         Args: { p_limit?: number; p_product_slug: string }
         Returns: {

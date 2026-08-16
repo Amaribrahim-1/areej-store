@@ -13,6 +13,7 @@ export function useCreateReview() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["product-reviews"] });
       void queryClient.invalidateQueries({ queryKey: ["my-product-review"] });
+      void queryClient.invalidateQueries({ queryKey: ["home-testimonials"] });
       void queryClient.invalidateQueries({ queryKey: ["product"] });
       toast.success("تم إرسال تقييمك");
     },
