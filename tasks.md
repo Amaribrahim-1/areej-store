@@ -291,9 +291,10 @@ Built after products and reviews exist, because every section on it is driven by
 - [x] **9.5 — Testimonials section**: top-rated reviews that contain a text comment, across all products, each labelled with its product (spec decision #9). Static grid.
   **Done:** `list_home_testimonials` RPC + `getHomeTestimonials` (comment required, active products, rating then recency). `HomeTestimonials` static grid on `/` reuses `StarRating`, labels each quote with a product link, with loading/error/empty. No carousel; no `testimonials` table.
   🚩 Static grid, no carousel (backlog). No separate admin testimonial-entry screen (spec decision #9).
-- **9.6 — Lazy-load Testimonials and Featured** if they pull extra data (`coding-standards.md` §5), and fetch Home's sections in parallel, not as a waterfall.
+- [x] **9.6 — Lazy-load Testimonials and Featured** if they pull extra data (`coding-standards.md` §5), and fetch Home's sections in parallel, not as a waterfall.
+      **Done:** `next/dynamic` for `FeaturedProducts` and `HomeTestimonials` on `/`; Latest stays in the initial bundle. Both deferred sections render unconditionally so their queries start independently (no data waterfall). No carousel; no server prefetch (backlog).
 
-`[commit: feat(home): hero and features, feat(home): latest and featured sections, feat(home): testimonials]`
+`[commit: feat(home): hero and features, feat(home): latest and featured sections, feat(home): testimonials, feat(home): lazy-load featured and testimonials]`
 
 ---
 
