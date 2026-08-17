@@ -161,7 +161,7 @@ export default function OwnedReviewPanel({
           تقييمك
         </h3>
         <p className="text-sm text-muted-foreground">
-          قيّمتِ المنتج ده قبل كده — تقدر تعدّلي التقييم أو تحذفيه.
+          قيّمتِ المنتج ده قبل كده — تقدري تعدّلي التقييم أو تحذفيه.
         </p>
         <StarRating value={review.rating} size="lg" />
         {safeComment ? (
@@ -236,7 +236,7 @@ export default function OwnedReviewPanel({
         <Textarea
           id="edit-review-comment"
           rows={3}
-          placeholder="إيه اللي عجبك في المنتج؟"
+          placeholder="إيه اللي عجبكِ في المنتج؟"
           aria-invalid={!!errors.comment}
           {...register("comment")}
         />

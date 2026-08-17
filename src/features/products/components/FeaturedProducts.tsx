@@ -50,7 +50,7 @@ export default function FeaturedProducts() {
         ) : isError ? (
           <ErrorState
             title="فشل تحميل العروض"
-            description="تعذّر جلب المنتجات المخفّضة. حاول مرة أخرى."
+            description="تعذّر جلب المنتجات المخفّضة. حاولي مرة أخرى."
             onRetry={() => refetch()}
           />
         ) : !data || data.length === 0 ? (

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
@@ -65,14 +64,15 @@ export default function AccountForm({ initialProfile }: AccountFormProps) {
 
   const { mutate, isPending } = useUpdateMyProfile();
 
-  // Skip the first run: `selectedGovernorate` starts at the prefilled
-  // profile value, and clearing markaz then would wipe the saved address.
-  const isFirstGovernorateEffect = useRef(true);
+  // Clear markaz only when the governorate actually changes. A "skip first
+  // run" ref fails in React Strict Mode (the second effect pass wipes the
+  // saved markaz on load).
+  const previousGovernorateRef = useRef(selectedGovernorate);
   useEffect(() => {
-    if (isFirstGovernorateEffect.current) {
-      isFirstGovernorateEffect.current = false;
+    if (previousGovernorateRef.current === selectedGovernorate) {
       return;
     }
+    previousGovernorateRef.current = selectedGovernorate;
     setValue("markaz", "", { shouldValidate: false });
   }, [selectedGovernorate, setValue]);
 
@@ -88,22 +88,14 @@ export default function AccountForm({ initialProfile }: AccountFormProps) {
       noValidate
       onSubmit={handleSubmit(onSubmit)}
     >
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-1">
-          <h1 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
-            بياناتي
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            عدّلي اسمك ورقم موبايلك وعنوانك — التعديل بيسري على الطلبات
-            القادمة فقط.
-          </p>
-        </div>
-        <Link
-          href="/orders"
-          className="text-sm font-medium text-text-accent underline-offset-4 hover:underline"
-        >
-          طلباتي
-        </Link>
+      <header className="space-y-1">
+        <h1 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
+          بياناتي
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          عدّلي اسمك ورقم موبايلك وعنوانك — التعديل بيسري على الطلبات
+          القادمة فقط.
+        </p>
       </header>
 
       <div className="space-y-2">
@@ -150,7 +142,7 @@ export default function AccountForm({ initialProfile }: AccountFormProps) {
               {...register("governorate")}
             >
               <option value="" disabled>
-                اختر المحافظة
+                اختاري المحافظة
               </option>
               {governorates.map((governorate) => (
                 <option key={governorate.value} value={governorate.value}>
@@ -171,7 +163,7 @@ export default function AccountForm({ initialProfile }: AccountFormProps) {
               {...register("markaz")}
             >
               <option value="" disabled>
-                {selectedGovernorate ? "اختر المركز" : "اختر المحافظة أولاً"}
+                {selectedGovernorate ? "اختاري المركز" : "اختاري المحافظة أولاً"}
               </option>
               {markazOptions.map((markaz) => (
                 <option key={markaz.value} value={markaz.value}>

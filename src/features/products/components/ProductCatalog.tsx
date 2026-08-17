@@ -74,7 +74,7 @@ export default function ProductCatalog({ children }: ProductCatalogProps) {
           id="catalog-search"
           name="search"
           type="search"
-          placeholder="ابحث عن عطر، مسك..."
+          placeholder="ابحثي عن عطر، مسك..."
           className="h-11 bg-background pe-3 ps-10"
           value={draftSearch}
           onChange={(e) => setDraftSearch(e.target.value)}

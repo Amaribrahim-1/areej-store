@@ -189,7 +189,7 @@ export default function RegisterForm({ nextPath = "/" }: RegisterFormProps) {
               {...register("governorate")}
             >
               <option value="" disabled>
-                اختر المحافظة
+                اختاري المحافظة
               </option>
               {governorates.map((governorate) => (
                 <option key={governorate.value} value={governorate.value}>
@@ -210,7 +210,7 @@ export default function RegisterForm({ nextPath = "/" }: RegisterFormProps) {
               {...register("markaz")}
             >
               <option value="" disabled>
-                {selectedGovernorate ? "اختر المركز" : "اختر المحافظة أولاً"}
+                {selectedGovernorate ? "اختاري المركز" : "اختاري المحافظة أولاً"}
               </option>
               {markazOptions.map((markaz) => (
                 <option key={markaz.value} value={markaz.value}>

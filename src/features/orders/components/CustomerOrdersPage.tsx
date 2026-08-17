@@ -43,7 +43,7 @@ export default function CustomerOrdersPage() {
           title="لسه مفيش طلبات"
           description="لما تعملي طلب، هتلاقيه هنا بالتفاصيل والحالة."
           action={
-            <Button render={<Link href="/products" />}>تصفح المنتجات</Button>
+            <Button render={<Link href="/products" />}>تصفّحي المنتجات</Button>
           }
         />
       ) : null}

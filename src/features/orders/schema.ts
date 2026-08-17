@@ -14,7 +14,7 @@ function assertValidEgyptLocation(
     ctx.addIssue({
       code: "custom",
       path: ["governorate"],
-      message: "اختر محافظة صحيحة",
+      message: "اختاري محافظة صحيحة",
     });
     return;
   }
@@ -23,7 +23,7 @@ function assertValidEgyptLocation(
     ctx.addIssue({
       code: "custom",
       path: ["markaz"],
-      message: "اختر مركزًا صحيحًا لهذه المحافظة",
+      message: "اختاري مركزًا صحيحًا لهذه المحافظة",
     });
   }
 }
@@ -39,12 +39,12 @@ export const checkoutSchema = z
       .trim()
       .min(2, { message: "الاسم لازم يكون حرفين على الأقل" }),
     phone: z.string().trim().regex(egyptianPhoneRegex, {
-      message: "أدخل رقم موبايل مصري صحيح (مثل 01xxxxxxxxx)",
+      message: "أدخلي رقم موبايل مصري صحيح (مثل 01xxxxxxxxx)",
     }),
-    governorate: z.string().min(1, { message: "اختر المحافظة" }),
-    markaz: z.string().min(1, { message: "اختر المركز" }),
+    governorate: z.string().min(1, { message: "اختاري المحافظة" }),
+    markaz: z.string().min(1, { message: "اختاري المركز" }),
     addressText: z.string().trim().min(10, {
-      message: "اكتب وصفًا أوضح للعنوان (مثل الشارع أو علامة مميزة)",
+      message: "اكتبي وصفًا أوضح للعنوان (مثل الشارع أو علامة مميزة)",
     }),
     items: z
       .array(

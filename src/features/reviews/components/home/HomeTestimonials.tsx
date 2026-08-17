@@ -39,7 +39,7 @@ export default function HomeTestimonials() {
         ) : isError ? (
           <ErrorState
             title="فشل تحميل الآراء"
-            description="تعذّر جلب آراء العملاء. حاول مرة أخرى."
+            description="تعذّر جلب آراء العملاء. حاولي مرة أخرى."
             onRetry={() => refetch()}
           />
         ) : !data || data.length === 0 ? (

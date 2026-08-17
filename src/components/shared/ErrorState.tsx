@@ -13,7 +13,7 @@ type ErrorStateProps = {
 
 export default function ErrorState({
   title = "حدث خطأ ما",
-  description = "تعذّر تحميل المحتوى. حاول مرة أخرى.",
+  description = "تعذّر تحميل المحتوى. حاولي مرة أخرى.",
   onRetry,
   retryLabel = "إعادة المحاولة",
   className,

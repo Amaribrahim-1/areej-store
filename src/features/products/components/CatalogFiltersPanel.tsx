@@ -72,7 +72,7 @@ export default function CatalogFiltersPanel({
     <div className={cn("space-y-8 text-start", className)}>
       <div>
         <h2 className="font-heading text-lg font-semibold text-brand-800">
-          تسوق المنتجات
+          تسوّقي المنتجات
         </h2>
         <Button
           type="button"

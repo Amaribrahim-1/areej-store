@@ -60,10 +60,10 @@ function CreateReviewForm({ slug }: { slug: string }) {
     >
       <div className="space-y-1">
         <h3 className="font-heading text-lg font-semibold text-foreground">
-          أضف تقييمك
+          أضيفي تقييمك
         </h3>
         <p className="text-sm text-muted-foreground">
-          قيّم المنتج وشارك رأيك مع باقي العملاء.
+          قيّمي المنتج وشاركي رأيك مع باقي العملاء.
         </p>
       </div>
 
@@ -90,7 +90,7 @@ function CreateReviewForm({ slug }: { slug: string }) {
         <Textarea
           id="add-review-comment"
           rows={3}
-          placeholder="إيه اللي عجبك في المنتج؟"
+          placeholder="إيه اللي عجبكِ في المنتج؟"
           aria-invalid={!!errors.comment}
           {...register("comment")}
         />
@@ -132,10 +132,10 @@ export default function AddReviewForm({
     return (
       <div className="space-y-3 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5">
         <h3 className="font-heading text-lg font-semibold text-foreground">
-          أضف تقييمك
+          أضيفي تقييمك
         </h3>
         <p className="text-sm text-muted-foreground">
-          سجّل دخولك عشان تقدر تقيّم المنتج وتشارك رأيك.
+          سجّلي دخولك عشان تقدري تقيّمي المنتج وتشاركي رأيك.
         </p>
         <Link
           href={loginHref}
@@ -164,10 +164,10 @@ export default function AddReviewForm({
     return (
       <div className="space-y-2 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5">
         <h3 className="font-heading text-lg font-semibold text-foreground">
-          أضف تقييمك
+          أضيفي تقييمك
         </h3>
         <p className="text-sm text-muted-foreground">
-          تعذّر التحقق من تقييمك الحالي. تقدر تحاولي تاني بعد شوية.
+          تعذّر التحقق من تقييمك الحالي. تقدري تحاولي تاني بعد شوية.
         </p>
       </div>
     );
