@@ -7,6 +7,7 @@ import {
   computeCartSubtotal,
   lineKey,
   useCartLineDetails,
+  useCartPriceDriftNotice,
   useCartStore,
 } from "@/features/cart/public";
 import type { MyProfile } from "@/types/profile";
@@ -14,6 +15,7 @@ import type { MyProfile } from "@/types/profile";
 import { notifyOrderPlaced } from "../api/notifyOrderPlaced";
 import { usePlaceOrder } from "../api/usePlaceOrder";
 import { DEFAULT_PAYMENT_METHOD } from "../constants";
+import { hasCompleteProfile } from "../lib/hasCompleteProfile";
 import type { CheckoutLineItemData } from "../types";
 import CheckoutPage from "./CheckoutPage";
 import CheckoutSuccess from "./CheckoutSuccess";
@@ -22,28 +24,21 @@ type CheckoutPageClientProps = {
   profile: MyProfile | null;
 };
 
-function hasCompleteProfile(profile: MyProfile | null): profile is MyProfile & {
-  fullName: string;
-  phone: string;
-  governorate: string;
-  markaz: string;
-  addressText: string;
-} {
-  return Boolean(
-    profile?.fullName &&
-    profile.phone &&
-    profile.governorate &&
-    profile.markaz &&
-    profile.addressText,
-  );
-}
-
 export default function CheckoutPageClient({
   profile,
 }: CheckoutPageClientProps) {
   const items = useCartStore((state) => state.items);
+  const removeItem = useCartStore((state) => state.removeItem);
   const clearCart = useCartStore((state) => state.clear);
+  const syncUnitPriceSnapshots = useCartStore(
+    (state) => state.syncUnitPriceSnapshots,
+  );
   const { data, isError, isPending, refetch } = useCartLineDetails();
+  const showPriceDriftNotice = useCartPriceDriftNotice(
+    data,
+    items,
+    syncUnitPriceSnapshots,
+  );
   const { mutate, isPending: isPlacingOrder } = usePlaceOrder();
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
@@ -66,12 +61,21 @@ export default function CheckoutPageClient({
     ];
   });
 
+  const unresolvedLines = data?.unresolved ?? [];
   const subtotal = computeCartSubtotal(lines);
   const showPending = items.length > 0 && isPending;
-  const canPlaceOrder = hasCompleteProfile(profile) && lines.length > 0;
+  const canPlaceOrder =
+    hasCompleteProfile(profile) &&
+    lines.length > 0 &&
+    unresolvedLines.length === 0;
 
   function handleRetry() {
     void refetch();
+  }
+
+  function handleRemoveUnresolved(productId: string, variantId: string) {
+    removeItem(productId, variantId);
+    toast.success("تم حذف المنتج من السلة");
   }
 
   function handlePlaceOrder() {
@@ -82,6 +86,11 @@ export default function CheckoutPageClient({
 
     if (lines.length === 0) {
       toast.error("السلة فارغة");
+      return;
+    }
+
+    if (unresolvedLines.length > 0) {
+      toast.error("شيلي المنتجات غير المتاحة من السلة قبل إتمام الطلب");
       return;
     }
 
@@ -114,13 +123,16 @@ export default function CheckoutPageClient({
   return (
     <CheckoutPage
       lines={lines}
+      unresolvedLines={unresolvedLines}
       subtotal={subtotal}
       total={subtotal}
       profile={profile}
       paymentMethod={DEFAULT_PAYMENT_METHOD}
       isPending={showPending}
       isError={isError}
+      showPriceDriftNotice={showPriceDriftNotice}
       onRetry={handleRetry}
+      onRemoveUnresolved={handleRemoveUnresolved}
       onPlaceOrder={handlePlaceOrder}
       isPlacingOrder={isPlacingOrder}
       canPlaceOrder={canPlaceOrder}
