@@ -1,3 +1,5 @@
+import { isAuthSessionMissingError } from "@supabase/supabase-js";
+
 import { createClient } from "@/lib/supabase/client";
 import type { MyProfile } from "@/types/profile";
 
@@ -31,7 +33,14 @@ export async function updateMyProfile(
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError || !user) {
+  if (userError) {
+    if (isAuthSessionMissingError(userError)) {
+      throw new Error("UNAUTHENTICATED");
+    }
+    throw userError;
+  }
+
+  if (!user) {
     throw new Error("UNAUTHENTICATED");
   }
 

@@ -26,10 +26,11 @@ export default function UnresolvedCartLinesNotice({
 
   return (
     <ul className={cn("space-y-2", className)} role="list">
-      {lines.map((line) => (
+      {lines.map((line, index) => (
         <UnresolvedCartLineRow
           key={`${line.productId}:${line.variantId}`}
           line={line}
+          index={index}
           onRemove={onRemove}
         />
       ))}
@@ -39,10 +40,15 @@ export default function UnresolvedCartLinesNotice({
 
 type UnresolvedCartLineRowProps = {
   line: CartLineLookup;
+  index: number;
   onRemove: UnresolvedCartLinesNoticeProps["onRemove"];
 };
 
-function UnresolvedCartLineRow({ line, onRemove }: UnresolvedCartLineRowProps) {
+function UnresolvedCartLineRow({
+  line,
+  index,
+  onRemove,
+}: UnresolvedCartLineRowProps) {
   function handleRemove() {
     onRemove(line.productId, line.variantId);
   }
@@ -59,7 +65,13 @@ function UnresolvedCartLineRow({ line, onRemove }: UnresolvedCartLineRowProps) {
         />
         هذا المنتج لم يعد متاحًا
       </span>
-      <Button type="button" variant="ghost" size="sm" onClick={handleRemove}>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        aria-label={`إزالة منتج غير متاح ${index + 1}`}
+        onClick={handleRemove}
+      >
         إزالة
       </Button>
     </li>

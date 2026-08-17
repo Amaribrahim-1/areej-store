@@ -21,7 +21,7 @@ export function useUpdateMyProfile() {
           ? "بيانات غير صحيحة"
           : raw === "UNAUTHENTICATED"
             ? "لازم تكوني مسجّلة الدخول"
-            : raw || "حصل خطأ أثناء الحفظ، جرّبي تاني";
+            : "حصل خطأ أثناء الحفظ، جرّبي تاني";
       toast.error(message);
     },
   });

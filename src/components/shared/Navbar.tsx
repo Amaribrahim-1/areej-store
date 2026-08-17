@@ -6,8 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { type AuthUser } from "@/features/auth/api/getCurrentUser";
 import { useCurrentUser } from "@/features/auth/api/useCurrentUser";
 import { useSignOut } from "@/features/auth/api/useSignOut";
-import { getCartItemCount } from "@/features/cart/lib/getCartItemCount";
-import { useCartStore } from "@/features/cart/store";
+import { getCartItemCount, useCartStore } from "@/features/cart/public";
 import { cn } from "@/lib/utils";
 
 import BrandLogo from "./BrandLogo";
