@@ -16,18 +16,9 @@ import { cn } from "@/lib/utils";
 import { useCreateReview } from "../../api/useCreateReview";
 import { useMyProductReview } from "../../api/useMyProductReview";
 import { reviewSchema, type ReviewSchemaType } from "../../schema";
+import OwnedReviewPanel from "./OwnedReviewPanel";
 
-export default function AddReviewForm({ slug }: { slug: string }) {
-  const user = useCurrentUser();
-  const pathname = usePathname();
-  const loginHref = `/login?next=${encodeURIComponent(pathname)}`;
-
-  const {
-    data: myReview,
-    isLoading: isLoadingMyReview,
-    isError: isMyReviewError,
-  } = useMyProductReview({ slug }, !!user);
-
+function CreateReviewForm({ slug }: { slug: string }) {
   const {
     register,
     control,
@@ -59,66 +50,6 @@ export default function AddReviewForm({ slug }: { slug: string }) {
       },
     );
   };
-
-  if (!user) {
-    return (
-      <div className="space-y-3 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5">
-        <h3 className="font-heading text-lg font-semibold text-foreground">
-          أضف تقييمك
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          سجّل دخولك عشان تقدر تقيّم المنتج وتشارك رأيك.
-        </p>
-        <Link
-          href={loginHref}
-          className={cn(
-            buttonVariants({ size: "lg" }),
-            "w-full sm:w-auto sm:min-w-40",
-          )}
-        >
-          تسجيل الدخول
-        </Link>
-      </div>
-    );
-  }
-
-  if (isLoadingMyReview) {
-    return (
-      <div
-        className="h-40 animate-pulse rounded-3xl border border-border bg-brand-50/40"
-        aria-busy="true"
-        aria-label="جاري التحقق من تقييمك"
-      />
-    );
-  }
-
-  if (isMyReviewError) {
-    return (
-      <div className="space-y-2 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5">
-        <h3 className="font-heading text-lg font-semibold text-foreground">
-          أضف تقييمك
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          تعذّر التحقق من تقييمك الحالي. تقدر تحاولي تاني بعد شوية.
-        </p>
-      </div>
-    );
-  }
-
-  // One review per customer per product (DB unique). Edit/delete → Phase C.
-  if (myReview) {
-    return (
-      <div className="space-y-3 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5">
-        <h3 className="font-heading text-lg font-semibold text-foreground">
-          تقييمك
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          قيّمتِ المنتج ده قبل كده — ريفيو واحد لكل منتج.
-        </p>
-        <StarRating value={myReview.rating} size="lg" />
-      </div>
-    );
-  }
 
   return (
     <form
@@ -175,4 +106,67 @@ export default function AddReviewForm({ slug }: { slug: string }) {
       </Button>
     </form>
   );
+}
+
+export default function AddReviewForm({ slug }: { slug: string }) {
+  const user = useCurrentUser();
+  const pathname = usePathname();
+  const loginHref = `/login?next=${encodeURIComponent(pathname)}`;
+
+  const {
+    data: myReview,
+    isLoading: isLoadingMyReview,
+    isError: isMyReviewError,
+  } = useMyProductReview({ slug }, !!user);
+
+  if (!user) {
+    return (
+      <div className="space-y-3 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5">
+        <h3 className="font-heading text-lg font-semibold text-foreground">
+          أضف تقييمك
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          سجّل دخولك عشان تقدر تقيّم المنتج وتشارك رأيك.
+        </p>
+        <Link
+          href={loginHref}
+          className={cn(
+            buttonVariants({ size: "lg" }),
+            "w-full sm:w-auto sm:min-w-40",
+          )}
+        >
+          تسجيل الدخول
+        </Link>
+      </div>
+    );
+  }
+
+  if (isLoadingMyReview) {
+    return (
+      <div
+        className="h-40 animate-pulse rounded-3xl border border-border bg-brand-50/40"
+        aria-busy="true"
+        aria-label="جاري التحقق من تقييمك"
+      />
+    );
+  }
+
+  if (isMyReviewError) {
+    return (
+      <div className="space-y-2 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5">
+        <h3 className="font-heading text-lg font-semibold text-foreground">
+          أضف تقييمك
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          تعذّر التحقق من تقييمك الحالي. تقدر تحاولي تاني بعد شوية.
+        </p>
+      </div>
+    );
+  }
+
+  if (myReview) {
+    return <OwnedReviewPanel slug={slug} review={myReview} />;
+  }
+
+  return <CreateReviewForm slug={slug} />;
 }

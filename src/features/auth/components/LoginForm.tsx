@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
 import FieldError from "@/components/shared/FieldError";
+import PasswordInput from "@/components/shared/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -80,12 +81,9 @@ export default function LoginForm({ nextPath = "/" }: LoginFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="login-password">كلمة المرور</Label>
-        <Input
+        <PasswordInput
           id="login-password"
-          type="password"
           autoComplete="current-password"
-          dir="ltr"
-          className="text-start"
           aria-invalid={!!errors.password}
           {...register("password")}
         />

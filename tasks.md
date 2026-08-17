@@ -320,13 +320,19 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 
 `[branch: feature/customer-mvp-gaps]` (or extend the relevant feature branch when the gap is tiny and still open)
 
-- **C.1 — Customer can edit their own review** (rating + optional comment). Owner-only; re-validate `reviewSchema` and sanitize comment before update. After success, invalidate product reviews (+ product rating aggregates as needed).
-- **C.2 — Customer can delete their own review.** Owner-only, with a confirm step. After delete, the add-review form is available again for that product (unique constraint still applies while a row exists).
+- [x] **C.1 — Customer can edit their own review** (rating + optional comment). Owner-only; re-validate `reviewSchema` and sanitize comment before update. After success, invalidate product reviews (+ product rating aggregates as needed).
+      **Done:** Owner-only `UPDATE` RLS + column grant (`rating`, `comment`); `updateReview` re-validates `reviewSchema` and sanitizes before write; `OwnedReviewPanel` edit/cancel on the product page; invalidates product reviews, my-review, product rating, and home testimonials.
+- [x] **C.2 — Customer can delete their own review.** Owner-only, with a confirm step. After delete, the add-review form is available again for that product (unique constraint still applies while a row exists).
+      **Done:** Owner-only `DELETE` RLS + revoke anon DELETE; `deleteReview` resolves from active slug + session (never a client review id); confirm dialog on `OwnedReviewPanel`; invalidates product reviews, my-review, product rating, and home testimonials so the add form returns.
   🚩 Guests still cannot review. No editing/deleting someone else’s review. Admin delete is Phase A — not here.
-- **C.3 — Overlay navbar on the Home Hero**: on `/` at the top of the page, the customer navbar sits over the Hero (transparent, no solid bar) so they read as one visual unit. After scroll, and on every other customer page, keep the current solid sticky bar (`bg-background` + blur + border). Navbar stays in the customer layout — do not duplicate a Home-only nav.
+- [x] **C.3 — Overlay navbar on the Home Hero**: on `/` at the top of the page, the customer navbar sits over the Hero (transparent, no solid bar) so they read as one visual unit. After scroll, and on every other customer page, keep the current solid sticky bar (`bg-background` + blur + border). Navbar stays in the customer layout — do not duplicate a Home-only nav.
+      **Done:** Home-at-top overlay from the shared customer navbar; solid sticky bar after scroll and on other pages. Full-viewport hero with a light top/copy wash so the photo stays vivid and nav/copy stay readable. Brand mark in nav, footer, and mobile menu, plus favicon.
   🚩 Overlay is Home-at-top only. Do not make the navbar transparent site-wide. Logo, links, cart badge, and mobile menu icon must stay readable on the photo (add a top wash on the Hero if needed). If Alaa swaps the Hero image, re-check contrast. Admin navbar (11.3) is out of scope.
+- [x] **C.4 — Show/hide password toggle** on customer login and register (password + confirm password): an eye control so the customer can reveal the typed value. Shared control, Lucide eye icons, Arabic `aria-label` (e.g. «إظهار كلمة المرور» / «إخفاء كلمة المرور»), visible focus. Reuse the same control in admin login when **11.1** is built — do not fork a second toggle.
+      **Done:** Shared `PasswordInput` (Lucide eye, Arabic aria-label, visible focus) on login + register password/confirm. Same control is ready for admin login in **11.1** — do not fork.
+  🚩 Not Forgot Password / reset (backlog). Toggle visibility only; do not email or change the password.
 
-`[commit: feat(reviews): customer edit and delete own review, feat(shell): overlay navbar on home hero]`
+`[commit: feat(reviews): customer edit and delete own review, feat(shell): overlay navbar on home hero, feat(auth): password visibility toggle]`
 
 ---
 

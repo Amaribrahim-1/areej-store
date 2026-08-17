@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { type AuthUser } from "@/features/auth/api/getCurrentUser";
 import { useCurrentUser } from "@/features/auth/api/useCurrentUser";
 import { useSignOut } from "@/features/auth/api/useSignOut";
 import { getCartItemCount } from "@/features/cart/lib/getCartItemCount";
 import { useCartStore } from "@/features/cart/store";
+import { cn } from "@/lib/utils";
 
+import BrandLogo from "./BrandLogo";
 import NavLink from "./navbar/NavLink";
 import NavbarAccountActions from "./navbar/NavbarAccountActions";
 import NavbarCartLink from "./navbar/NavbarCartLink";
@@ -20,18 +21,40 @@ type NavbarProps = {
   initialUser: AuthUser | null;
 };
 
+const SCROLL_SOLID_AT = 8;
+
 export default function Navbar({ initialUser }: NavbarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { mutate: signOut, isPending: isSigningOut } = useSignOut();
   const user = useCurrentUser(initialUser);
 
+  const isHome = pathname === "/";
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const cartCount = useCartStore((state) => getCartItemCount(state.items));
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!isHome) {
+      setIsScrolled(false);
+      return;
+    }
+
+    function updateScrolled() {
+      setIsScrolled(window.scrollY > SCROLL_SOLID_AT);
+    }
+
+    updateScrolled();
+    window.addEventListener("scroll", updateScrolled, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrolled);
+  }, [isHome]);
+
+  const isOverlay = isHome && !isScrolled;
 
   function closeMobileNav() {
     setMobileOpen(false);
@@ -53,14 +76,16 @@ export default function Navbar({ initialUser }: NavbarProps) {
   const accountLabel = isLoggedIn ? "حسابي" : "تسجيل الدخول";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80">
+    <header
+      className={cn(
+        "sticky top-0 z-40 transition-[background-color,border-color,backdrop-filter] duration-200",
+        isOverlay
+          ? "border-b border-transparent bg-transparent"
+          : "border-b border-border bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80",
+      )}
+    >
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:h-16 sm:px-6">
-        <Link
-          href="/"
-          className="shrink-0 font-heading text-xl font-bold tracking-tight text-brand sm:text-2xl"
-        >
-          أريج
-        </Link>
+        <BrandLogo priority className="size-8 sm:size-9" />
 
         <nav
           className="ms-4 hidden items-center gap-6 md:flex"
