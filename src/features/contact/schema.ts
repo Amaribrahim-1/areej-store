@@ -1,12 +1,12 @@
 import { z } from "zod";
 
+import { egyptianPhoneRegex } from "@/lib/egyptianPhoneRegex";
+
 import {
   CONTACT_MESSAGE_MAX_LENGTH,
   CONTACT_MESSAGE_MIN_LENGTH,
   CONTACT_NAME_MAX_LENGTH,
 } from "./constants";
-
-const egyptianPhoneRegex = /^01[0125]\d{8}$/;
 
 export const contactSchema = z.object({
   name: z
