@@ -10,6 +10,7 @@ import StarRating from "@/components/shared/StarRating";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import type { AuthUser } from "@/features/auth/api/getCurrentUser";
 import { useCurrentUser } from "@/features/auth/api/useCurrentUser";
 import { cn } from "@/lib/utils";
 
@@ -108,8 +109,16 @@ function CreateReviewForm({ slug }: { slug: string }) {
   );
 }
 
-export default function AddReviewForm({ slug }: { slug: string }) {
-  const user = useCurrentUser();
+type AddReviewFormProps = {
+  slug: string;
+  initialUser: AuthUser | null;
+};
+
+export default function AddReviewForm({
+  slug,
+  initialUser,
+}: AddReviewFormProps) {
+  const user = useCurrentUser(initialUser);
   const pathname = usePathname();
   const loginHref = `/login?next=${encodeURIComponent(pathname)}`;
 

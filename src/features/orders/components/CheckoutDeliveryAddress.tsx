@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { buttonVariants } from "@/components/ui/button";
 import type { MyProfile } from "@/types/profile";
 import {
   resolveGovernorateLabel,
@@ -5,20 +8,12 @@ import {
 } from "@/lib/egypt-locations";
 import { cn } from "@/lib/utils";
 
+import { hasCompleteProfile } from "../lib/hasCompleteProfile";
+
 type CheckoutDeliveryAddressProps = {
   profile: MyProfile | null;
   className?: string;
 };
-
-function hasDeliveryFields(profile: MyProfile): boolean {
-  return Boolean(
-    profile.fullName ||
-      profile.phone ||
-      profile.governorate ||
-      profile.markaz ||
-      profile.addressText,
-  );
-}
 
 export default function CheckoutDeliveryAddress({
   profile,
@@ -43,10 +38,19 @@ export default function CheckoutDeliveryAddress({
         بيانات التوصيل
       </h2>
 
-      {!profile || !hasDeliveryFields(profile) ? (
-        <p className="text-sm text-muted-foreground" role="status">
-          لا توجد بيانات توصيل محفوظة على الحساب. أكملي بياناتك قبل إتمام الطلب.
-        </p>
+      {!hasCompleteProfile(profile) ? (
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground" role="status">
+            بيانات التوصيل المحفوظة على الحساب غير مكتملة. أكملي بياناتك قبل
+            إتمام الطلب.
+          </p>
+          <Link
+            href="/account"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
+            إكمال البيانات
+          </Link>
+        </div>
       ) : (
         <dl className="space-y-2 text-sm">
           {profile.fullName ? (

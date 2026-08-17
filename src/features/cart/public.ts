@@ -3,7 +3,9 @@
  * Prefer this over deep imports into cart/api or cart/lib.
  */
 export { useCartLineDetails } from "./api/useCartLineDetails";
+export { useCartPriceDriftNotice } from "./hooks/useCartPriceDriftNotice";
 export { computeCartSubtotal } from "./lib/computeCartSubtotal";
 export { lineKey } from "./lib/lineKey";
 export { useCartStore } from "./store";
-export type { CartLineItemData } from "./types";
+export type { CartLine, CartPriceSnapshotUpdate } from "./store";
+export type { CartLineItemData, CartLineLookup } from "./types";

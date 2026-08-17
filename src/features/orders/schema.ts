@@ -4,8 +4,7 @@ import {
   isGovernorate,
   isMarkazForGovernorate,
 } from "@/lib/egypt-locations";
-
-const egyptianPhoneRegex = /^01[0125]\d{8}$/;
+import { egyptianPhoneRegex } from "@/lib/egyptianPhoneRegex";
 
 function assertValidEgyptLocation(
   data: { governorate: string; markaz: string },

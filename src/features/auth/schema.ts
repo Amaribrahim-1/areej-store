@@ -4,8 +4,7 @@ import {
   isGovernorate,
   isMarkazForGovernorate,
 } from "@/lib/egypt-locations";
-
-const egyptianPhoneRegex = /^01[0125]\d{8}$/;
+import { egyptianPhoneRegex } from "@/lib/egyptianPhoneRegex";
 
 function assertValidEgyptLocation(
   data: { governorate: string; markaz: string },
@@ -71,6 +70,29 @@ export const loginSchema = z.object({
   password: z.string().min(6, { message: "كلمة المرور ٦ أحرف على الأقل" }),
 });
 
+/**
+ * Editable account fields — name/phone/address only (task 4.1). No
+ * email/password here; those go through Supabase Auth flows, not this form.
+ * Validated again in `updateMyProfile` before the Supabase write.
+ */
+export const profileWriteSchema = z
+  .object({
+    fullName: z
+      .string()
+      .trim()
+      .min(2, { message: "الاسم لازم يكون حرفين على الأقل" }),
+    phone: z.string().trim().regex(egyptianPhoneRegex, {
+      message: "أدخل رقم موبايل مصري صحيح (مثل 01xxxxxxxxx)",
+    }),
+    governorate: z.string().min(1, { message: "اختر المحافظة" }),
+    markaz: z.string().min(1, { message: "اختر المركز" }),
+    addressText: z.string().trim().min(10, {
+      message: "اكتب وصفًا أوضح للعنوان (مثل الشارع أو علامة مميزة)",
+    }),
+  })
+  .superRefine(assertValidEgyptLocation);
+
 export type RegisterType = z.infer<typeof registerSchema>;
 export type RegisterWriteInput = z.infer<typeof registerWriteSchema>;
 export type LoginType = z.infer<typeof loginSchema>;
+export type ProfileWriteInput = z.infer<typeof profileWriteSchema>;

@@ -5,6 +5,8 @@ import { MessageSquareIcon } from "lucide-react";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
 
+import type { AuthUser } from "@/features/auth/api/getCurrentUser";
+
 import { useProductReviews } from "../../api/useProductReviews";
 import AddReviewForm from "./AddReviewForm";
 import ProductReviewsSkeleton from "./ProductReviewsSkeleton";
@@ -12,9 +14,13 @@ import ReviewItem from "./ReviewItem";
 
 type ProductReviewsListProps = {
   slug: string;
+  initialUser: AuthUser | null;
 };
 
-export default function ProductReviewsList({ slug }: ProductReviewsListProps) {
+export default function ProductReviewsList({
+  slug,
+  initialUser,
+}: ProductReviewsListProps) {
   const {
     data: reviews,
     isLoading,
@@ -60,7 +66,7 @@ export default function ProductReviewsList({ slug }: ProductReviewsListProps) {
         </ul>
       ) : null}
 
-      <AddReviewForm slug={slug} />
+      <AddReviewForm slug={slug} initialUser={initialUser} />
     </section>
   );
 }

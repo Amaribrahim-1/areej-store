@@ -1,3 +1,6 @@
+import { cache } from "react";
+import { isAuthSessionMissingError } from "@supabase/supabase-js";
+
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthUser = {
@@ -7,11 +10,17 @@ export type AuthUser = {
 
 /**
  * Reads the authenticated user from the request cookies (server-only).
- * Returns `null` when there is no valid session.
+ * Returns `null` only for the confirmed "no session" case (guest). Any other
+ * `getUser()` failure (network blip, server hiccup) throws instead, so
+ * callers like `requireCustomer` can show an error state rather than
+ * redirecting an actually-logged-in customer to `/login` — mirrors
+ * `getCustomerOrders`'s error handling.
  *
  * Prefer this over trusting client-only auth state for layouts/RSC.
+ * Wrapped in React `cache()` so layout + page in the same request share
+ * one `getUser()` call (product details needs the user for the review form).
  */
-export async function getCurrentUser(): Promise<AuthUser | null> {
+export const getCurrentUser = cache(async function getCurrentUser(): Promise<AuthUser | null> {
   const supabase = await createClient();
 
   const {
@@ -19,7 +28,14 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     error,
   } = await supabase.auth.getUser();
 
-  if (error || !user) {
+  if (error) {
+    if (isAuthSessionMissingError(error)) {
+      return null;
+    }
+    throw error;
+  }
+
+  if (!user) {
     return null;
   }
 
@@ -27,4 +43,4 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     id: user.id,
     email: user.email ?? null,
   };
-}
+});

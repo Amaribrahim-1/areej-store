@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { loginSchema, registerSchema, registerWriteSchema } from "./schema";
+import {
+  loginSchema,
+  profileWriteSchema,
+  registerSchema,
+  registerWriteSchema,
+} from "./schema";
 
 const validRegisterBase = {
   fullName: "مريم أحمد",
@@ -79,6 +84,87 @@ describe("registerSchema", () => {
       confirmPassword: "secret1",
     });
     expect(result.success).toBe(true);
+  });
+});
+
+const validProfileBase = {
+  fullName: "مريم أحمد",
+  phone: "01012345678",
+  governorate: "Kafr El-Sheikh",
+  markaz: "Kafr Al-Shaykh",
+  addressText: "قرية قراجة، جانب موقف الأتوبيس",
+};
+
+describe("profileWriteSchema", () => {
+  it("accepts a valid name/phone/address payload", () => {
+    const result = profileWriteSchema.safeParse(validProfileBase);
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a name shorter than two characters", () => {
+    const result = profileWriteSchema.safeParse({
+      ...validProfileBase,
+      fullName: "أ",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path[0] === "fullName"))
+        .toBe(true);
+    }
+  });
+
+  it("rejects an invalid Egyptian phone number", () => {
+    const result = profileWriteSchema.safeParse({
+      ...validProfileBase,
+      phone: "0212345678",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path[0] === "phone")).toBe(
+        true,
+      );
+    }
+  });
+
+  it("rejects an address shorter than 10 characters", () => {
+    const result = profileWriteSchema.safeParse({
+      ...validProfileBase,
+      addressText: "شارع 1",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(
+        result.error.issues.some((issue) => issue.path[0] === "addressText"),
+      ).toBe(true);
+    }
+  });
+
+  it("rejects an unknown governorate", () => {
+    const result = profileWriteSchema.safeParse({
+      ...validProfileBase,
+      governorate: "NotAGovernorate",
+      markaz: "Kafr El-Sheikh",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(
+        result.error.issues.some((issue) => issue.path[0] === "governorate"),
+      ).toBe(true);
+    }
+  });
+
+  it("rejects a markaz that does not belong to the governorate", () => {
+    const result = profileWriteSchema.safeParse({
+      ...validProfileBase,
+      governorate: "Cairo",
+      markaz: "Kafr El-Sheikh",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path[0] === "markaz")).toBe(
+        true,
+      );
+    }
   });
 });
 

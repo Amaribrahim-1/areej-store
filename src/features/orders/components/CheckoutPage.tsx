@@ -3,7 +3,10 @@ import { ShoppingCartIcon } from "lucide-react";
 
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
+import PriceDriftNotice from "@/components/shared/PriceDriftNotice";
+import UnresolvedCartLinesNotice from "@/components/shared/UnresolvedCartLinesNotice";
 import { Button, buttonVariants } from "@/components/ui/button";
+import type { CartLineLookup } from "@/features/cart/public";
 import { cn } from "@/lib/utils";
 import type { MyProfile } from "@/types/profile";
 
@@ -17,13 +20,16 @@ import CheckoutPaymentMethod from "./CheckoutPaymentMethod";
 
 type CheckoutPageProps = {
   lines: CheckoutLineItemData[];
+  unresolvedLines?: CartLineLookup[];
   subtotal: number;
   total: number;
   profile: MyProfile | null;
   paymentMethod?: PaymentMethod;
   isPending?: boolean;
   isError?: boolean;
+  showPriceDriftNotice?: boolean;
   onRetry?: () => void;
+  onRemoveUnresolved?: (productId: string, variantId: string) => void;
   onPlaceOrder: () => void;
   isPlacingOrder?: boolean;
   canPlaceOrder?: boolean;
@@ -31,18 +37,22 @@ type CheckoutPageProps = {
 
 export default function CheckoutPage({
   lines,
+  unresolvedLines = [],
   subtotal,
   total,
   profile,
   paymentMethod = DEFAULT_PAYMENT_METHOD,
   isPending = false,
   isError = false,
+  showPriceDriftNotice = false,
   onRetry,
+  onRemoveUnresolved,
   onPlaceOrder,
   isPlacingOrder = false,
   canPlaceOrder = false,
 }: CheckoutPageProps) {
-  const hasLines = lines.length > 0;
+  const hasResolvedLines = lines.length > 0;
+  const hasAnyLines = hasResolvedLines || unresolvedLines.length > 0;
   const isSubmitDisabled = isPlacingOrder || !canPlaceOrder;
 
   return (
@@ -60,7 +70,7 @@ export default function CheckoutPage({
 
       {!isPending && isError ? <ErrorState onRetry={onRetry} /> : null}
 
-      {!isPending && !isError && !hasLines ? (
+      {!isPending && !isError && !hasAnyLines ? (
         <EmptyState
           icon={<ShoppingCartIcon />}
           title="السلة فارغة"
@@ -71,8 +81,10 @@ export default function CheckoutPage({
         />
       ) : null}
 
-      {!isPending && !isError && hasLines ? (
+      {!isPending && !isError && hasAnyLines ? (
         <>
+          {showPriceDriftNotice ? <PriceDriftNotice /> : null}
+
           <section
             aria-labelledby="checkout-lines-heading"
             className="space-y-3"
@@ -93,26 +105,38 @@ export default function CheckoutPage({
                 تعديل السلة
               </Link>
             </div>
-            <CheckoutLinesList lines={lines} />
+
+            {onRemoveUnresolved ? (
+              <UnresolvedCartLinesNotice
+                lines={unresolvedLines}
+                onRemove={onRemoveUnresolved}
+              />
+            ) : null}
+
+            {hasResolvedLines ? <CheckoutLinesList lines={lines} /> : null}
           </section>
 
-          <CheckoutOrderSummary subtotal={subtotal} total={total} />
+          {hasResolvedLines ? (
+            <>
+              <CheckoutOrderSummary subtotal={subtotal} total={total} />
 
-          <div className="space-y-8 border-t border-border pt-8">
-            <CheckoutDeliveryAddress profile={profile} />
-            <CheckoutPaymentMethod paymentMethod={paymentMethod} />
-          </div>
+              <div className="space-y-8 border-t border-border pt-8">
+                <CheckoutDeliveryAddress profile={profile} />
+                <CheckoutPaymentMethod paymentMethod={paymentMethod} />
+              </div>
 
-          <Button
-            type="button"
-            className="w-full"
-            size="lg"
-            disabled={isSubmitDisabled}
-            aria-busy={isPlacingOrder}
-            onClick={onPlaceOrder}
-          >
-            {isPlacingOrder ? "جاري إتمام الطلب..." : "إتمام الطلب"}
-          </Button>
+              <Button
+                type="button"
+                className="w-full"
+                size="lg"
+                disabled={isSubmitDisabled}
+                aria-busy={isPlacingOrder}
+                onClick={onPlaceOrder}
+              >
+                {isPlacingOrder ? "جاري إتمام الطلب..." : "إتمام الطلب"}
+              </Button>
+            </>
+          ) : null}
         </>
       ) : null}
     </div>
