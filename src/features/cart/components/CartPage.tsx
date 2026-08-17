@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { ShoppingCartIcon } from "lucide-react";
 
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
 import PriceDriftNotice from "@/components/shared/PriceDriftNotice";
@@ -47,6 +49,16 @@ export default function CartPage({
   const subtotal = computeCartSubtotal(lines);
   const hasResolvedLines = lines.length > 0;
   const hasAnyLines = hasResolvedLines || unresolvedLines.length > 0;
+  const [clearOpen, setClearOpen] = useState(false);
+
+  function requestClear() {
+    setClearOpen(true);
+  }
+
+  function confirmClear() {
+    onClear();
+    setClearOpen(false);
+  }
 
   return (
     <div className="space-y-6">
@@ -62,7 +74,7 @@ export default function CartPage({
           ) : null}
         </div>
         {!isPending && !isError && hasAnyLines ? (
-          <Button type="button" variant="outline" size="sm" onClick={onClear}>
+          <Button type="button" variant="outline" size="sm" onClick={requestClear}>
             إفراغ السلة
           </Button>
         ) : null}
@@ -78,7 +90,7 @@ export default function CartPage({
           title="السلة فارغة"
           description="لم تضيفي أي منتجات بعد. تصفّحي المتجر وأضيفي ما يناسبك."
           action={
-            <Button render={<Link href="/products" />}>تصفح المنتجات</Button>
+            <Button render={<Link href="/products" />}>تصفّحي المنتجات</Button>
           }
         />
       ) : null}
@@ -112,6 +124,15 @@ export default function CartPage({
           ) : null}
         </>
       ) : null}
+
+      <ConfirmDialog
+        open={clearOpen}
+        onOpenChange={setClearOpen}
+        title="إفراغ السلة؟"
+        description="كل المنتجات هتتشال من السلة. تقدري تضيفيهم تاني من المتجر."
+        confirmLabel="إفراغ السلة"
+        onConfirm={confirmClear}
+      />
     </div>
   );
 }
