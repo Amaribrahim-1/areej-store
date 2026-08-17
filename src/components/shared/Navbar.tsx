@@ -72,7 +72,7 @@ export default function Navbar({ initialUser }: NavbarProps) {
 
   const badgeCount = hasMounted ? cartCount : 0;
   const isLoggedIn = user !== null;
-  const accountHref = isLoggedIn ? "/orders" : "/login";
+  const accountHref = isLoggedIn ? "/account" : "/login";
   const accountLabel = isLoggedIn ? "حسابي" : "تسجيل الدخول";
 
   return (
