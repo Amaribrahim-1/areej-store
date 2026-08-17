@@ -12,6 +12,7 @@ import StarRating from "@/components/shared/StarRating";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { AuthUser } from "@/features/auth/api/getCurrentUser";
 import { useCartStore } from "@/features/cart/store";
 import ProductReviewsList from "@/features/reviews/components/product/ProductReviewsList";
 import { toast } from "sonner";
@@ -24,9 +25,13 @@ import VariantSelector from "./VariantSelector";
 
 type ProductDetailsProps = {
   slug: string;
+  initialUser: AuthUser | null;
 };
 
-export default function ProductDetails({ slug }: ProductDetailsProps) {
+export default function ProductDetails({
+  slug,
+  initialUser,
+}: ProductDetailsProps) {
   const { data: product, isLoading, isError, refetch } = useProduct({ slug });
 
   return (
@@ -48,7 +53,9 @@ export default function ProductDetails({ slug }: ProductDetailsProps) {
         <ProductDetailsContent product={product} />
       ) : null}
 
-      {product || isLoading ? <ProductReviewsList slug={slug} /> : null}
+      {product || isLoading ? (
+        <ProductReviewsList slug={slug} initialUser={initialUser} />
+      ) : null}
     </>
   );
 }

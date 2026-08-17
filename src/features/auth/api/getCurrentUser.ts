@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { isAuthSessionMissingError } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/server";
@@ -16,8 +17,10 @@ export type AuthUser = {
  * `getCustomerOrders`'s error handling.
  *
  * Prefer this over trusting client-only auth state for layouts/RSC.
+ * Wrapped in React `cache()` so layout + page in the same request share
+ * one `getUser()` call (product details needs the user for the review form).
  */
-export async function getCurrentUser(): Promise<AuthUser | null> {
+export const getCurrentUser = cache(async function getCurrentUser(): Promise<AuthUser | null> {
   const supabase = await createClient();
 
   const {
@@ -40,4 +43,4 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     id: user.id,
     email: user.email ?? null,
   };
-}
+});
