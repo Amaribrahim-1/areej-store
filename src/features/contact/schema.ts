@@ -17,7 +17,7 @@ export const contactSchema = z.object({
       message: `الاسم طويل جدًا (حد أقصى ${CONTACT_NAME_MAX_LENGTH} حرف)`,
     }),
   phone: z.string().trim().regex(egyptianPhoneRegex, {
-    message: "أدخل رقم موبايل مصري صحيح (مثل 01xxxxxxxxx)",
+    message: "أدخلي رقم موبايل مصري صحيح (مثل 01xxxxxxxxx)",
   }),
   message: z
     .string()

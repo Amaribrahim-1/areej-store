@@ -12,3 +12,4 @@ alwaysApply: false
 - Every form input has an associated `<label>` — no placeholder-as-label.
 - Custom controls (e.g., star rating) need proper `aria-label` (e.g., "4 من 5 نجوم").
 - Visible focus states on every interactive element — never strip outlines without replacing them.
+- Customer-facing copy addresses the shopper in feminine Arabic (اختاري، أضيفي، سجّلي). Nouns keep their own grammatical gender. Do not apply this to admin copy.

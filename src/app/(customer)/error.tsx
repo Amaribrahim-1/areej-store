@@ -11,7 +11,7 @@ export default function CustomerError({
   return (
     <ErrorState
       title="حدث خطأ في الصفحة"
-      description="حصل مشكلة أثناء عرض الصفحة. جرّب إعادة المحاولة، أو ارجع لاحقًا."
+      description="حصل مشكلة أثناء عرض الصفحة. جرّبي إعادة المحاولة، أو ارجعي لاحقًا."
       onRetry={reset}
       className="min-h-[50vh]"
     />

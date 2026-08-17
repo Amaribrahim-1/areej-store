@@ -53,7 +53,7 @@ export default function ProductReviewsList({
           icon={<MessageSquareIcon />}
           titleAs="p"
           title="لا توجد تقييمات بعد"
-          description="كن أول من يقيّم هذا المنتج."
+          description="كوني أول من تقيّم هذا المنتج."
           className="py-8"
         />
       ) : null}

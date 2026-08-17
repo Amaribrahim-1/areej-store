@@ -1,23 +1,24 @@
 import { createClient } from "@/lib/supabase/server";
 import type { MyProfile } from "@/types/profile";
 
+import { getCurrentUser } from "./getCurrentUser";
+
 export type { MyProfile };
 
 /**
  * Loads the authenticated customer's profile delivery fields.
  * Returns `null` when there is no session or no profiles row.
+ * Session-check failures throw via `getCurrentUser` (shared with the
+ * protected layout) so `/account` and `/checkout` do not render an empty
+ * form as if the profile were missing.
  */
 export async function getMyProfile(): Promise<MyProfile | null> {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
+  const user = await getCurrentUser();
+  if (!user) {
     return null;
   }
+
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("profiles")

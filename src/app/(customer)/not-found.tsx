@@ -8,7 +8,7 @@ export default function CustomerNotFound() {
     <EmptyState
       titleAs="h1"
       title="الصفحة غير موجودة"
-      description="الرابط اللي دخلت عليه مش موجود، أو المنتج اتشال من المتجر."
+      description="الرابط اللي دخلتي عليه مش موجود، أو المنتج اتشال من المتجر."
       className="min-h-[50vh]"
       action={<Button render={<Link href="/" />}>العودة للرئيسية</Button>}
     />

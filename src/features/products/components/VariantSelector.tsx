@@ -24,7 +24,7 @@ export default function VariantSelector({
   return (
     <fieldset className={cn("space-y-3", className)}>
       <legend className="font-heading text-sm font-semibold text-foreground">
-        اختر الحجم
+        اختاري الحجم
       </legend>
       <div
         role="radiogroup"

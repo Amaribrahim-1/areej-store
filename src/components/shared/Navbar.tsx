@@ -6,11 +6,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { type AuthUser } from "@/features/auth/api/getCurrentUser";
 import { useCurrentUser } from "@/features/auth/api/useCurrentUser";
 import { useSignOut } from "@/features/auth/api/useSignOut";
-import { getCartItemCount } from "@/features/cart/lib/getCartItemCount";
-import { useCartStore } from "@/features/cart/store";
+import { getCartItemCount, useCartStore } from "@/features/cart/public";
 import { cn } from "@/lib/utils";
 
 import BrandLogo from "./BrandLogo";
+import ConfirmDialog from "./ConfirmDialog";
 import NavLink from "./navbar/NavLink";
 import NavbarAccountActions from "./navbar/NavbarAccountActions";
 import NavbarCartLink from "./navbar/NavbarCartLink";
@@ -33,6 +33,7 @@ export default function Navbar({ initialUser }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [signOutOpen, setSignOutOpen] = useState(false);
   const cartCount = useCartStore((state) => getCartItemCount(state.items));
 
   useEffect(() => {
@@ -60,10 +61,15 @@ export default function Navbar({ initialUser }: NavbarProps) {
     setMobileOpen(false);
   }
 
-  function handleSignOut() {
+  function requestSignOut() {
+    closeMobileNav();
+    setSignOutOpen(true);
+  }
+
+  function confirmSignOut() {
     signOut(undefined, {
       onSuccess: () => {
-        closeMobileNav();
+        setSignOutOpen(false);
         router.push("/");
         router.refresh();
       },
@@ -102,7 +108,7 @@ export default function Navbar({ initialUser }: NavbarProps) {
             accountHref={accountHref}
             accountLabel={accountLabel}
             isSigningOut={isSigningOut}
-            onSignOut={handleSignOut}
+            onSignOut={requestSignOut}
           />
 
           <NavbarCartLink badgeCount={badgeCount} />
@@ -114,11 +120,22 @@ export default function Navbar({ initialUser }: NavbarProps) {
             accountLabel={accountLabel}
             isLoggedIn={isLoggedIn}
             isSigningOut={isSigningOut}
-            onSignOut={handleSignOut}
+            onSignOut={requestSignOut}
             onNavigate={closeMobileNav}
           />
         </div>
       </div>
+
+      <ConfirmDialog
+        open={signOutOpen}
+        onOpenChange={setSignOutOpen}
+        title="تسجيل الخروج؟"
+        description="هتخرجي من حسابك على الجهاز ده. السلة هتفضل محفوظة."
+        confirmLabel="تسجيل الخروج"
+        pendingLabel="جاري الخروج..."
+        isPending={isSigningOut}
+        onConfirm={confirmSignOut}
+      />
     </header>
   );
 }

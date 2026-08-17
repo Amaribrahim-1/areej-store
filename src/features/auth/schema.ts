@@ -14,7 +14,7 @@ function assertValidEgyptLocation(
     ctx.addIssue({
       code: "custom",
       path: ["governorate"],
-      message: "اختر محافظة صحيحة",
+      message: "اختاري محافظة صحيحة",
     });
     return;
   }
@@ -23,7 +23,7 @@ function assertValidEgyptLocation(
     ctx.addIssue({
       code: "custom",
       path: ["markaz"],
-      message: "اختر مركزًا صحيحًا لهذه المحافظة",
+      message: "اختاري مركزًا صحيحًا لهذه المحافظة",
     });
   }
 }
@@ -34,15 +34,15 @@ const registerFieldsObject = z.object({
     .string()
     .trim()
     .min(2, { message: "الاسم لازم يكون حرفين على الأقل" }),
-  email: z.email({ message: "أدخل بريدًا إلكترونيًا صحيحًا" }),
+  email: z.email({ message: "أدخلي بريدًا إلكترونيًا صحيحًا" }),
   password: z.string().min(6, { message: "كلمة المرور ٦ أحرف على الأقل" }),
   phone: z.string().trim().regex(egyptianPhoneRegex, {
-    message: "أدخل رقم موبايل مصري صحيح (مثل 01xxxxxxxxx)",
+    message: "أدخلي رقم موبايل مصري صحيح (مثل 01xxxxxxxxx)",
   }),
-  governorate: z.string().min(1, { message: "اختر المحافظة" }),
-  markaz: z.string().min(1, { message: "اختر المركز" }),
+  governorate: z.string().min(1, { message: "اختاري المحافظة" }),
+  markaz: z.string().min(1, { message: "اختاري المركز" }),
   addressDescription: z.string().trim().min(10, {
-    message: "اكتب وصفًا أوضح للعنوان (مثل الشارع أو علامة مميزة)",
+    message: "اكتبي وصفًا أوضح للعنوان (مثل الشارع أو علامة مميزة)",
   }),
 });
 
@@ -57,7 +57,7 @@ export const registerWriteSchema = registerFieldsObject.superRefine(
 /** Client form schema (includes confirmPassword match). */
 export const registerSchema = registerFieldsObject
   .extend({
-    confirmPassword: z.string().min(6, { message: "أكّد كلمة المرور" }),
+    confirmPassword: z.string().min(6, { message: "أكّدي كلمة المرور" }),
   })
   .superRefine(assertValidEgyptLocation)
   .refine((data) => data.password === data.confirmPassword, {
@@ -66,7 +66,7 @@ export const registerSchema = registerFieldsObject
   });
 
 export const loginSchema = z.object({
-  email: z.email({ message: "أدخل بريدًا إلكترونيًا صحيحًا" }),
+  email: z.email({ message: "أدخلي بريدًا إلكترونيًا صحيحًا" }),
   password: z.string().min(6, { message: "كلمة المرور ٦ أحرف على الأقل" }),
 });
 
@@ -82,12 +82,12 @@ export const profileWriteSchema = z
       .trim()
       .min(2, { message: "الاسم لازم يكون حرفين على الأقل" }),
     phone: z.string().trim().regex(egyptianPhoneRegex, {
-      message: "أدخل رقم موبايل مصري صحيح (مثل 01xxxxxxxxx)",
+      message: "أدخلي رقم موبايل مصري صحيح (مثل 01xxxxxxxxx)",
     }),
-    governorate: z.string().min(1, { message: "اختر المحافظة" }),
-    markaz: z.string().min(1, { message: "اختر المركز" }),
+    governorate: z.string().min(1, { message: "اختاري المحافظة" }),
+    markaz: z.string().min(1, { message: "اختاري المركز" }),
     addressText: z.string().trim().min(10, {
-      message: "اكتب وصفًا أوضح للعنوان (مثل الشارع أو علامة مميزة)",
+      message: "اكتبي وصفًا أوضح للعنوان (مثل الشارع أو علامة مميزة)",
     }),
   })
   .superRefine(assertValidEgyptLocation);

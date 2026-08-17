@@ -170,7 +170,7 @@ function CardActions({
         aria-label={`إضافة ${productName} إلى السلة`}
       >
         <ShoppingCartIcon data-icon="inline-start" />
-        أضف
+        أضيفي
       </Button>
     </>
   );

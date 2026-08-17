@@ -44,7 +44,7 @@ export default function ProductDetails({
         <EmptyState
           icon={<PackageXIcon />}
           title="المنتج غير موجود"
-          description="عذراً، المنتج الذي تبحث عنه غير موجود أو تم إخفاؤه."
+          description="عذرًا، المنتج اللي بتبحثي عنه غير موجود أو تم إخفاؤه."
           className="min-h-[50vh]"
         />
       ) : null}
@@ -170,7 +170,7 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
             onClick={addToCart}
           >
             <ShoppingCartIcon data-icon="inline-start" />
-            أضف للعربة
+            أضيفي للعربة
           </Button>
         </div>
 

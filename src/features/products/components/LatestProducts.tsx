@@ -50,7 +50,7 @@ export default function LatestProducts() {
         ) : isError ? (
           <ErrorState
             title="فشل تحميل المنتجات"
-            description="تعذّر جلب أحدث المنتجات. حاول مرة أخرى."
+            description="تعذّر جلب أحدث المنتجات. حاولي مرة أخرى."
             onRetry={() => refetch()}
           />
         ) : !data || data.length === 0 ? (

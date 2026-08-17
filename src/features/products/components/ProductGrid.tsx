@@ -59,7 +59,7 @@ export default function ProductGrid() {
     return (
       <ErrorState
         title="فشل تحميل المنتجات"
-        description="تعذّر جلب قائمة المنتجات. حاول مرة أخرى."
+        description="تعذّر جلب قائمة المنتجات. حاولي مرة أخرى."
         onRetry={() => refetch()}
       />
     );
@@ -74,7 +74,7 @@ export default function ProductGrid() {
       <EmptyState
         icon={<PackageSearchIcon />}
         title="لا توجد منتجات"
-        description="لم نعثر على منتجات تطابق البحث أو الفلاتر الحالية. جرّب تعديل التصفية."
+        description="لم نعثر على منتجات تطابق البحث أو الفلاتر الحالية. جرّبي تعديل التصفية."
       />
     );
   }

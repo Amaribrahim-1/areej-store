@@ -5,6 +5,7 @@
 export { useCartLineDetails } from "./api/useCartLineDetails";
 export { useCartPriceDriftNotice } from "./hooks/useCartPriceDriftNotice";
 export { computeCartSubtotal } from "./lib/computeCartSubtotal";
+export { getCartItemCount } from "./lib/getCartItemCount";
 export { lineKey } from "./lib/lineKey";
 export { useCartStore } from "./store";
 export type { CartLine, CartPriceSnapshotUpdate } from "./store";

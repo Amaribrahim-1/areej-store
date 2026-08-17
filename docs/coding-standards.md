@@ -97,6 +97,7 @@ Route files (`app/`) stay thin: they compose components from `features/`, they d
 - All form inputs have associated `<label>`s — no placeholder-as-label.
 - Star rating component needs proper `aria-label` (e.g., "4 من 5 نجوم") since it's likely a custom, non-native control.
 - Visible focus states on every interactive element — don't strip outlines without replacing them.
+- Customer-facing copy addresses the shopper in feminine Arabic (اختاري، أضيفي، سجّلي، ابحثي). Nouns keep their own grammatical gender (سلة التسوق، الكمية لازم تكون). Do not apply this to admin copy.
 
 ---
 

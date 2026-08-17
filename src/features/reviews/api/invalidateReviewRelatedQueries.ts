@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 
-import { productQueryKey } from "@/features/products/api/productQueryKey";
+import { productQueryKey } from "@/features/products/public";
 
 import { HOME_TESTIMONIALS_PAGE_SIZE } from "../constants";
 import { homeTestimonialsQueryKey } from "./useHomeTestimonials";
