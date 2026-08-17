@@ -1,7 +1,7 @@
 import { requireCustomer } from "@/features/auth/api/requireCustomer";
 
 /**
- * Shared guard for customer-only routes (`/checkout`, `/orders`).
+ * Shared guard for customer-only routes (`/account`, `/checkout`, `/orders`).
  * Relies on `x-pathname` stamped by the Supabase session proxy.
  */
 export default async function ProtectedCustomerLayout({

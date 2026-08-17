@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AuthUser } from "@/features/auth/api/getCurrentUser";
-import { useCartStore } from "@/features/cart/store";
+import { useCartStore } from "@/features/cart/public";
 import ProductReviewsList from "@/features/reviews/components/product/ProductReviewsList";
 import { toast } from "sonner";
 

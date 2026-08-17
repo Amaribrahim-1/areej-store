@@ -4,17 +4,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { deleteReview, type DeleteReviewInput } from "./deleteReview";
+import { invalidateReviewRelatedQueries } from "./invalidateReviewRelatedQueries";
 
 export function useDeleteReview() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (input: DeleteReviewInput) => deleteReview(input),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["product-reviews"] });
-      void queryClient.invalidateQueries({ queryKey: ["my-product-review"] });
-      void queryClient.invalidateQueries({ queryKey: ["home-testimonials"] });
-      void queryClient.invalidateQueries({ queryKey: ["product"] });
+    onSuccess: (_data, input) => {
+      invalidateReviewRelatedQueries(queryClient, input.productSlug);
       toast.success("تم حذف تقييمك");
     },
     onError: (error) => {

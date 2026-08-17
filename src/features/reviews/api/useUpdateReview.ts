@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { invalidateReviewRelatedQueries } from "./invalidateReviewRelatedQueries";
 import { updateReview, type UpdateReviewInput } from "./updateReview";
 
 export function useUpdateReview() {
@@ -10,11 +11,8 @@ export function useUpdateReview() {
 
   return useMutation({
     mutationFn: (input: UpdateReviewInput) => updateReview(input),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["product-reviews"] });
-      void queryClient.invalidateQueries({ queryKey: ["my-product-review"] });
-      void queryClient.invalidateQueries({ queryKey: ["home-testimonials"] });
-      void queryClient.invalidateQueries({ queryKey: ["product"] });
+    onSuccess: (_data, input) => {
+      invalidateReviewRelatedQueries(queryClient, input.productSlug);
       toast.success("تم تعديل تقييمك");
     },
     onError: (error) => {

@@ -10,7 +10,7 @@ import PriceTag from "@/components/shared/PriceTag";
 import StarRating from "@/components/shared/StarRating";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useCartStore } from "@/features/cart/store";
+import { useCartStore } from "@/features/cart/public";
 import { cn } from "@/lib/utils";
 
 import { PRODUCT_CATEGORY_LABELS } from "../constants";
