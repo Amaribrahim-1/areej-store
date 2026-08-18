@@ -23,7 +23,7 @@ export default function DashboardKpiCards({ kpis }: DashboardKpiCardsProps) {
       />
       <DashboardKpiCard
         title="طلبات قيد المراجعة"
-        description="الطلبات اللي لسه حالتها قيد المراجعة"
+        description="ما اتشحنتش لسه"
         displayValue={countFormatter.format(kpis.pendingOrders)}
         icon={ClockIcon}
       />

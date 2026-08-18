@@ -4,8 +4,9 @@ import type { AdminDashboardKpis } from "../types";
 
 /**
  * Returns the three admin dashboard KPIs as a single DB aggregate.
- * `totalSales` is COD realized sales (Delivered only). Pending/Shipping are
- * not money in hand yet. Non-admin sessions fail with `NOT_ADMIN`.
+ * `totalSales` is COD realized sales (Delivered only). Pending and Shipping
+ * are not money in hand yet; only `Pending` is counted on the pending card.
+ * Non-admin sessions fail with `NOT_ADMIN`.
  * An empty shop is still one row of zeros — never `null`.
  */
 export async function getAdminDashboardKpis(): Promise<AdminDashboardKpis> {

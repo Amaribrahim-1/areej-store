@@ -26,7 +26,7 @@ export default function AdminDashboardPage() {
       {isError ? (
         <ErrorState
           title="تعذر تحميل أرقام اللوحة"
-          description="حصل مشكلة وإحنا بنجيب ملخص المتجر. حاول مرة أخرى."
+          description="تعذّر جلب ملخص المتجر. جرّب إعادة المحاولة."
           onRetry={() => refetch()}
         />
       ) : null}

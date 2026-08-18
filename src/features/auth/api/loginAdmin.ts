@@ -5,10 +5,8 @@ import { adminLoginSchema } from "../schema";
 import type { LoginAdminInput, LoginAdminResult } from "../types";
 
 /**
- * Signs in with email/password, then allows the session only when
- * `profiles.role` is admin. Non-admin accounts are signed out.
- *
- * Re-validates with `adminLoginSchema` before any Auth call.
+ * Re-validates with `adminLoginSchema` before Auth. A non-admin sign-in is
+ * signed out so that session cannot linger after a rejected admin login.
  */
 export async function loginAdmin(
   input: LoginAdminInput,

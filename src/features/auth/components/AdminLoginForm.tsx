@@ -37,8 +37,8 @@ export default function AdminLoginForm({
     },
   });
 
-  const onSubmit: SubmitHandler<AdminLoginType> = (data) => {
-    mutate(data, {
+  const onSubmit: SubmitHandler<AdminLoginType> = (credentials) => {
+    mutate(credentials, {
       onSuccess: () => {
         router.push(nextPath);
         router.refresh();
