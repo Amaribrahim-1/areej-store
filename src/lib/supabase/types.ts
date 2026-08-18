@@ -359,6 +359,14 @@ export type Database = {
       }
     }
     Functions: {
+      get_admin_dashboard_kpis: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          pending_orders: number
+          total_products: number
+          total_sales: number
+        }[]
+      }
       list_home_testimonials: {
         Args: { p_limit?: number }
         Returns: {
