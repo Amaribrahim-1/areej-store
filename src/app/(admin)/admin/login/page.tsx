@@ -19,8 +19,8 @@ export default async function AdminLoginPage({
   const nextPath = getSafeAdminNextPath(params.next);
 
   return (
-    <section className="mx-auto w-full max-w-md px-4 py-8 sm:px-6 sm:py-12">
+    <main className="mx-auto w-full max-w-md px-4 py-8 sm:px-6 sm:py-12">
       <AdminLoginForm nextPath={nextPath} />
-    </section>
+    </main>
   );
 }
