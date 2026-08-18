@@ -15,3 +15,29 @@ export function getSafeNextPath(
   if (raw.includes("://")) return fallback;
   return raw;
 }
+
+function adminPathname(path: string): string {
+  return path.split("?")[0] ?? path;
+}
+
+/**
+ * Same-origin relative paths that stay inside the admin panel.
+ * Rejects `/admin/login` so a failed guard cannot loop the login page.
+ */
+export function getSafeAdminNextPath(
+  next: string | string[] | undefined | null,
+  fallback = "/admin",
+): string {
+  const path = getSafeNextPath(next, fallback);
+  const pathname = adminPathname(path);
+
+  if (pathname === "/admin/login" || pathname.startsWith("/admin/login/")) {
+    return fallback;
+  }
+
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    return path;
+  }
+
+  return fallback;
+}

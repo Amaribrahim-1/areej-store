@@ -340,7 +340,7 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 
 `[branch: feature/admin-shell]`
 
-- **11.1 — Admin login page**: email + password, credentials provisioned directly in Supabase (spec).
+- [x] **11.1 — Admin login page**: email + password, credentials provisioned directly in Supabase (spec).
   🚩 No password change/reset screen for admin (backlog). No self-service admin signup.
 - **11.2 — Server-side admin guard**: the `(admin)` layout or middleware verifies the admin role **server-side** — hiding the UI client-side is not protection (`coding-standards.md` §7). Verify a logged-in normal customer hitting `/admin` directly is rejected, not just unable to see the link.
 - **11.3 — Admin layout + navbar**: Dashboard / Orders / Products / Reviews.

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  adminLoginSchema,
   loginSchema,
   profileWriteSchema,
   registerSchema,
@@ -180,6 +181,24 @@ describe("loginSchema", () => {
   it("rejects a short password", () => {
     const result = loginSchema.safeParse({
       email: "user@example.com",
+      password: "123",
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("adminLoginSchema", () => {
+  it("accepts a valid email and password", () => {
+    const result = adminLoginSchema.safeParse({
+      email: "admin@example.com",
+      password: "secret1",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a short password", () => {
+    const result = adminLoginSchema.safeParse({
+      email: "admin@example.com",
       password: "123",
     });
     expect(result.success).toBe(false);
