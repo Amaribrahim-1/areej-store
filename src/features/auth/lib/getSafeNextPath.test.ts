@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getSafeNextPath } from "./getSafeNextPath";
+import { getSafeAdminNextPath, getSafeNextPath } from "./getSafeNextPath";
 
 describe("getSafeNextPath", () => {
   it("returns a same-origin relative path", () => {
@@ -28,5 +28,24 @@ describe("getSafeNextPath", () => {
 
   it("rejects paths that embed a scheme", () => {
     expect(getSafeNextPath("/redirect://evil.com")).toBe("/");
+  });
+});
+
+describe("getSafeAdminNextPath", () => {
+  it("allows admin panel paths including query strings", () => {
+    expect(getSafeAdminNextPath("/admin")).toBe("/admin");
+    expect(getSafeAdminNextPath("/admin?tab=orders")).toBe("/admin?tab=orders");
+    expect(getSafeAdminNextPath("/admin/orders")).toBe("/admin/orders");
+  });
+
+  it("rejects the login page so the next path cannot loop", () => {
+    expect(getSafeAdminNextPath("/admin/login")).toBe("/admin");
+    expect(getSafeAdminNextPath("/admin/login?next=/admin")).toBe("/admin");
+  });
+
+  it("falls back for storefront paths and unsafe URLs", () => {
+    expect(getSafeAdminNextPath("/checkout")).toBe("/admin");
+    expect(getSafeAdminNextPath("https://evil.com")).toBe("/admin");
+    expect(getSafeAdminNextPath(undefined)).toBe("/admin");
   });
 });

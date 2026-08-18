@@ -1,0 +1,4 @@
+interface:
+  display_name: "Areej Teach"
+  short_description: "Learner walkthrough file after backend, full tasks, or reviews"
+  default_prompt: "Use $areej-teach after shipping backend, finishing a full task the developer asked you to implement, or completing a review — write docs/walkthroughs/current.md at intern level."

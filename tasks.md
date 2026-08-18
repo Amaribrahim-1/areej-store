@@ -340,13 +340,15 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 
 `[branch: feature/admin-shell]`
 
-- **11.1 — Admin login page**: email + password, credentials provisioned directly in Supabase (spec).
+- [x] **11.1 — Admin login page**: email + password, credentials provisioned directly in Supabase (spec).
   🚩 No password change/reset screen for admin (backlog). No self-service admin signup.
-- **11.2 — Server-side admin guard**: the `(admin)` layout or middleware verifies the admin role **server-side** — hiding the UI client-side is not protection (`coding-standards.md` §7). Verify a logged-in normal customer hitting `/admin` directly is rejected, not just unable to see the link.
-- **11.3 — Admin layout + navbar**: Dashboard / Orders / Products / Reviews.
-- **11.4 — KPI query hook**: Total Sales, Pending Orders, Total Products. Aggregate in the DB (Postgres aggregate or view), not by fetching all rows and summing in JS.
-- **11.5 — KPI cards.**
+- [x] **11.2 — Server-side admin guard**: the `(admin)` layout or middleware verifies the admin role **server-side** — hiding the UI client-side is not protection (`coding-standards.md` §7). Verify a logged-in normal customer hitting `/admin` directly is rejected, not just unable to see the link.
+- [x] **11.3 — Admin layout + navbar**: Dashboard / Orders / Products / Reviews.
+- [x] **11.4 — KPI query hook**: Total Sales, Pending Orders, Total Products. Aggregate in the DB (Postgres aggregate or view), not by fetching all rows and summing in JS.
+      **Done:** `get_admin_dashboard_kpis` + `getAdminDashboardKpis`. Total Sales = sum of `Delivered` totals (COD: money counts after delivery). Pending = `Pending` count. Total Products = all product rows including inactive.
+- [x] **11.5 — KPI cards.**
   🚩 Cards only — no charts (backlog). No revenue-over-time graph, no sparklines.
+      **Done:** Three cards on `/admin` (sales / pending / products) with loading/error. No charts.
 
 `[commit: feat(admin): admin login, feat(admin): server-side role guard, feat(admin): dashboard kpis]`
 

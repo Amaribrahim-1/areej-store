@@ -17,11 +17,12 @@ Full context: `docs/ai-interactions.md` and `docs/coding-standards.md`.
 
 - Talk to the developer in Egyptian Arabic (اللهجة المصرية).
 - All code, comments, commit messages, and docs stay in English.
+- **Exception:** `docs/walkthroughs/` (areej-teach) — teaching prose in Egyptian Arabic; usage contracts/code/paths stay English. Chat after a walkthrough is a short pointer to `docs/walkthroughs/current.md`.
 
 # Team split (locked — Phase 3 onward; company-style)
 
 - **Human = frontend team.** Feature `types.ts` (mirror the usage contract), TanStack `use*` wrappers, UI, routes, Zustand UI state, RHF+Zod client forms, wiring, styling/a11y. Default: they draft → you review/teach. Help or write frontend code only when they ask.
-- **AI = backend team.** Supabase (schema, RLS, migrations, views, RPCs, triggers, storage), regen DB types when needed, and pure fetch/mutation functions (`getProduct`, `getProducts`, …) that talk to Supabase. Does **not** own `use*` hooks. Ship a **usage contract in chat** (params / return / errors / call example only — no FE how-tos). No "wait for an explicit Supabase request" gate.
+- **AI = backend team.** Supabase (schema, RLS, migrations, views, RPCs, triggers, storage), regen DB types when needed, and pure fetch/mutation functions (`getProduct`, `getProducts`, …) that talk to Supabase. Does **not** own `use*` hooks. Ship a **usage contract** (params / return / errors / call example only — no FE how-tos) in the areej-teach walkthrough; chat gets a pointer. No "wait for an explicit Supabase request" gate.
 - Components never call `supabase.from(...)` — only via `use*` → `get*` / mutate helpers.
 - `tasks.md` lists **what** to build, not who. Owner split stays in this protocol + chat.
 - Do not silently build deferred backlog items.
@@ -57,3 +58,5 @@ On a fresh session, read `docs/project-spec.md`, `docs/backlog.md`, `docs/ai-int
 # MVP task workflow
 
 For a concrete MVP task (e.g. «يلا التاسك 3.4»), use the project skill `.cursor/skills/areej-task/SKILL.md` (`areej-task`) — explain → FE/BE split → BE gate → FE start signal → review → check `tasks.md` → commit commands.
+
+After backend ships, after a full task the developer asked the AI to implement, and after a review: use `.cursor/skills/areej-teach/SKILL.md` (`areej-teach`) so the lesson lives in `docs/walkthroughs/current.md` (overwrite each time): problem + solution, pages/files without internals, flow, key decisions. Reviews: must/should/ذوق problems only, then a bare change list.

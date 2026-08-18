@@ -3,11 +3,12 @@ name: areej-task
 description: >-
   Runs the Areej MVP task workflow under the company-style FE/BE split: explain
   the task, split frontend vs backend in chat, wait for go-ahead before backend
-  work, ship get* helpers + an API-only chat usage contract (no FE recipes),
-  give a FE start signal, review after the developer's draft, whole-task review,
-  check off tasks.md, then commit commands from the real diff. Use when the
-  developer invokes areej-task, says "يلا التاسك" / "يلا التاسك X.Y", starts a
-  new MVP task by id, or asks to run the task workflow.
+  work, ship get* helpers + an API-only usage contract via areej-teach (no FE
+  recipes), give a FE start signal, review after the developer's draft,
+  whole-task review, check off tasks.md, then commit commands from the real
+  diff. Use when the developer invokes areej-task, says "يلا التاسك" /
+  "يلا التاسك X.Y", starts a new MVP task by id, or asks to run the task
+  workflow.
   DO NOT USE for ad-hoc reviews only (areej-review), clean-code-only passes
   (clean-code-guard), docs-only edits (docs-guard), or test-code review
   (test-guard). Manual invoke only — do not auto-start this skill.
@@ -22,10 +23,13 @@ Orchestrate one MVP task end-to-end under the locked company-style team split in
 - **Human (frontend team)** = feature `types.ts` from the usage contract, TanStack
   `use*` wrappers, UI, components, wiring, Zustand UI state, RHF+Zod client.
 - **AI (backend team)** = Supabase + pure `get*` / mutate helpers in
-  `features/*/api/` (not the `use*` hooks). Always hand FE a chat usage contract.
+  `features/*/api/` (not the `use*` hooks). Always hand FE a usage contract via
+  **areej-teach** (`docs/walkthroughs/current.md`); chat is a short pointer.
 
 Talk to the developer in Egyptian Arabic. Code, usage contracts, commit messages,
-and `tasks.md` edits stay in English. `tasks.md` describes **what**, never who.
+and `tasks.md` edits stay in English. Walkthrough teaching prose in
+`docs/walkthroughs/` is Egyptian Arabic (areej-teach exception). `tasks.md`
+describes **what**, never who.
 
 Do **not** invent product scope. Authoritative sources (re-read as needed):
 
@@ -87,16 +91,18 @@ If BE is empty, say so explicitly (FE-only task). Do not put owner names into `t
 - Tell the developer BE should ship first and **wait for an explicit go-ahead** (e.g. «ابدأ الباك»).
 - On go-ahead: implement BE/DB from scratch as the backend teammate.
 - Verify when possible (migration applied, SQL smoke, types, lint on touched api files).
-- Deliver a **usage contract in chat** (English) — API surface only: function
-  name + path, params, return shape (incl. null/empty), errors, minimal call
-  example. Do **not** write a docs file unless they ask. Do **not** include FE
-  implementation recipes (`queryKey`, hook structure, where to put types, etc.).
+- Invoke **areej-teach** (`backend` kind). The English usage contract lives in
+  the walkthrough (function name + path, params, return shape including
+  null/empty, errors, minimal call example). Chat: pointer to
+  `docs/walkthroughs/current.md` plus function names + one-liners. Do **not**
+  include FE implementation recipes (`queryKey`, hook structure, where to put
+  types, etc.).
 
 ### 4 — Frontend start signal
 
 Clear signal that FE can begin. Include **only**:
 
-- That the usage contract above is the API they consume
+- That the usage contract in `docs/walkthroughs/current.md` is the API they consume
 - Out of scope / backlog flags (if any)
 - Reminder that `tasks.md` sub-tasks are the acceptance checklist
 
@@ -110,11 +116,13 @@ When they signal ready («خلصت»، «راجع»، etc.):
 - Review with explanations (**why**, not only what).
 - Prefer guidance/fixes they apply; write FE code only if they ask.
 - Invoke **clean-code-guard** on their production changes.
+- Invoke **areej-teach** (`review` kind) so must/should/ذوق findings and a
+  bare change list live in `docs/walkthroughs/current.md`.
 - Do not whole-rewrite.
 
 ### 6 — Whole-task review
 
-Review FE + BE together against the task acceptance bar. Invoke **areej-review** for the Areej feature checklist (Performance → … → Git). Fix BE issues you own; for FE, guide or fix only if asked.
+Review FE + BE together against the task acceptance bar. Invoke **areej-review** for the Areej feature checklist (Performance → … → Git). Fix BE issues you own; for FE, guide or fix only if asked. Then invoke **areej-teach** (`review` kind) for the learner write-up.
 
 ### 7 — Check off `tasks.md`
 
@@ -137,6 +145,7 @@ If step 2 finds no BE work: after explain + split + guards → go directly to st
 ## Anti-patterns
 
 - Starting BE without go-ahead when BE is needed
+- Skipping areej-teach after BE or after review (chat-only shallow summary)
 - Giving FE start signal with implementation recipes (hook/`queryKey`/file how-tos) before their draft
 - Giving FE start signal before BE contract/verification when BE was required
 - Auto-committing or expanding into backlog items

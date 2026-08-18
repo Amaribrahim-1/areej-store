@@ -3,16 +3,16 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { signOutCustomer } from "./signOutCustomer";
+import { signOutSession } from "./signOutSession";
 
 export function useSignOut() {
   return useMutation({
-    mutationFn: signOutCustomer,
+    mutationFn: signOutSession,
     onSuccess: () => {
       toast.success("تم تسجيل الخروج");
     },
     onError: () => {
-      toast.error("مقدرناش نطلّعك، جرّبي تاني");
+      toast.error("تعذر تسجيل الخروج، حاول مرة أخرى");
     },
   });
 }

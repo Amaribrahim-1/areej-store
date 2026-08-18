@@ -10,7 +10,9 @@ description: >-
   self-invocation pattern as clean-code-guard. Focuses on Areej performance
   conventions, the project security checklist, RTL/Arabic accessibility, UX/UI
   against project sources, whether tests are needed (not test-code quality),
-  scalability markers, and whether a commit/branch is due. DO NOT USE for general
+  scalability markers, and whether a commit/branch is due. After the report,
+  invoke areej-teach so the learner walkthrough lands in docs/walkthroughs/.
+  DO NOT USE for general
   Clean Code/SOLID/DRY/KISS/YAGNI/AI-failure-mode checks (use clean-code-guard),
   reviewing test code once written (use test-guard), or documentation accuracy
   (use docs-guard).
@@ -212,12 +214,18 @@ End with one summary line:
 
 Or: `areej-review: clean — <git note if any>`
 
+Then invoke **areej-teach** (`review` kind). Chat keeps this structured report
+short; `docs/walkthroughs/current.md` gets problems only (must / should / ذوق)
+plus a bare change list. Do not skip that handoff.
+
 ## What this skill does NOT do
 
 - General Clean Code / SOLID / DRY / KISS / YAGNI / AI failure-mode review →
   `clean-code-guard`
 - Review of test file quality after tests are written → `test-guard`
 - Documentation accuracy / docs-vs-code drift → `docs-guard`
+- Learner walkthrough → `areej-teach` (this skill
+  must invoke it after the report; it does not replace it)
 - Rewrite or implement fixes unprompted (mentor hard boundary)
 - Invent rules beyond the listed source files
 - Duplicate project rules into extra reference files

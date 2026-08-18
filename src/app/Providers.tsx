@@ -23,7 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         {children}
         <Toaster
           dir="rtl"
-          position="top-center"
+          position="bottom-center"
           closeButton
           toastOptions={{
             style: {

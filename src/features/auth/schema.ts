@@ -70,6 +70,12 @@ export const loginSchema = z.object({
   password: z.string().min(6, { message: "كلمة المرور ٦ أحرف على الأقل" }),
 });
 
+/** Admin login form + write re-validation. Neutral Arabic — not shopper-feminine. */
+export const adminLoginSchema = z.object({
+  email: z.email({ message: "أدخل بريدًا إلكترونيًا صحيحًا" }),
+  password: z.string().min(6, { message: "كلمة المرور ٦ أحرف على الأقل" }),
+});
+
 /**
  * Editable account fields — name/phone/address only (task 4.1). No
  * email/password here; those go through Supabase Auth flows, not this form.
@@ -95,4 +101,5 @@ export const profileWriteSchema = z
 export type RegisterType = z.infer<typeof registerSchema>;
 export type RegisterWriteInput = z.infer<typeof registerWriteSchema>;
 export type LoginType = z.infer<typeof loginSchema>;
+export type AdminLoginType = z.infer<typeof adminLoginSchema>;
 export type ProfileWriteInput = z.infer<typeof profileWriteSchema>;
