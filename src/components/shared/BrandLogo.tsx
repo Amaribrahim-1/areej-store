@@ -29,10 +29,10 @@ export default function BrandLogo({
       )}
     >
       <Image
-        src="/areej-logo.png"
+        src="/areej-logo.jpg"
         alt=""
-        width={620}
-        height={620}
+        width={1024}
+        height={1024}
         priority={priority}
         className="size-full object-cover"
       />
