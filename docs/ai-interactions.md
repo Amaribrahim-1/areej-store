@@ -17,6 +17,8 @@ The developer's primary learning goal is **frontend**, practiced the way a compa
 - **Code, code comments, commit messages, and all project documentation files (including this one):** English.
 - Never mix the two within the same channel — keep the split clean and consistent.
 
+**Exception — `docs/walkthroughs/`:** learner walkthroughs written by the `areej-teach` skill. Teaching prose is Egyptian Arabic so the intern can re-read it. Usage contracts, code, paths, SQL, types, and error names inside those files stay English. Chat after a walkthrough is a **short pointer** to `docs/walkthroughs/current.md`, not a second copy of the lesson. See `.cursor/skills/areej-teach/SKILL.md`.
+
 ## Team split (locked — from Phase 3 onward)
 
 We work like **two separate teams** (company-style). There is no REST server in this stack; the backend “endpoint” is a pure function (e.g. `getProduct`) instead of a URL. Everything else matches how FE consumes a backend API.
@@ -26,9 +28,11 @@ We work like **two separate teams** (company-style). There is no REST server in 
 | **Frontend team** | The human developer | Feature `types.ts` shapes that mirror the backend usage contract; TanStack Query wrappers (`useProducts`, `useProduct`, mutations); UI, route composition, Zustand UI state, RHF+Zod client forms, wiring hooks into screens, styling/a11y. Default: they implement; AI helps only when asked. |
 | **Backend team** | The AI | Supabase (schema, migrations, RLS, views, RPCs, triggers, storage), regenerating `lib/supabase/types.ts` when migrations change, and pure fetch/mutation functions in `features/*/api/` that talk to Supabase (`getProducts`, `getProduct`, …). Does **not** own the `use*` TanStack wrappers. |
 
-### API usage contract (backend → frontend, in chat)
+### API usage contract (backend → frontend)
 
-When a new fetch/mutation ships, the backend team must hand the frontend team a short **usage contract in chat** (English) so the FE team never guesses **how to call the API**. Include at least:
+When a new fetch/mutation ships, the backend team must hand the frontend team a **usage contract** (English) so the FE team never guesses **how to call the API**. The full contract lives in `docs/walkthroughs/current.md` (areej-teach, overwritten each time). Chat only gets a short pointer plus function names + one-liners so they are not blocked before opening the file.
+
+Include at least:
 
 - Function name and file path
 - Params (required vs optional; exactly-one unions called out)
@@ -36,9 +40,11 @@ When a new fetch/mutation ships, the backend team must hand the frontend team a 
 - Error behavior (what throws vs what returns empty)
 - One minimal call example
 
-Do **not** require the frontend to read Supabase/SQL to know how to call the API. Do **not** write a separate docs file unless the developer asks.
+Do **not** require the frontend to read Supabase/SQL to know how to call the API.
 
 Do **not** use the contract (or the FE start signal) to prescribe frontend implementation: no “put types here like X”, no `queryKey`/`staleTime`/`enabled` recipes, no “copy `useProducts`”, no smoke-UI how-tos. Caching and hook shape are FE decisions; review them **after** the developer drafts.
+
+After backend ships, after a full task the developer asked the AI to implement, and after a review: run **areej-teach** so every file, every why, and (for reviews) right-vs-wrong with severity lives in `docs/walkthroughs/` — not as a shallow chat summary.
 
 ### Frontend track (AI behavior)
 
@@ -50,7 +56,7 @@ Do **not** use the contract (or the FE start signal) to prescribe frontend imple
 ### Backend / DB track (AI behavior)
 
 - Own backend/DB work when a task needs it — no "wait until the developer asks for SQL" gate.
-- Still explain what shipped and why (especially security: RLS, grants, `security_invoker`).
+- Still explain what shipped and why (especially security: RLS, grants, `security_invoker`) via **areej-teach**, not a shallow chat dump.
 - Do not silently expand scope into deferred backlog items.
 - Components never call `supabase.from(...)` — only `use*` hooks, which call `get*` / mutate helpers.
 - Historical note: task **3.2** shipped `useProducts` under the older split (AI owned both `get*` and `use*`). From **3.3** onward, the company-style split above applies.
