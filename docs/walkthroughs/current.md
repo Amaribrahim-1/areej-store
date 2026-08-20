@@ -1,45 +1,61 @@
-# شرح التاسك — 12.2
+# شرح التاسك — 12.3
 
 - التاريخ: 2026-08-20
 - النوع: full-task
 
 ## المشكلة والحل
 
-علاء محتاجة تشوف كل الطلبات: الاسم، العنوان، الإجمالي، الحالة، التاريخ، الهاتف، وزر تفاصيل. الجدول عريض على الموبايل. الحل: كروت تحت `lg`، وجدول من `lg` فوق.
+علاء من الليستة تشوف الملخص بس. عشان تجهّز الطلب محتاجة صفحة طلب واحد: العميل، عنوان التسليم، والمنتجات بالسعر والكمية. الحل: `/admin/orders/[id]` بتقرأ `getAdminOrder` وتعرض الرجوع + بلوك العميل + جدول المنتجات.
 
 ## الصفحات والملفات
 
-- `/admin/orders` (`src/app/(admin)/admin/(protected)/orders/page.tsx`) — نفس الصفحة. لسة رفيعة: ميتاداتا + الكمبوننت.
-- `src/features/orders/components/admin/AdminOrdersPage.tsx` — تحميل، غلط، فاضي، أو الليستة.
-- `src/features/orders/components/admin/AdminOrdersList.tsx` — يختار كروت أو جدول حسب العرض.
-- `src/features/orders/components/admin/AdminOrderCard.tsx` — كارت طلب على الموبايل/التابلت: الاسم، الحالة، الهاتف، التاريخ، الإجمالي، العنوان الكامل، زر التفاصيل.
-- `src/features/orders/components/admin/AdminOrdersTable.tsx` — جدول الأدمن: الأعمدة اللي في التاسك. العنوان سطرين كحد أقصى.
-- `src/features/orders/components/admin/AdminOrderDetailsLink.tsx` — زر «التفاصيل» → `/admin/orders/[id]`.
-- `src/features/orders/components/admin/AdminOrderPhoneLink.tsx` — رقم الموبايل كرابط `tel:`.
-- `src/features/orders/lib/formatOrderAddress.ts` — عنوان عربي من المحافظة + المركز + النص. نفس الشكل في رسالة الواتساب.
-- `src/features/orders/lib/formatOrderPlacedAt.ts` — تاريخ عربي مختصر.
+- `/admin/orders/[id]` (`src/app/(admin)/admin/(protected)/orders/[id]/page.tsx`) — صفحة رفيعة: ميتاداتا + `orderId` للكمبوننت.
+- `src/features/orders/components/admin/AdminOrderDetailsPage.tsx` — تحميل، غلط، مش موجود، أو التفاصيل.
+- `src/features/orders/components/admin/AdminOrderBackLink.tsx` — «العودة للطلبات» → `/admin/orders`.
+- `src/features/orders/components/admin/AdminOrderDetails.tsx` — اسم العميل، بادج الحالة (عرض فقط)، البلوك، المنتجات، الإجمالي.
+- `src/features/orders/components/admin/AdminOrderCustomerBlock.tsx` — الاسم، الهاتف `tel:`، العنوان الكامل، التاريخ، طريقة الدفع.
+- `src/features/orders/components/admin/AdminOrderItemsList.tsx` — كروت تحت `lg`، جدول من `lg`.
+- `src/features/orders/components/admin/AdminOrderLineItemCard.tsx` — منتج على الموبايل: اسم، سعر، كمية، إجمالي السطر.
+- `src/features/orders/components/admin/AdminOrderItemsTable.tsx` — نفس الأعمدة على الشاشة الواسعة.
+- `src/features/orders/api/admin/useAdminOrder.ts` — قراءة الطلب الواحد.
+- `src/features/orders/api/admin/getAdminOrder.ts` — الـ helper (من شحنة الباك).
+- `supabase/migrations/20260820085421_get_admin_order.sql` — RPC أدمن فقط.
+
+## عقد الاستخدام (English)
+
+### `getAdminOrder` — `src/features/orders/api/admin/getAdminOrder.ts`
+
+- **Params:** `orderId: string` (UUID). Whitespace trimmed.
+- **Returns:** `AdminOrderDetail | null`
+  - Success: header snapshot (`id`, `status`, `total`, `paymentMethod`, `customerName`, `customerPhone`, `governorate`, `markaz`, `addressText`, `createdAt`) plus `items[]`.
+  - Each item: `id`, `productName`, `variantLabel` (`string | null`), `quantity`, `unitPrice`, `lineTotal`. Purchase snapshots — no live image/slug.
+  - Missing order, empty string, or malformed UUID → `null`.
+- **Errors:** non-admin throws `NOT_ADMIN`. Unexpected status/payment/line shape throws.
+- **Call:**
+
+```ts
+const order = await getAdminOrder(orderId)
+```
 
 ## التدفق
 
-1. علاء تفتح `/admin/orders`.
-2. `useAdminOrders` يجيب `AdminOrder[]` (من 12.1).
-3. عرض ضيق → كروت. عرض واسع → جدول.
-4. العنوان بيتترجم من قيم DB الإنجليزية (`Cairo`) لعربي (`القاهرة`).
-5. «التفاصيل» بيروح `/admin/orders/[id]`. صفحة التفاصيل نفسها تاسك **12.3** — اللينك جاهز، الصفحة لسة مش موجودة.
+1. من `/admin/orders` زر «التفاصيل» يفتح `/admin/orders/<id>`.
+2. `getAdminOrder` ينادي `get_admin_order`.
+3. مش أدمن → `NOT_ADMIN` → حالة الغلط.
+4. `null` → «الطلب غير موجود».
+5. الطلب موجود → العميل/العنوان من الـ snapshot، والمنتجات بأسعار وقت الشراء.
 
 ## قرارات مهمة وليه
 
-- **كروت على الموبايل مش سكرول أفقي بس:** سبع أعمدة + عنوان طويل بيخبّي الهاتف والحالة برّه الشاشة. علاء بتشتغل من الموبايل. الكارت بيوري كل الحقول من غير سحب.
-- **الجدول من `lg` مش `md`:** عند 768px الأعمدة لسة زحمة. من 1024px المسح بالعين أسرع.
-- **`formatOrderAddress` في `lib/` مش جوّه الكمبوننت:** نفس قاعدة العنوان في إشعار الطلب. نسختين هيفرقوا يوم ما المحافظة تتكتب إنجليزي في الجدول وعربي في الواتساب.
-- **`OrderStatusBadge` مش سترينج جديد:** الحالة من `constants.ts`. ترجمة تانية في الجدول هتكسر التوحيد مع سجل العميل.
-- **`aria-label` على زر التفاصيل فيه اسم العميل:** أزرار كتير كلها «التفاصيل» من غير اسم = قارئ الشاشة مش بيفرّق.
-- **الشيفرون `ChevronRight` + `rtl:rotate-180`:** لوسيد مش بيقلب لوحده. في RTL السهم لازم يشيّر يسار (قدام).
+- **كروت على الموبايل زي الليستة:** أربع أعمدة + اسم منتج عربي طويل تزدحم على الشاشة الصغيرة. نفس حد `lg`.
+- **بادج الحالة عرض مش كنترول:** التحديث تاسك 12.4. من غير البادج علاء تفتح التفاصيل ومش عارفة الطلب Pending ولا Shipping.
+- **سهم الرجوع عكس سهم التفاصيل:** لوسيد مش بيقلب. في RTL الرجوع يمين، والتفاصيل شمال.
+- **`null` = مش موجود مش إكسبشن:** لينك UUID بايظ أو طلب اتمسح يظهر فاضي، مش 500.
+- **العنوان من `formatOrderAddress`:** نفس ترجمة المحافظة في الليستة والإشعار. نسختين هيفرقوا.
 
 ## تحقق بنفسك
 
-1. أدمن على `/admin/orders` وفي طلبات: على الموبايل كروت، على شاشة واسعة جدول. الأعمدة: العميل، العنوان، الإجمالي، الحالة، التاريخ، الهاتف، التفاصيل.
-2. العنوان عربي (مش `Cairo`). التاريخ عربي. الحالة بادج زي سجل العميل.
-3. الهاتف لينك `tel:` — من الموبايل يفتح الاتصال.
-4. فاضي وغلط لسة شغالين زي 12.1.
-5. «التفاصيل» بيروح `/admin/orders/<id>`. هتلاقي 404 لحد 12.3. ده متوقع.
+1. أدمن من الليستة → «التفاصيل»: رجوع، اسم، هاتف يتفتح اتصال، عنوان عربي كامل، منتجات (اسم / سعر / كمية / إجمالي السطر)، إجمالي الطلب. موبايل كروت، شاشة واسعة جدول.
+2. بادج الحالة ظاهرة ومفيش قائمة تغيير حالة.
+3. UUID شكله صح ومش موجود → «الطلب غير موجود» + رجوع.
+4. الجلسة محمية زي باقي `/admin` — عميلة على الرابط تترفض من السيرفر.

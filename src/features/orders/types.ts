@@ -55,3 +55,22 @@ export type AdminOrder = {
   addressText: string;
   createdAt: string;
 };
+
+/**
+ * One `order_items` snapshot on the admin details read.
+ * Names and prices are purchase-time; no live product image/slug.
+ */
+export type AdminOrderLineItem = {
+  id: string;
+  productName: string;
+  variantLabel: string | null;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+};
+
+/** One order for the admin details page, including line items. */
+export type AdminOrderDetail = AdminOrder & {
+  paymentMethod: PaymentMethod;
+  items: AdminOrderLineItem[];
+};

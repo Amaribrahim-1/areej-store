@@ -367,6 +367,22 @@ export type Database = {
           total_sales: number
         }[]
       }
+      get_admin_order: {
+        Args: { p_order_id: string }
+        Returns: {
+          address_text: string
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          governorate: string
+          id: string
+          items: Json
+          markaz: string
+          payment_method: string
+          status: string
+          total: number
+        }[]
+      }
       list_admin_orders: {
         Args: never
         Returns: {

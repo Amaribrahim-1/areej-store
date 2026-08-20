@@ -363,7 +363,8 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
   🚩 If this hook (or an admin status-update mutation) needs to invalidate the customer's `customerOrdersQueryKey` (from 8.1) — or vice versa — that is the trigger to move `orders` feature query keys into a shared `queryKeys.ts` instead of hooks importing each other's key builders directly.
 - [x] **12.2 — Orders table**: Customer Name, Address, Total, Status, Date, Phone, Details button. Mobile-first: a table this wide needs a card layout or horizontal scroll on phones — decide, don't let it break.
       **Done:** Cards below `lg`, table from `lg` up. Shared `formatOrderAddress`. Details links to `/admin/orders/[id]` (page in **12.3**).
-- **12.3 — Order details page**: back button, line-items table (Product, Price, Quantity, Line Total), customer + address block.
+- [x] **12.3 — Order details page**: back button, line-items table (Product, Price, Quantity, Line Total), customer + address block.
+      **Done:** `/admin/orders/[id]` via `getAdminOrder` / `useAdminOrder`. Back link, customer+address snapshot, products as cards below `lg` and a table from `lg`. Status badge is display-only (mutation in **12.4**).
 - **12.4 — Update-status control**: `Pending → Shipping → Delivered → Cancelled`, values from `constants.ts`, never retyped inline (§4).
 - **12.5 — Status mutation** with optimistic update or invalidation, plus a Sonner toast. Only admin can update — enforced by RLS (Phase 1.3), not just by the UI.
 - **12.6 — Filter/sort orders by status** if the list grows — deferrable, note it rather than building it now.
