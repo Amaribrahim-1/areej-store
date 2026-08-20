@@ -361,7 +361,8 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 - [x] **12.1 — `api/useAdminOrders.ts`**: all orders. Shorter `staleTime` / more aggressive refetch than the catalog — Alaa acts on these in near-real-time (`coding-standards.md` §5).
       **Done:** `list_admin_orders` + `getAdminOrders` / `useAdminOrders` (`adminOrdersQueryKey`, 30s staleTime). `/admin/orders` shows loading, error, and empty. Table UI stays **12.2**.
   🚩 If this hook (or an admin status-update mutation) needs to invalidate the customer's `customerOrdersQueryKey` (from 8.1) — or vice versa — that is the trigger to move `orders` feature query keys into a shared `queryKeys.ts` instead of hooks importing each other's key builders directly.
-- **12.2 — Orders table**: Customer Name, Address, Total, Status, Date, Phone, Details button. Mobile-first: a table this wide needs a card layout or horizontal scroll on phones — decide, don't let it break.
+- [x] **12.2 — Orders table**: Customer Name, Address, Total, Status, Date, Phone, Details button. Mobile-first: a table this wide needs a card layout or horizontal scroll on phones — decide, don't let it break.
+      **Done:** Cards below `lg`, table from `lg` up. Shared `formatOrderAddress`. Details links to `/admin/orders/[id]` (page in **12.3**).
 - **12.3 — Order details page**: back button, line-items table (Product, Price, Quantity, Line Total), customer + address block.
 - **12.4 — Update-status control**: `Pending → Shipping → Delivered → Cancelled`, values from `constants.ts`, never retyped inline (§4).
 - **12.5 — Status mutation** with optimistic update or invalidation, plus a Sonner toast. Only admin can update — enforced by RLS (Phase 1.3), not just by the UI.

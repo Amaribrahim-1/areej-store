@@ -8,6 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { useAdminOrders } from "../../api/admin/useAdminOrders";
 
+import AdminOrdersList from "./AdminOrdersList";
+
 export default function AdminOrdersPage() {
   const { data: orders, isPending, isError, refetch } = useAdminOrders();
   const orderList = orders ?? [];
@@ -37,20 +39,23 @@ export default function AdminOrdersPage() {
           description="عندما يضع العملاء طلبات، ستظهر هنا."
         />
       ) : null}
+
+      {!isPending && !isError && orderList.length > 0 ? (
+        <AdminOrdersList orders={orderList} />
+      ) : null}
     </div>
   );
 }
 
 function AdminOrdersSkeleton() {
   return (
-    <div
-      className="flex flex-col gap-4"
-      aria-busy="true"
-      aria-label="جاري التحميل"
-    >
-      <Skeleton className="h-24 w-full rounded-2xl" />
-      <Skeleton className="h-24 w-full rounded-2xl" />
-      <Skeleton className="h-24 w-full rounded-2xl" />
+    <div aria-busy="true" aria-label="جاري التحميل">
+      <div className="flex flex-col gap-4 lg:hidden">
+        <Skeleton className="h-44 w-full rounded-2xl" />
+        <Skeleton className="h-44 w-full rounded-2xl" />
+        <Skeleton className="h-44 w-full rounded-2xl" />
+      </div>
+      <Skeleton className="hidden h-64 w-full rounded-2xl lg:block" />
     </div>
   );
 }
