@@ -27,3 +27,6 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
 
 /** Customer order history is personal, near-real-time data — shorter than the catalog's 5 min. */
 export const CUSTOMER_ORDERS_STALE_TIME_MS = 2 * 60 * 1000;
+
+/** Admin order list is acted on in near-real-time — shorter than the catalog. */
+export const ADMIN_ORDERS_STALE_TIME_MS = 30 * 1000;
