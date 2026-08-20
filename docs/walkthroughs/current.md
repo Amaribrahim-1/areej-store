@@ -1,52 +1,45 @@
-# شرح التاسك — 12.1
+# شرح التاسك — 12.2
 
 - التاريخ: 2026-08-20
 - النوع: full-task
 
 ## المشكلة والحل
 
-علاء محتاجة ليستة كل الطلبات في الأدمن. الباك كان جاهز. اتظبط الفرونت: النوع، الهوك، والصفحة من غير جدول (ده 12.2).
+علاء محتاجة تشوف كل الطلبات: الاسم، العنوان، الإجمالي، الحالة، التاريخ، الهاتف، وزر تفاصيل. الجدول عريض على الموبايل. الحل: كروت تحت `lg`، وجدول من `lg` فوق.
 
 ## الصفحات والملفات
 
-- `/admin/orders` (`src/app/(admin)/admin/(protected)/orders/page.tsx`) — علاء تفتح الطلبات. الصفحة رفيعة: ميتاداتا + الكمبوننت.
-- `src/features/orders/components/admin/AdminOrdersPage.tsx` — عنوان «الطلبات»، تحميل، غلط، أو فاضي.
-- `src/features/orders/api/admin/useAdminOrders.ts` — الهوك اللي بيجيب الليستة.
-- `src/features/orders/api/admin/getAdminOrders.ts` — بينادي الـ RPC ويرجع `AdminOrder[]`.
-- `src/features/orders/types.ts` — شكل الصف اللي الفرونت بيشتغل عليه.
-- `src/features/orders/constants.ts` — `ADMIN_ORDERS_STALE_TIME_MS` (30 ثانية).
-
-## عقد الاستخدام (English)
-
-### `getAdminOrders` — `src/features/orders/api/admin/getAdminOrders.ts`
-
-- **Params:** none
-- **Returns:** `AdminOrder[]`, newest first. Empty shop → `[]`.
-- **Errors:** `Error("NOT_ADMIN")` if the session is not admin. Other RPC failures throw as-is.
-- **Call:**
-
-```ts
-const orders = await getAdminOrders()
-```
+- `/admin/orders` (`src/app/(admin)/admin/(protected)/orders/page.tsx`) — نفس الصفحة. لسة رفيعة: ميتاداتا + الكمبوننت.
+- `src/features/orders/components/admin/AdminOrdersPage.tsx` — تحميل، غلط، فاضي، أو الليستة.
+- `src/features/orders/components/admin/AdminOrdersList.tsx` — يختار كروت أو جدول حسب العرض.
+- `src/features/orders/components/admin/AdminOrderCard.tsx` — كارت طلب على الموبايل/التابلت: الاسم، الحالة، الهاتف، التاريخ، الإجمالي، العنوان الكامل، زر التفاصيل.
+- `src/features/orders/components/admin/AdminOrdersTable.tsx` — جدول الأدمن: الأعمدة اللي في التاسك. العنوان سطرين كحد أقصى.
+- `src/features/orders/components/admin/AdminOrderDetailsLink.tsx` — زر «التفاصيل» → `/admin/orders/[id]`.
+- `src/features/orders/components/admin/AdminOrderPhoneLink.tsx` — رقم الموبايل كرابط `tel:`.
+- `src/features/orders/lib/formatOrderAddress.ts` — عنوان عربي من المحافظة + المركز + النص. نفس الشكل في رسالة الواتساب.
+- `src/features/orders/lib/formatOrderPlacedAt.ts` — تاريخ عربي مختصر.
 
 ## التدفق
 
 1. علاء تفتح `/admin/orders`.
-2. `AdminOrdersPage` يستدعي `useAdminOrders`.
-3. الهوك ينادي `getAdminOrders` → RPC `list_admin_orders`.
-4. الصفوف بتتحول من `snake_case` لشكل `AdminOrder` في `types.ts`.
-5. تحميل → سكلتون. غلط → `ErrorState`. فاضي → `EmptyState`.
+2. `useAdminOrders` يجيب `AdminOrder[]` (من 12.1).
+3. عرض ضيق → كروت. عرض واسع → جدول.
+4. العنوان بيتترجم من قيم DB الإنجليزية (`Cairo`) لعربي (`القاهرة`).
+5. «التفاصيل» بيروح `/admin/orders/[id]`. صفحة التفاصيل نفسها تاسك **12.3** — اللينك جاهز، الصفحة لسة مش موجودة.
 
 ## قرارات مهمة وليه
 
-- **`types.ts` مش تكرار للمتعة:** ده عقد الفرونت. الـ RPC بيرجع `customer_name`. الصفحة تشتغل بـ `customerName`. النوع في النص هو الجسر: الـ helper يلتزم بيه، والهوك بيرثه، وجدول 12.2 هياخد `AdminOrder` في الـ props. لو حقل نقص، الكومبايلر يصرخ قبل الرن.
-- **مفرد `AdminOrder` مش `AdminOrders`:** الصف واحد. الليستة `AdminOrder[]`. الجمع على النوع بيخلط الصف بالمصفوفة.
-- **`status: OrderStatus` مش يونيون متكتب تاني:** القيم عايشة في `constants.ts`. نسختين هيفرقوا يوم ما نزود حالة.
-- **الـ helper بيستورد النوع من `types.ts`:** زي `getCustomerOrders`. مصدر واحد للشكل، مش نوع في الـ api ونوع في الفرونت.
-- **`staleTime` 30 ثانية مش `0`:** أدمن قريب من الوقت الحقيقي من غير ريفetch على كل فوكس. نفس رقم KPIs.
-- **المفتاح متصدّر من الهوك:** 12.5 هتعمل invalidate لنفس المفتاح. سترينج متكرر بيتكسّر بهدوء.
+- **كروت على الموبايل مش سكرول أفقي بس:** سبع أعمدة + عنوان طويل بيخبّي الهاتف والحالة برّه الشاشة. علاء بتشتغل من الموبايل. الكارت بيوري كل الحقول من غير سحب.
+- **الجدول من `lg` مش `md`:** عند 768px الأعمدة لسة زحمة. من 1024px المسح بالعين أسرع.
+- **`formatOrderAddress` في `lib/` مش جوّه الكمبوننت:** نفس قاعدة العنوان في إشعار الطلب. نسختين هيفرقوا يوم ما المحافظة تتكتب إنجليزي في الجدول وعربي في الواتساب.
+- **`OrderStatusBadge` مش سترينج جديد:** الحالة من `constants.ts`. ترجمة تانية في الجدول هتكسر التوحيد مع سجل العميل.
+- **`aria-label` على زر التفاصيل فيه اسم العميل:** أزرار كتير كلها «التفاصيل» من غير اسم = قارئ الشاشة مش بيفرّق.
+- **الشيفرون `ChevronRight` + `rtl:rotate-180`:** لوسيد مش بيقلب لوحده. في RTL السهم لازم يشيّر يسار (قدام).
 
 ## تحقق بنفسك
 
-1. أدمن على `/admin/orders`: عنوان «الطلبات». فاضي → رسالة مفيش طلبات. مش إنجليزي، ومفيش لوج في الكونسول.
-2. لو الـ query فشل: `ErrorState` وزر إعادة المحاولة، مش صفحة كأنها نجحت.
+1. أدمن على `/admin/orders` وفي طلبات: على الموبايل كروت، على شاشة واسعة جدول. الأعمدة: العميل، العنوان، الإجمالي، الحالة، التاريخ، الهاتف، التفاصيل.
+2. العنوان عربي (مش `Cairo`). التاريخ عربي. الحالة بادج زي سجل العميل.
+3. الهاتف لينك `tel:` — من الموبايل يفتح الاتصال.
+4. فاضي وغلط لسة شغالين زي 12.1.
+5. «التفاصيل» بيروح `/admin/orders/<id>`. هتلاقي 404 لحد 12.3. ده متوقع.
