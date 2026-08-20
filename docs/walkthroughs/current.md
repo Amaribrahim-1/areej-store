@@ -1,59 +1,52 @@
-# شرح التاسك — Phase 11 review fixes
+# شرح التاسك — 12.1
 
-- التاريخ: 2026-08-18
+- التاريخ: 2026-08-20
 - النوع: full-task
 
 ## المشكلة والحل
 
-المراجعة وقفت على أسماء ونبرة وكومنت بيكرر الكود. التصليحات اتشحنت. سلوك الحارس واللوجين نفسه زي ما هو.
+علاء محتاجة ليستة كل الطلبات في الأدمن. الباك كان جاهز. اتظبط الفرونت: النوع، الهوك، والصفحة من غير جدول (ده 12.2).
 
 ## الصفحات والملفات
 
-- `src/features/auth/api/signOutSession.ts` — تسجيل خروج الجلسة لأي دور (ستور أو لوحة).
-- `src/features/auth/api/useSignOut.ts` — توست الخروج بصيغة محايدة.
-- `src/features/auth/lib/adminLoginErrorMessage.ts` — ترجمة أخطاء لوجين الأدمن لعربي.
-- `src/features/auth/api/useAdminLogin.ts` — التوست بس؛ الرسالة من الدالة فوق.
-- `src/features/auth/api/loginAdmin.ts` — كومنت الـ why بس.
-- `src/features/auth/components/AdminLoginForm.tsx` — اسم الحقل `credentials`.
-- `src/features/admin-dashboard/components/AdminDashboardPage.tsx` — وصف الخطأ بنفس نبرة `error.tsx`.
+- `/admin/orders` (`src/app/(admin)/admin/(protected)/orders/page.tsx`) — علاء تفتح الطلبات. الصفحة رفيعة: ميتاداتا + الكمبوننت.
+- `src/features/orders/components/admin/AdminOrdersPage.tsx` — عنوان «الطلبات»، تحميل، غلط، أو فاضي.
+- `src/features/orders/api/admin/useAdminOrders.ts` — الهوك اللي بيجيب الليستة.
+- `src/features/orders/api/admin/getAdminOrders.ts` — بينادي الـ RPC ويرجع `AdminOrder[]`.
+- `src/features/orders/types.ts` — شكل الصف اللي الفرونت بيشتغل عليه.
+- `src/features/orders/constants.ts` — `ADMIN_ORDERS_STALE_TIME_MS` (30 ثانية).
 
 ## عقد الاستخدام (English)
 
-### `signOutSession` — `src/features/auth/api/signOutSession.ts`
+### `getAdminOrders` — `src/features/orders/api/admin/getAdminOrders.ts`
 
 - **Params:** none
-- **Returns:** `void`
-- **Errors:** throws the Supabase `signOut` error
+- **Returns:** `AdminOrder[]`, newest first. Empty shop → `[]`.
+- **Errors:** `Error("NOT_ADMIN")` if the session is not admin. Other RPC failures throw as-is.
 - **Call:**
 
 ```ts
-await signOutSession()
-```
-
-### `adminLoginErrorMessage` — `src/features/auth/lib/adminLoginErrorMessage.ts`
-
-- **Params:** `error: unknown`
-- **Returns:** Arabic string for the admin login toast. Unknown/empty → `"حدث خطأ، حاول مرة أخرى"`.
-- **Errors:** none (pure)
-- **Call:**
-
-```ts
-toast.error(adminLoginErrorMessage(error))
+const orders = await getAdminOrders()
 ```
 
 ## التدفق
 
-1. تسجيل الخروج من الستور أو اللوحة يعدّي على `signOutSession`.
-2. لو الخروج فشل، التوست محايد الجنس.
-3. لوجين الأدمن لو فشل: `useAdminLogin` يمرر الخطأ لـ `adminLoginErrorMessage` ويعرض الناتج.
+1. علاء تفتح `/admin/orders`.
+2. `AdminOrdersPage` يستدعي `useAdminOrders`.
+3. الهوك ينادي `getAdminOrders` → RPC `list_admin_orders`.
+4. الصفوف بتتحول من `snake_case` لشكل `AdminOrder` في `types.ts`.
+5. تحميل → سكلتون. غلط → `ErrorState`. فاضي → `EmptyState`.
 
 ## قرارات مهمة وليه
 
-- **`signOutSession` مش `signOut`:** الاسم التاني هيختلط بـ `supabase.auth.signOut`.
-- **توست واحد محايد:** الهوك مشترك. صيغتين هتتكرر.
+- **`types.ts` مش تكرار للمتعة:** ده عقد الفرونت. الـ RPC بيرجع `customer_name`. الصفحة تشتغل بـ `customerName`. النوع في النص هو الجسر: الـ helper يلتزم بيه، والهوك بيرثه، وجدول 12.2 هياخد `AdminOrder` في الـ props. لو حقل نقص، الكومبايلر يصرخ قبل الرن.
+- **مفرد `AdminOrder` مش `AdminOrders`:** الصف واحد. الليستة `AdminOrder[]`. الجمع على النوع بيخلط الصف بالمصفوفة.
+- **`status: OrderStatus` مش يونيون متكتب تاني:** القيم عايشة في `constants.ts`. نسختين هيفرقوا يوم ما نزود حالة.
+- **الـ helper بيستورد النوع من `types.ts`:** زي `getCustomerOrders`. مصدر واحد للشكل، مش نوع في الـ api ونوع في الفرونت.
+- **`staleTime` 30 ثانية مش `0`:** أدمن قريب من الوقت الحقيقي من غير ريفetch على كل فوكس. نفس رقم KPIs.
+- **المفتاح متصدّر من الهوك:** 12.5 هتعمل invalidate لنفس المفتاح. سترينج متكرر بيتكسّر بهدوء.
 
 ## تحقق بنفسك
 
-1. من اللوحة: سجّل خروج. الرسالة مش مؤنثة لو حصل خطأ.
-2. `/admin/login` بحساب كاستومر: توست «هذا الحساب ليس حساب مدير».
-3. `/admin` لو الـ KPIs فشلت: الوصف رسمي خفيف زي باقي اللوحة.
+1. أدمن على `/admin/orders`: عنوان «الطلبات». فاضي → رسالة مفيش طلبات. مش إنجليزي، ومفيش لوج في الكونسول.
+2. لو الـ query فشل: `ErrorState` وزر إعادة المحاولة، مش صفحة كأنها نجحت.
