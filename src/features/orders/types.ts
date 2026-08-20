@@ -42,3 +42,16 @@ export type CustomerOrder = {
   createdAt: string;
   items: CustomerOrderLineItem[];
 };
+
+/** One row in the admin orders list (no line items). Newest first. */
+export type AdminOrder = {
+  id: string;
+  status: OrderStatus;
+  total: number;
+  customerName: string;
+  customerPhone: string;
+  governorate: string;
+  markaz: string;
+  addressText: string;
+  createdAt: string;
+};

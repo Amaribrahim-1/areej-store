@@ -360,11 +360,25 @@ export type Database = {
     }
     Functions: {
       get_admin_dashboard_kpis: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           pending_orders: number
           total_products: number
           total_sales: number
+        }[]
+      }
+      list_admin_orders: {
+        Args: never
+        Returns: {
+          address_text: string
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          governorate: string
+          id: string
+          markaz: string
+          status: string
+          total: number
         }[]
       }
       list_home_testimonials: {
