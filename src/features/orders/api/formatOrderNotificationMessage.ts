@@ -1,9 +1,5 @@
-import {
-  resolveGovernorateLabel,
-  resolveMarkazLabel,
-} from "@/lib/egypt-locations";
-
 import { PAYMENT_METHOD_LABELS, type PaymentMethod } from "../constants";
+import { formatOrderAddress } from "../lib/formatOrderAddress";
 
 export type OrderNotificationLine = {
   productName: string;
@@ -37,14 +33,6 @@ function formatPaymentMethod(paymentMethod: string): string {
   return paymentMethod;
 }
 
-function formatAddress(order: OrderNotificationPayload): string {
-  const governorate =
-    resolveGovernorateLabel(order.governorate) ?? order.governorate;
-  const markaz =
-    resolveMarkazLabel(order.governorate, order.markaz) ?? order.markaz;
-  return `${governorate} – ${markaz} – ${order.addressText}`;
-}
-
 function formatLines(lines: OrderNotificationLine[]): string {
   return lines
     .map((line) => {
@@ -65,7 +53,7 @@ export function formatOrderNotificationMessage(
     `رقم مختصر: ${shortId}`,
     `العميلة: ${order.customerName}`,
     `الهاتف: ${order.customerPhone}`,
-    `العنوان: ${formatAddress(order)}`,
+    `العنوان: ${formatOrderAddress(order)}`,
     `الدفع: ${formatPaymentMethod(order.paymentMethod)}`,
     "المنتجات:",
     formatLines(order.lines),

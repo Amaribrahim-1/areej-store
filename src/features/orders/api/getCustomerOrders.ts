@@ -1,11 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 
-import {
-  ORDER_STATUSES,
-  PAYMENT_METHODS,
-  type OrderStatus,
-  type PaymentMethod,
-} from "../constants";
+import { requireOrderStatus, requirePaymentMethod } from "../constants";
 import type { CustomerOrder, CustomerOrderLineItem } from "../types";
 
 type CustomerOrderProduct = {
@@ -121,26 +116,4 @@ function toCustomerOrderLine(line: CustomerOrderItemRow): CustomerOrderLineItem 
     imageUrl: product?.image_url ?? null,
     slug: product?.slug ?? null,
   };
-}
-
-function isOrderStatus(value: string): value is OrderStatus {
-  return (ORDER_STATUSES as readonly string[]).includes(value);
-}
-
-function isPaymentMethod(value: string): value is PaymentMethod {
-  return (PAYMENT_METHODS as readonly string[]).includes(value);
-}
-
-function requireOrderStatus(value: string): OrderStatus {
-  if (!isOrderStatus(value)) {
-    throw new Error(`Unexpected order status: ${value}`);
-  }
-  return value;
-}
-
-function requirePaymentMethod(value: string): PaymentMethod {
-  if (!isPaymentMethod(value)) {
-    throw new Error(`Unexpected payment method: ${value}`);
-  }
-  return value;
 }

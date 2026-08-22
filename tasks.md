@@ -286,11 +286,11 @@ Built after products and reviews exist, because every section on it is driven by
 - [x] **9.3 — "Latest" section**: newest active products, reusing `ProductCard`.
       **Done:** `LatestProducts` on `/` under Features; `getProducts({ sort: "newest", pageSize: 4 })` via `useProducts`, reuses `ProductCard`, with loading/error/empty and a catalog link.
 - [x] **9.4 — "Featured / Top Sales" section**: active products where `current_price < original_price`, sorted by discount depth or recency (spec decision #10). Static grid.
-  **Done:** `catalog_products` now exposes `has_discount` (any variant `current_price < original_price`) and `discount_depth`. `getFeaturedProducts` returns active discounted products sorted by depth then recency. `FeaturedProducts` static grid on `/` reuses `ProductCard`, with loading/error/empty. No carousel; no `is_featured`.
-  🚩 Static grid only — no auto-advancing carousel, no arrow navigation (backlog, spec decision #3). And no manual `is_featured` toggle in admin; the discount drives it.
+      **Done:** `catalog_products` now exposes `has_discount` (any variant `current_price < original_price`) and `discount_depth`. `getFeaturedProducts` returns active discounted products sorted by depth then recency. `FeaturedProducts` static grid on `/` reuses `ProductCard`, with loading/error/empty. No carousel; no `is_featured`.
+      🚩 Static grid only — no auto-advancing carousel, no arrow navigation (backlog, spec decision #3). And no manual `is_featured` toggle in admin; the discount drives it.
 - [x] **9.5 — Testimonials section**: top-rated reviews that contain a text comment, across all products, each labelled with its product (spec decision #9). Static grid.
-  **Done:** `list_home_testimonials` RPC + `getHomeTestimonials` (comment required, active products, rating then recency). `HomeTestimonials` static grid on `/` reuses `StarRating`, labels each quote with a product link, with loading/error/empty. No carousel; no `testimonials` table.
-  🚩 Static grid, no carousel (backlog). No separate admin testimonial-entry screen (spec decision #9).
+      **Done:** `list_home_testimonials` RPC + `getHomeTestimonials` (comment required, active products, rating then recency). `HomeTestimonials` static grid on `/` reuses `StarRating`, labels each quote with a product link, with loading/error/empty. No carousel; no `testimonials` table.
+      🚩 Static grid, no carousel (backlog). No separate admin testimonial-entry screen (spec decision #9).
 - [x] **9.6 — Lazy-load Testimonials and Featured** if they pull extra data (`coding-standards.md` §5), and fetch Home's sections in parallel, not as a waterfall.
       **Done:** `next/dynamic` for `FeaturedProducts` and `HomeTestimonials` on `/`; Latest stays in the initial bundle. Both deferred sections render unconditionally so their queries start independently (no data waterfall). No carousel; no server prefetch (backlog).
 
@@ -308,7 +308,7 @@ Built after products and reviews exist, because every section on it is driven by
       **Done:** `/contact` + `contactSchema` (phone-only — no email column) + `createContactMessage` / `useCreateContactMessage` calling `submit_contact_message`. Guest-accessible. No email delivery.
 - [x] **10.3 — Sanitize the contact message** before storage/render (§7), and rate-limit or otherwise guard the endpoint — a public insert endpoint is a spam target.
       **Done:** `sanitizePlainText` before the RPC; RPC strips tags, re-validates, and rate-limits 3/phone/hour. Dropped `contact_messages_insert_anyone`; INSERT revoked from anon/authenticated. Honeypot on the form. No email send (backlog).
-  🚩 The contact form stores messages for Alaa to read; it does not need to send email. Adding email delivery here pulls in the same integration that "Forgot Password" was deferred for (backlog).
+      🚩 The contact form stores messages for Alaa to read; it does not need to send email. Adding email delivery here pulls in the same integration that "Forgot Password" was deferred for (backlog).
 
 `[commit: feat(pages): about page, feat(contact): contact form]`
 
@@ -324,13 +324,13 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
       **Done:** Owner-only `UPDATE` RLS + column grant (`rating`, `comment`); `updateReview` re-validates `reviewSchema` and sanitizes before write; `OwnedReviewPanel` edit/cancel on the product page; invalidates product reviews, my-review, product rating, and home testimonials.
 - [x] **C.2 — Customer can delete their own review.** Owner-only, with a confirm step. After delete, the add-review form is available again for that product (unique constraint still applies while a row exists).
       **Done:** Owner-only `DELETE` RLS + revoke anon DELETE; `deleteReview` resolves from active slug + session (never a client review id); confirm dialog on `OwnedReviewPanel`; invalidates product reviews, my-review, product rating, and home testimonials so the add form returns.
-  🚩 Guests still cannot review. No editing/deleting someone else’s review. Admin delete is Phase A — not here.
+      🚩 Guests still cannot review. No editing/deleting someone else’s review. Admin delete is Phase A — not here.
 - [x] **C.3 — Overlay navbar on the Home Hero**: on `/` at the top of the page, the customer navbar sits over the Hero (transparent, no solid bar) so they read as one visual unit. After scroll, and on every other customer page, keep the current solid sticky bar (`bg-background` + blur + border). Navbar stays in the customer layout — do not duplicate a Home-only nav.
       **Done:** Home-at-top overlay from the shared customer navbar; solid sticky bar after scroll and on other pages. Full-viewport hero with a light top/copy wash so the photo stays vivid and nav/copy stay readable. Brand mark in nav, footer, and mobile menu, plus favicon.
-  🚩 Overlay is Home-at-top only. Do not make the navbar transparent site-wide. Logo, links, cart badge, and mobile menu icon must stay readable on the photo (add a top wash on the Hero if needed). If Alaa swaps the Hero image, re-check contrast. Admin navbar (11.3) is out of scope.
+      🚩 Overlay is Home-at-top only. Do not make the navbar transparent site-wide. Logo, links, cart badge, and mobile menu icon must stay readable on the photo (add a top wash on the Hero if needed). If Alaa swaps the Hero image, re-check contrast. Admin navbar (11.3) is out of scope.
 - [x] **C.4 — Show/hide password toggle** on customer login and register (password + confirm password): an eye control so the customer can reveal the typed value. Shared control, Lucide eye icons, Arabic `aria-label` (e.g. «إظهار كلمة المرور» / «إخفاء كلمة المرور»), visible focus. Reuse the same control in admin login when **11.1** is built — do not fork a second toggle.
       **Done:** Shared `PasswordInput` (Lucide eye, Arabic aria-label, visible focus) on login + register password/confirm. Same control is ready for admin login in **11.1** — do not fork.
-  🚩 Not Forgot Password / reset (backlog). Toggle visibility only; do not email or change the password.
+      🚩 Not Forgot Password / reset (backlog). Toggle visibility only; do not email or change the password.
 
 `[commit: feat(reviews): customer edit and delete own review, feat(shell): overlay navbar on home hero, feat(auth): password visibility toggle]`
 
@@ -341,13 +341,13 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 `[branch: feature/admin-shell]`
 
 - [x] **11.1 — Admin login page**: email + password, credentials provisioned directly in Supabase (spec).
-  🚩 No password change/reset screen for admin (backlog). No self-service admin signup.
+      🚩 No password change/reset screen for admin (backlog). No self-service admin signup.
 - [x] **11.2 — Server-side admin guard**: the `(admin)` layout or middleware verifies the admin role **server-side** — hiding the UI client-side is not protection (`coding-standards.md` §7). Verify a logged-in normal customer hitting `/admin` directly is rejected, not just unable to see the link.
 - [x] **11.3 — Admin layout + navbar**: Dashboard / Orders / Products / Reviews.
 - [x] **11.4 — KPI query hook**: Total Sales, Pending Orders, Total Products. Aggregate in the DB (Postgres aggregate or view), not by fetching all rows and summing in JS.
       **Done:** `get_admin_dashboard_kpis` + `getAdminDashboardKpis`. Total Sales = sum of `Delivered` totals (COD: money counts after delivery). Pending = `Pending` count. Total Products = all product rows including inactive.
 - [x] **11.5 — KPI cards.**
-  🚩 Cards only — no charts (backlog). No revenue-over-time graph, no sparklines.
+      🚩 Cards only — no charts (backlog). No revenue-over-time graph, no sparklines.
       **Done:** Three cards on `/admin` (sales / pending / products) with loading/error. No charts.
 
 `[commit: feat(admin): admin login, feat(admin): server-side role guard, feat(admin): dashboard kpis]`
@@ -358,13 +358,17 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 
 `[branch: feature/admin-orders]`
 
-- **12.1 — `api/useAdminOrders.ts`**: all orders. Shorter `staleTime` / more aggressive refetch than the catalog — Alaa acts on these in near-real-time (`coding-standards.md` §5).
-  🚩 If this hook (or an admin status-update mutation) needs to invalidate the customer's `customerOrdersQueryKey` (from 8.1) — or vice versa — that is the trigger to move `orders` feature query keys into a shared `queryKeys.ts` instead of hooks importing each other's key builders directly.
-- **12.2 — Orders table**: Customer Name, Address, Total, Status, Date, Phone, Details button. Mobile-first: a table this wide needs a card layout or horizontal scroll on phones — decide, don't let it break.
-- **12.3 — Order details page**: back button, line-items table (Product, Price, Quantity, Line Total), customer + address block.
-- **12.4 — Update-status control**: `Pending → Shipping → Delivered → Cancelled`, values from `constants.ts`, never retyped inline (§4).
-- **12.5 — Status mutation** with optimistic update or invalidation, plus a Sonner toast. Only admin can update — enforced by RLS (Phase 1.3), not just by the UI.
-- **12.6 — Filter/sort orders by status** if the list grows — deferrable, note it rather than building it now.
+- [x] **12.1 — `api/useAdminOrders.ts`**: all orders. Shorter `staleTime` / more aggressive refetch than the catalog — Alaa acts on these in near-real-time (`coding-standards.md` §5).
+      **Done:** `list_admin_orders` + `getAdminOrders` / `useAdminOrders` (`adminOrdersQueryKey`, 30s staleTime). `/admin/orders` shows loading, error, and empty. Table UI stays **12.2**.
+      🚩 If this hook (or an admin status-update mutation) needs to invalidate the customer's `customerOrdersQueryKey` (from 8.1) — or vice versa — that is the trigger to move `orders` feature query keys into a shared `queryKeys.ts` instead of hooks importing each other's key builders directly.
+- [x] **12.2 — Orders table**: Customer Name, Address, Total, Status, Date, Phone, Details button. Mobile-first: a table this wide needs a card layout or horizontal scroll on phones — decide, don't let it break.
+      **Done:** Cards below `lg`, table from `lg` up. Shared `formatOrderAddress`. Details links to `/admin/orders/[id]` (page in **12.3**).
+- [x] **12.3 — Order details page**: back button, line-items table (Product, Price, Quantity, Line Total), customer + address block.
+      **Done:** `/admin/orders/[id]` via `getAdminOrder` / `useAdminOrder`. Back link, customer+address snapshot, products as cards below `lg` and a table from `lg`. Status badge is display-only (mutation in **12.4**).
+- [x] **12.4 — Update-status control**: `Pending → Shipping → Delivered → Cancelled`, values from `constants.ts`, never retyped inline (§4).
+- [x] **12.5 — Status mutation** with optimistic update or invalidation, plus a Sonner toast. Only admin can update — enforced by RLS (Phase 1.3), not just by the UI.
+- [x] **12.6 — Filter/sort orders by status** if the list grows — deferrable, note it rather than building it now.
+      **Done:** `/admin/orders` filter (all + four statuses) and sort (newest / oldest / by status). URL `?status=&sort=`. Client-side on the 12.1 list so the 12.5 cache stays one key. Distinct empty state when the filter matches nothing.
 
 `[commit: feat(admin-orders): orders table, feat(admin-orders): order details and status update]`
 
@@ -467,25 +471,25 @@ After admin feature work (Phases 11–14), before Hardening & Launch. Park essen
 
 Everything below is **deferred**. Each item is listed with the task where it would most likely creep in, so it gets refused at the right moment instead of discovered in review.
 
-| Deferred item                                                        | Where it would creep in                                                  |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Coupon system                                                        | 0.7 (shared types), 1.1/1.5 (schema + total function), 4.5 (cart totals) |
-| Google Auth                                                          | 5.5 (login form)                                                         |
-| Wishlist                                                             | 2.3 (navbar icon), 3.4 (product card heart button)                       |
-| Shipping fee calculation                                             | 1.1/1.5 (schema + total function), 4.5 (cart totals), 6.2 (checkout)     |
-| Admin dashboard charts                                               | 11.5 (KPI cards)                                                         |
-| Animated Testimonials / Featured carousels                           | 9.4, 9.5 (Home sections)                                                 |
-| Forgot Password (customer)                                           | 5.5 (login form)                                                         |
-| Change/Reset Password (admin)                                        | 11.1 (admin login)                                                       |
-| Real-time notifications for new reviews                              | 6.6 (order notification), 14.3 (admin reviews)                           |
-| Inventory / stock tracking (out of MVP entirely)                     | 1.1 (schema), 13.2 (products table)                                      |
-| English / i18n toggle (out of MVP entirely)                          | 0.1 (root layout), 2.3 (navbar)                                          |
-| Manual `is_featured` flag (replaced by discount logic)               | 1.1 (schema), 13.4 (product form)                                        |
-| Separate `testimonials` table / admin entry screen                   | 1.1 (schema), 9.5 (Home testimonials)                                    |
-| Standalone "List by Categories" page (covered by the catalog filter) | 3.7 (catalog filters)                                                    |
-| Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)             |
-| Admin-managed categories (CRUD)                                      | 1.1 (schema), 13.4 (product form category field)                         |
-| TanStack Query server prefetch + hydrate                             | 3.x (product catalog/detail pages), Providers / QueryClient setup        |
+| Deferred item                                                        | Where it would creep in                                                                      |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Coupon system                                                        | 0.7 (shared types), 1.1/1.5 (schema + total function), 4.5 (cart totals)                     |
+| Google Auth                                                          | 5.5 (login form)                                                                             |
+| Wishlist                                                             | 2.3 (navbar icon), 3.4 (product card heart button)                                           |
+| Shipping fee calculation                                             | 1.1/1.5 (schema + total function), 4.5 (cart totals), 6.2 (checkout)                         |
+| Admin dashboard charts                                               | 11.5 (KPI cards)                                                                             |
+| Animated Testimonials / Featured carousels                           | 9.4, 9.5 (Home sections)                                                                     |
+| Forgot Password (customer)                                           | 5.5 (login form)                                                                             |
+| Change/Reset Password (admin)                                        | 11.1 (admin login)                                                                           |
+| Real-time notifications for new reviews                              | 6.6 (order notification), 14.3 (admin reviews)                                               |
+| Inventory / stock tracking (out of MVP entirely)                     | 1.1 (schema), 13.2 (products table)                                                          |
+| English / i18n toggle (out of MVP entirely)                          | 0.1 (root layout), 2.3 (navbar)                                                              |
+| Manual `is_featured` flag (replaced by discount logic)               | 1.1 (schema), 13.4 (product form)                                                            |
+| Separate `testimonials` table / admin entry screen                   | 1.1 (schema), 9.5 (Home testimonials)                                                        |
+| Standalone "List by Categories" page (covered by the catalog filter) | 3.7 (catalog filters)                                                                        |
+| Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)                                 |
+| Admin-managed categories (CRUD)                                      | 1.1 (schema), 13.4 (product form category field)                                             |
+| TanStack Query server prefetch + hydrate                             | 3.x (product catalog/detail pages), Providers / QueryClient setup                            |
 | Product bundles / packages (multi-item offer at one price)           | 13.4–13.6 (admin product form), 3.x (catalog/detail), 4.x/6.x (cart/checkout line snapshots) |
 
 ## Open Dependencies (not blocked on code)

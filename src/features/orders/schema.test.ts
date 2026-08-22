@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { checkoutSchema } from "./schema";
+import { checkoutSchema, updateAdminOrderStatusSchema } from "./schema";
+import { ORDER_STATUSES } from "./constants";
 
 const validVariantId = "3828d7dc-6139-4ee3-b82a-de0d59b29ad3";
 
@@ -88,5 +89,38 @@ describe("checkoutSchema", () => {
         ),
       ).toBe(true);
     }
+  });
+});
+
+describe("updateAdminOrderStatusSchema", () => {
+  const valid = {
+    orderId: "11111111-2222-4333-8444-555555555555",
+    status: "Shipping" as const,
+  };
+
+  it("accepts each ORDER_STATUSES value", () => {
+    for (const status of ORDER_STATUSES) {
+      const result = updateAdminOrderStatusSchema.safeParse({
+        ...valid,
+        status,
+      });
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it("rejects a malformed order id", () => {
+    const result = updateAdminOrderStatusSchema.safeParse({
+      ...valid,
+      orderId: "not-a-uuid",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a status that is not in ORDER_STATUSES", () => {
+    const result = updateAdminOrderStatusSchema.safeParse({
+      ...valid,
+      status: "pending",
+    });
+    expect(result.success).toBe(false);
   });
 });

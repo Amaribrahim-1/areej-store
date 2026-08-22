@@ -14,6 +14,31 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   Cancelled: "ملغي",
 };
 
+export function isOrderStatus(value: string): value is OrderStatus {
+  return (ORDER_STATUSES as readonly string[]).includes(value);
+}
+
+export function requireOrderStatus(value: string): OrderStatus {
+  if (!isOrderStatus(value)) {
+    throw new Error(`Unexpected order status: ${value}`);
+  }
+  return value;
+}
+
+export const ADMIN_ORDER_SORTS = ["newest", "oldest", "status"] as const;
+
+export type AdminOrderSort = (typeof ADMIN_ORDER_SORTS)[number];
+
+export const ADMIN_ORDER_SORT_LABELS: Record<AdminOrderSort, string> = {
+  newest: "الأحدث",
+  oldest: "الأقدم",
+  status: "حسب الحالة",
+};
+
+export function isAdminOrderSort(value: string): value is AdminOrderSort {
+  return (ADMIN_ORDER_SORTS as readonly string[]).includes(value);
+}
+
 /** DB / API payment method values. MVP ships COD only. */
 export const PAYMENT_METHODS = ["cod"] as const;
 
@@ -25,5 +50,19 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   cod: "الدفع عند الاستلام",
 };
 
+function isPaymentMethod(value: string): value is PaymentMethod {
+  return (PAYMENT_METHODS as readonly string[]).includes(value);
+}
+
+export function requirePaymentMethod(value: string): PaymentMethod {
+  if (!isPaymentMethod(value)) {
+    throw new Error(`Unexpected payment method: ${value}`);
+  }
+  return value;
+}
+
 /** Customer order history is personal, near-real-time data — shorter than the catalog's 5 min. */
 export const CUSTOMER_ORDERS_STALE_TIME_MS = 2 * 60 * 1000;
+
+/** Admin order list is acted on in near-real-time — shorter than the catalog. */
+export const ADMIN_ORDERS_STALE_TIME_MS = 30 * 1000;
