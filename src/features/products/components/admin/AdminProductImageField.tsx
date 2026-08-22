@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import type { Control } from "react-hook-form";
 import { Controller } from "react-hook-form";
@@ -186,13 +186,17 @@ function ImageSelectionSummary({
 }
 
 function SelectedFilePreview({ file }: { file: File }) {
-  const previewUrl = useMemo(() => URL.createObjectURL(file), [file]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
     return () => {
-      URL.revokeObjectURL(previewUrl);
+      URL.revokeObjectURL(url);
     };
-  }, [previewUrl]);
+  }, [file]);
+
+  if (!previewUrl) return null;
 
   return (
     <div className="flex items-center gap-3">
