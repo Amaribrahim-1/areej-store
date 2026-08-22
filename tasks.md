@@ -390,7 +390,8 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
     Standalone Zod example first, then apply.
       **Done:** `productSchema` in `features/products/schema.ts`. Fields: name, description, `PRODUCT_CATEGORIES` enum, `PRODUCT_STATUSES` enum, required `image` (File or existing URL), `variants` min 1 (optional `volumeLabel`, required price pair). `superRefine` enforces `currentPrice <= originalPrice` per row. Category does not change the form shape. Tests in `schema.test.ts`. Form UI stays **13.4**.
 - [x] **13.4 — Add-product form (shared with edit)**: name, slug (auto from name, editable), description, category, status toggle, single image upload with preview, and a variants block (always present; starts with one row).
-- **13.5 — Variant repeater UI**: add/remove variant rows, each with volume label (optional) and price pair (`useFieldArray`). Cannot remove the last remaining row.
+- [x] **13.5 — Variant repeater UI**: add/remove variant rows, each with volume label (optional) and price pair (`useFieldArray`). Cannot remove the last remaining row.
+      **Done:** `useFieldArray` in `AdminProductVariantsField`. Add/remove rows; delete is hidden on the last remaining row. Each row: optional volume label + price pair. Create mutation stays **13.7**.
 - **13.6 — Image upload to Supabase Storage**: one product image; client-side compress/resize to WebP + size validation before upload (1GB ceiling, §5), progress/error states, and cleanup of the orphaned file if create fails midway.
 - **13.7 — Create mutation** + redirect + toast.
 - **13.8 — Edit form prefill** from existing product + variants, and a diffed update (changed variants updated; removed variants deleted only when safe — e.g. not referenced by `order_items`). Replacing the product image cleans up the old storage object.

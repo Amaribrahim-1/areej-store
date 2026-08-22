@@ -1,5 +1,7 @@
-import AdminProductForm from "./AdminProductForm";
-import AdminProductsBackLink from "./AdminProductsBackLink";
+"use client";
+
+import AdminProductForm from "@/features/products/components/admin/AdminProductForm";
+import AdminProductsBackLink from "@/features/products/components/admin/AdminProductsBackLink";
 
 export default function AdminNewProductPage() {
   return (
@@ -12,8 +14,9 @@ export default function AdminNewProductPage() {
             إضافة منتج
           </h1>
           <p className="text-sm text-muted-foreground">
-            أدخل الاسم والوصف والفئة وصورة واحدة ومقاس واحد على الأقل. سعر البيع
-            لازم يكون أقل من أو يساوي السعر الأصلي.
+            أدخل الاسم والوصف والفئة وصورة واحدة ومقاس واحد على الأقل. ممكن
+            إضافة أكتر من مقاس. سعر البيع لازم يكون أقل من أو يساوي السعر
+            الأصلي.
           </p>
         </header>
 

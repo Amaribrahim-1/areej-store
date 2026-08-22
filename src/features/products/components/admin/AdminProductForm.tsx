@@ -30,7 +30,9 @@ import {
 
 import AdminProductCategoryField from "./AdminProductCategoryField";
 import AdminProductImageField from "./AdminProductImageField";
-import AdminProductVariantRow from "./AdminProductVariantRow";
+import AdminProductVariantsField, {
+  EMPTY_PRODUCT_VARIANT,
+} from "./AdminProductVariantsField";
 
 const checkboxClassName = cn(
   "size-4 shrink-0 rounded-sm border border-input accent-primary",
@@ -43,7 +45,7 @@ const CREATE_DEFAULTS: DefaultValues<ProductFormValues> = {
   description: "",
   category: "",
   status: "active",
-  variants: [{ volumeLabel: "", originalPrice: "", currentPrice: "" }],
+  variants: [{ ...EMPTY_PRODUCT_VARIANT }],
 };
 
 type AdminProductFormProps = {
@@ -62,25 +64,32 @@ export default function AdminProductForm({
   isSubmitting = false,
   syncSlugFromName = true,
 }: AdminProductFormProps) {
+  const initialValues = {
+    ...CREATE_DEFAULTS,
+    ...defaultValues,
+  };
+
   const {
     register,
     control,
     handleSubmit,
+    reset,
     watch,
     setValue,
     formState: { errors, dirtyFields },
   } = useForm<ProductFormValues, unknown, ProductInput>({
     mode: "onBlur",
     resolver: zodResolver(productSchema),
-    defaultValues: {
-      ...CREATE_DEFAULTS,
-      ...defaultValues,
-    },
+    defaultValues: initialValues,
   });
 
   const submitHandler: SubmitHandler<ProductInput> = (data) => {
     onSubmit?.(data);
   };
+
+  function handleCancel() {
+    reset(initialValues);
+  }
 
   const slug = watch("slug");
   const nameField = register("name");
@@ -194,30 +203,32 @@ export default function AdminProductForm({
         error={errors.image?.message}
       />
 
-      <fieldset className="space-y-4 rounded-2xl border border-border bg-card p-4">
-        <legend className="px-1 font-heading text-base font-semibold text-foreground">
-          المقاسات
-        </legend>
-        <p className="text-sm text-muted-foreground">
-          مقاس واحد على الأقل. اسم المقاس اختياري لو المنتج بحجم واحد.
-        </p>
-        <AdminProductVariantRow
-          index={0}
-          register={register}
-          errors={errors}
-        />
-        <FieldError message={errors.variants?.message} />
-        <FieldError message={errors.variants?.root?.message} />
-      </fieldset>
+      <AdminProductVariantsField
+        control={control}
+        register={register}
+        errors={errors}
+      />
 
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        size="lg"
-        className="w-full sm:w-auto sm:min-w-40"
-      >
-        {isSubmitting ? "جاري الحفظ..." : submitLabel}
-      </Button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          size="lg"
+          className="w-full sm:w-auto sm:min-w-40"
+        >
+          {isSubmitting ? "جاري الحفظ..." : submitLabel}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          disabled={isSubmitting}
+          className="w-full sm:w-auto sm:min-w-40"
+          onClick={handleCancel}
+        >
+          إلغاء
+        </Button>
+      </div>
     </form>
   );
 }

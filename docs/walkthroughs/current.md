@@ -1,70 +1,41 @@
-# شرح التاسك — 13.4 + 13.13
+# شرح التاسك — 13.5
 
 - التاريخ: 2026-08-22
 - النوع: full-task
 
 ## المشكلة والحل
 
-علاء هتضيف المنتجات من الأدمن (الداتا الحالية سيد). الفورم لازم فيه اسم، رابط، وصف، فئة، حالة، صورة بمعاينة، ومقاس واحد على الأقل. والفئات الأربعة الثابتة في الكود كانت هتمنع أي قسم جديد من غير تعديل كود.
+المنتج الواحد غالبًا ليه أكتر من حجم (50ml و 100ml مثلًا)، وكل حجم سعره. فورم 13.4 كان فيه صف مقاس واحد ثابت. علاء محتاجة تزود وتشيل صفوف وهي بتضيف المنتج.
 
-اتشحن: فورم إضافة على `/admin/products/new`؛ slug بيتولد من الاسم وقابل للتعديل؛ جدول `categories` علاء تضيف منه فئة وهي بتضيف منتج؛ معاينة للصورة بعد الاختيار؛ Placeholder المقاس بالعربي.
+اتشحن: ريبيتر مقاسات على نفس فورم الإضافة. زر «إضافة مقاس» بيزوّد صف فاضي. زر الحذف بيظهر من تاني صف. الصف الأخير مش بيتشال — الـ schema برضو رافضة مصفوفة فاضية.
 
 ## الصفحات والملفات
 
-- `/admin/products/new` (`src/app/(admin)/admin/(protected)/products/new/page.tsx`) — صفحة إضافة منتج.
-- `src/features/products/components/admin/AdminNewProductPage.tsx` — العنوان + الفورم في نص الشاشة.
-- `src/features/products/components/admin/AdminProductForm.tsx` — الفورم المشترك (إضافة/تعديل لاحقًا): اسم، رابط، وصف، فئة، حالة، صورة، مقاس واحد.
-- `src/features/products/components/admin/AdminProductCategoryField.tsx` — اختيار فئة من الجدول + «إضافة فئة جديدة».
-- `src/features/products/components/admin/AdminProductImageField.tsx` — اختيار صورة + معاينة (ملف جديد أو رابط موجود للتعديل).
-- `src/features/products/components/admin/AdminProductVariantRow.tsx` — صف مقاس واحد (إضافة/حذف صفوف = 13.5).
-- `src/features/products/api/getCategories.ts` — قراءة الفئات.
-- `src/features/products/api/admin/createCategory.ts` — إضافة فئة (أدمن فقط).
-- `src/features/products/lib/slugifyLabel.ts` — تحويل الاسم/الليبل لرابط.
-- `supabase/migrations/20260822131016_admin_managed_categories.sql` — جدول الفئات + FK بدل الـ check الثابت.
-- كتالوج الأدمن والمتجر بيقرأوا `categoryLabel` من الداتابيز.
-
-## عقد الاستخدام (English)
-
-### `getCategories` — `src/features/products/api/getCategories.ts`
-
-- **Params:** none
-- **Returns:** `{ slug, label, sortOrder }[]` ordered by `sort_order`. Empty table → `[]`.
-- **Errors:** throws on Supabase error.
-- **Call:**
-
-```ts
-const categories = await getCategories()
-```
-
-### `createCategory` — `src/features/products/api/admin/createCategory.ts`
-
-- **Params:** `{ label, slug }` (re-validated with `categorySchema`; label sanitized)
-- **Returns:** `{ slug, label, sortOrder }` of the inserted row
-- **Errors:** throws `INVALID_CATEGORY_PAYLOAD`; `CATEGORY_ALREADY_EXISTS` on unique slug/label (`23505`); other Supabase errors throw. Non-admin insert fails via RLS.
-- **Call:**
-
-```ts
-const row = await createCategory({ label: "بخور", slug: "bakhoor" })
-```
+- `/admin/products/new` (`src/app/(admin)/admin/(protected)/products/new/page.tsx`) — صفحة إضافة منتج. نفس الصفحة؛ بلوك المقاسات بقى قائمة مش صف واحد.
+- `src/features/products/components/admin/AdminNewProductPage.tsx` — العنوان + تلميح إن ممكن أكتر من مقاس.
+- `src/features/products/components/admin/AdminProductForm.tsx` — الفورم المشترك. بلوك المقاسات اتنقل لمكوّن خاص. زر إلغاء بيعمل reset للفورم من غير ما يخرج من الصفحة.
+- `src/features/products/components/admin/AdminProductVariantsField.tsx` — مالك `useFieldArray`: إضافة صف، منع حذف آخر صف.
+- `src/features/products/components/admin/AdminProductVariantRow.tsx` — صف واحد: اسم مقاس اختياري + السعر الأصلي + سعر البيع + حذف لو مسموح.
 
 ## التدفق
 
-1. الأدمن يكتب اسم المنتج → الـ slug بيتولد. لو عدّل الرابط بإيده، التوليد بيتوقف.
-2. يختار فئة من القائمة (من جدول `categories`). أو «إضافة فئة جديدة» → اسم عربي + slug → `createCategory` → الفئة بتظهر في السيلكت وفي فلتر الكتالوج.
-3. يختار صورة → معاينة + اسم الملف. رابط المعاينة بيتبني في `useEffect` ويتلغى عند التغيير/المغادرة (عشان Strict Mode ميفسدش الـ blob).
-4. الحفظ لسه مش بيكتب المنتج (13.7). الفئة الجديدة بتتحفظ فورًا لأنها صف منفصل.
+1. الصفحة بتفتح على صف مقاس واحد. مفيش زر حذف — لو اتشال، المنتج هيبقى من غير سعر.
+2. «إضافة مقاس» → صف فاضي جديد تحت. الأزرار دي `type="button"` عشان متبعتش الفورم بالغلط.
+3. من تاني صف، كل صف فيه أيقونة حذف. الحذف بيرجع الصفوف لحد واحد، وبعدين الأيقونة بتختفي تاني.
+4. كل صف لسه بيتتحقق بنفس `productSchema`: سعرين مطلوبين، وسعر البيع ≤ الأصلي. الغلط يظهر على الصف الغلط.
+5. حفظ المنتج لسه مش بيكتب في الداتابيز (13.7). الصورة لسه اختيار محلي (13.6).
 
 ## قرارات مهمة وليه
 
-- **الـ slug في الفورم، مش مستخبي لحد 13.7.** كل منتج محتاج رابط `/products/...`. التوليد من الاسم بيوفر الكتابة؛ التعديل لو حابت URL لاتيني جنب اسم عربي.
-- **جدول `categories` مش CRUD كامل.** إضافة من فورم المنتج تكفي. مفيش حذف: `ON DELETE RESTRICT` عشان منتجات قديمة متتكسرش.
-- **الليبل العربي من الداتابيز.** خريطة ثابتة في الكود كانت هتكسر أي فئة جديدة على الكارت والفلتر.
-- **معاينة الملف بـ `next/image` + `unoptimized`.** الـ blob مش على Storage ومش بيتأمّز؛ `createObjectURL` مش ينفع جوه `useMemo` لأن التنضيف في Strict Mode بيلغي الرابط وهو لسه مستخدم.
+- **`useFieldArray` مش `.map` على state يدوي.** RHF هو اللي يملك ترتيب الصفوف ومفاتيحها وأخطاء كل index بعد الحذف. لو المفاتيح كانت رقم الصف، React هيخلط قيم الصفوف لما تشيل صف من النص.
+- **مفتاح الصف `fieldId` مش `id`.** `useFieldArray` بيحقن مفتاح داخلي للـ React. الافتراضي اسمه `id`. التعديل (13.8) هيحتاج `id` الحقيقي من الداتابيز. لو الاتنين بنفس الاسم، RHF هيمسح الـ UUID.
+- **إخفاء الحذف على آخر صف، مش تعطيله.** زر ظاهر ومقفول يدعو للضغط. القاعدة ظاهرة: مفيش زر. الـ schema `.min(1)` هي الشبكة الثانية لو حد لفّ على الـ UI.
+- **صورة واحدة لكل المنتج.** مش صورة لكل مقاس — ده مؤجل في الـ backlog ومكانه 13.6 لو اتفتح.
 
 ## تحقق بنفسك
 
-1. `/admin/products/new` — اكتب اسم عربي. الرابط تحت الحقل لازم يتحدث. عدّل الرابط بإيدك، غيّر الاسم تاني: الرابط يفضل اللي كتبتيه.
-2. اختر صورة: لازم تظهر معاينة + اسم الملف.
-3. «إضافة فئة جديدة» (مثلاً بخور). المفروض toast نجاح، والفئة تظهر في السيلكت. على `/products` الفلتر لازم يعرضها.
-4. Placeholder المقاس: `50ml — متوسط — كبير`.
-5. حفظ المنتج لسه مش بيضيف صف في القائمة (13.7). إضافة مقاس تاني: 13.5.
+1. `/admin/products/new` — صف مقاس واحد، ومن غير أيقونة حذف.
+2. «إضافة مقاس» مرتين. المفروض ثلاثة صفوف، وكل صف فيه حذف.
+3. امسح صفين. يفضل صف واحد، وأيقونة الحذف تختفي.
+4. املأ صفين بأسعار صحيحة وصف واحد سعر بيعه أعلى من الأصلي. الغلط لازم يظهر على الصف الغلط بس.
+5. «إلغاء» بيفضّي الفورم ويفضل على نفس الصفحة. حفظ المنتج لسه مش بيضيف صف في القائمة.

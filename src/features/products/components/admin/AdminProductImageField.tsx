@@ -38,7 +38,12 @@ export default function AdminProductImageField({
               aria-describedby="admin-product-image-hint"
               name={field.name}
               onBlur={field.onBlur}
-              ref={field.ref}
+              ref={(element) => {
+                field.ref(element);
+                if (element && !(field.value instanceof File)) {
+                  element.value = "";
+                }
+              }}
               onChange={(event) => handleImageChange(event, field.onChange)}
             />
             <ImageSelectionSummary image={field.value} />
