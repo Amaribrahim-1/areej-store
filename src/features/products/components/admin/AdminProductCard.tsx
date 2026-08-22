@@ -4,7 +4,7 @@ import type { AdminProduct } from "../../types";
 
 import AdminProductEditLink from "./AdminProductEditLink";
 import AdminProductField from "./AdminProductField";
-import AdminProductStatusBadge from "./AdminProductStatusBadge";
+import AdminProductStatusToggle from "./AdminProductStatusToggle";
 
 type AdminProductCardProps = {
   product: AdminProduct;
@@ -26,7 +26,12 @@ export default function AdminProductCard({ product }: AdminProductCardProps) {
         >
           {product.name}
         </h2>
-        <AdminProductStatusBadge status={product.status} />
+        <AdminProductStatusToggle
+          productId={product.id}
+          productName={product.name}
+          status={product.status}
+          className="flex items-center"
+        />
       </header>
 
       <dl className="mt-3 space-y-2 text-sm">

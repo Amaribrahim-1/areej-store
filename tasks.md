@@ -397,7 +397,8 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 - [x] **13.7 — Create mutation** + redirect + toast.
       **Done:** `create_admin_product` + `createProduct` / `useCreateProduct`. Re-validates `productSchema`, sanitizes name/description, uploads then inserts product + variants atomically. Success: toast + redirect to `/admin/products`. Duplicate slug → `PRODUCT_SLUG_TAKEN`. Product query keys live in `api/queryKeys.ts` so the storefront catalog, Home sections, and dashboard product KPI invalidate.
 - [x] **13.8 — Edit form prefill** from existing product + variants, and a diffed update (changed variants updated; removed variants deleted only when safe — e.g. not referenced by `order_items`). Replacing the product image cleans up the old storage object.
-- **13.9 — Status toggle from the table** as a quick action (active/inactive controls storefront visibility).
+- [x] **13.9 — Status toggle from the table** as a quick action (active/inactive controls storefront visibility).
+      **Done:** `setProductStatus` (direct `products` update — `products_update_admin` RLS already gates it, no RPC needed) + `useSetProductStatus` with optimistic `admin-products` cache update and rollback on error. `AdminProductStatusToggle` (shadcn `Switch`) replaces the read-only status badge in both the table and card views.
 - **13.10 — Soft delete only.** Deleting a product referenced by past `order_items` corrupts order history — deactivate via `status = 'inactive'` only (agreed in 1.1).
 - **13.11 — Re-validate `productSchema` server-side before the write** (§7).
 - **13.12 — Unit-test the discount and variant price-resolution logic** (§8 priority 1).

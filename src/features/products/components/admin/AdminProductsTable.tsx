@@ -11,7 +11,7 @@ import {
 import type { AdminProduct } from "../../types";
 
 import AdminProductEditLink from "./AdminProductEditLink";
-import AdminProductStatusBadge from "./AdminProductStatusBadge";
+import AdminProductStatusToggle from "./AdminProductStatusToggle";
 
 type AdminProductsTableProps = {
   products: AdminProduct[];
@@ -28,7 +28,7 @@ export default function AdminProductsTable({
             <TableHead>الاسم</TableHead>
             <TableHead>الفئة</TableHead>
             <TableHead>السعر</TableHead>
-            <TableHead>الحالة</TableHead>
+            <TableHead className="w-32">الحالة</TableHead>
             <TableHead>
               <span className="sr-only">تعديل</span>
             </TableHead>
@@ -61,7 +61,12 @@ function AdminProductTableRow({ product }: { product: AdminProduct }) {
         />
       </TableCell>
       <TableCell>
-        <AdminProductStatusBadge status={product.status} />
+        <AdminProductStatusToggle
+          productId={product.id}
+          productName={product.name}
+          status={product.status}
+          className="flex items-center"
+        />
       </TableCell>
       <TableCell>
         <AdminProductEditLink
