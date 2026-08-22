@@ -53,3 +53,11 @@ export const PRODUCTS_STALE_TIME_MS = 5 * 60 * 1000;
 
 /** Admin product list is acted on by Alaa — shorter than the public catalog. */
 export const ADMIN_PRODUCTS_STALE_TIME_MS = 60 * 1000;
+
+export const PRODUCT_NAME_MIN_LENGTH = 2;
+export const PRODUCT_NAME_MAX_LENGTH = 120;
+export const PRODUCT_DESCRIPTION_MAX_LENGTH = 2000;
+export const PRODUCT_VOLUME_LABEL_MAX_LENGTH = 40;
+
+/** Matches `product_variants.original_price` / `current_price` numeric(10, 2). */
+export const PRODUCT_PRICE_MAX = 99_999_999.99;

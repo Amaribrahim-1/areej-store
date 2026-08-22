@@ -383,11 +383,12 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
       🚩 If admin product mutations (13.7–13.9) need to invalidate the storefront `productsQueryKey` — or vice versa — that is the trigger to move products feature query keys into a shared `queryKeys.ts`.
 - [x] **13.2 — Products table**: Name, Category, Price, Status, Edit button, "Add Product" button.
       🚩 No "available quantity" column — MVP has no inventory system (spec decision #5). If a stock column feels missing while building this, that's the deferred feature knocking.
-- **13.3 — `productSchema`** — **`NEW CONCEPT`** (Zod array / `superRefine` for variants):
+- [x] **13.3 — `productSchema`** — **`NEW CONCEPT`** (Zod array / `superRefine` for variants):
   - Every product: name, description, category, status, one required photo, and **at least one** variant row (optional `volume_label`, `original_price`, `current_price`).
   - `current_price <= original_price` on every price pair.
   - Category is a fixed enum for MVP — it does **not** change the form shape.
     Standalone Zod example first, then apply.
+      **Done:** `productSchema` in `features/products/schema.ts`. Fields: name, description, `PRODUCT_CATEGORIES` enum, `PRODUCT_STATUSES` enum, required `image` (File or existing URL), `variants` min 1 (optional `volumeLabel`, required price pair). `superRefine` enforces `currentPrice <= originalPrice` per row. Category does not change the form shape. Tests in `schema.test.ts`. Form UI stays **13.4**.
 - **13.4 — Add-product form (shared with edit)**: name, description, category, status toggle, single image upload, and a variants block (always present; starts with one row).
 - **13.5 — Variant repeater UI**: add/remove variant rows, each with volume label (optional) and price pair (`useFieldArray`). Cannot remove the last remaining row.
 - **13.6 — Image upload to Supabase Storage**: one product image; client-side compress/resize to WebP + size validation before upload (1GB ceiling, §5), progress/error states, and cleanup of the orphaned file if create fails midway.
