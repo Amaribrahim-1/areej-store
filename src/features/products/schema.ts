@@ -4,7 +4,9 @@ import {
   CATEGORY_LABEL_MAX_LENGTH,
   CATEGORY_LABEL_MIN_LENGTH,
   CATEGORY_SLUG_MAX_LENGTH,
+  isProductImageMimeType,
   PRODUCT_DESCRIPTION_MAX_LENGTH,
+  PRODUCT_IMAGE_MAX_INPUT_BYTES,
   PRODUCT_NAME_MAX_LENGTH,
   PRODUCT_NAME_MIN_LENGTH,
   PRODUCT_PRICE_MAX,
@@ -54,11 +56,21 @@ const productVariantSchema = z
  * so edit (13.8) and post-upload write re-validation (13.11) can reuse
  * the same schema.
  */
+const productImageFileSchema = z
+  .file({ message: "أرفق صورة للمنتج" })
+  .refine((file) => file.size > 0, {
+    message: "أرفق صورة للمنتج",
+  })
+  .refine((file) => isProductImageMimeType(file.type), {
+    message: "صيغة الصورة غير مدعومة. استخدم JPG أو PNG أو WebP أو GIF",
+  })
+  .refine((file) => file.size <= PRODUCT_IMAGE_MAX_INPUT_BYTES, {
+    message: "الصورة أكبر من 10 ميجا",
+  });
+
 const productImageSchema = z.union(
   [
-    z.file({ message: "أرفق صورة للمنتج" }).refine((file) => file.size > 0, {
-      message: "أرفق صورة للمنتج",
-    }),
+    productImageFileSchema,
     z.string().trim().min(1, { message: "أرفق صورة للمنتج" }),
   ],
   { message: "أرفق صورة للمنتج" },

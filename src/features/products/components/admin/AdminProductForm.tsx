@@ -1,12 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Controller,
-  type DefaultValues,
-  type SubmitHandler,
-  useForm,
-} from "react-hook-form";
+import { Controller, type DefaultValues, useForm } from "react-hook-form";
 
 import FieldError from "@/components/shared/FieldError";
 import { Button } from "@/components/ui/button";
@@ -27,6 +23,7 @@ import {
   type ProductFormValues,
   type ProductInput,
 } from "../../schema";
+import type { ProductImageUploadProgress } from "../../types";
 
 import AdminProductCategoryField from "./AdminProductCategoryField";
 import AdminProductImageField from "./AdminProductImageField";
@@ -48,11 +45,20 @@ const CREATE_DEFAULTS: DefaultValues<ProductFormValues> = {
   variants: [{ ...EMPTY_PRODUCT_VARIANT }],
 };
 
+type AdminProductFormSubmitResult = {
+  imageUrl?: string;
+};
+
 type AdminProductFormProps = {
   defaultValues?: DefaultValues<ProductFormValues>;
-  onSubmit?: SubmitHandler<ProductInput>;
+  onSubmit?: (
+    data: ProductInput,
+  ) => void | Promise<void | AdminProductFormSubmitResult>;
+  onCancel?: () => void | Promise<void>;
+  onReplaceImage?: () => void | Promise<void>;
   submitLabel?: string;
   isSubmitting?: boolean;
+  imageUploadProgress?: ProductImageUploadProgress | null;
   /** Create form: keep slug in sync with name until the slug field is edited. */
   syncSlugFromName?: boolean;
 };
@@ -60,14 +66,18 @@ type AdminProductFormProps = {
 export default function AdminProductForm({
   defaultValues,
   onSubmit,
+  onCancel,
+  onReplaceImage,
   submitLabel = "حفظ المنتج",
   isSubmitting = false,
+  imageUploadProgress = null,
   syncSlugFromName = true,
 }: AdminProductFormProps) {
   const initialValues = {
     ...CREATE_DEFAULTS,
     ...defaultValues,
   };
+  const [isPreparingImage, setIsPreparingImage] = useState(false);
 
   const {
     register,
@@ -83,12 +93,25 @@ export default function AdminProductForm({
     defaultValues: initialValues,
   });
 
-  const submitHandler: SubmitHandler<ProductInput> = (data) => {
-    onSubmit?.(data);
-  };
+  const isBusy = isSubmitting || isPreparingImage;
 
-  function handleCancel() {
+  async function submitHandler(data: ProductInput) {
+    try {
+      const result = await onSubmit?.(data);
+      if (result?.imageUrl) {
+        setValue("image", result.imageUrl, {
+          shouldValidate: true,
+          shouldDirty: false,
+        });
+      }
+    } catch {
+      // Mutation hooks toast the mapped error.
+    }
+  }
+
+  async function handleCancel() {
     reset(initialValues);
+    await onCancel?.();
   }
 
   const slug = watch("slug");
@@ -98,7 +121,7 @@ export default function AdminProductForm({
     <form
       className="space-y-6 text-start"
       noValidate
-      aria-busy={isSubmitting}
+      aria-busy={isBusy}
       onSubmit={handleSubmit(submitHandler)}
     >
       <div className="space-y-2">
@@ -201,6 +224,10 @@ export default function AdminProductForm({
       <AdminProductImageField
         control={control}
         error={errors.image?.message}
+        disabled={isBusy}
+        uploadProgress={imageUploadProgress}
+        onBusyChange={setIsPreparingImage}
+        onReplaceImage={onReplaceImage}
       />
 
       <AdminProductVariantsField
@@ -212,17 +239,21 @@ export default function AdminProductForm({
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isBusy}
           size="lg"
           className="w-full sm:w-auto sm:min-w-40"
         >
-          {isSubmitting ? "جاري الحفظ..." : submitLabel}
+          {isSubmitting
+            ? imageUploadProgress
+              ? "جاري رفع الصورة..."
+              : "جاري الحفظ..."
+            : submitLabel}
         </Button>
         <Button
           type="button"
           variant="outline"
           size="lg"
-          disabled={isSubmitting}
+          disabled={isBusy}
           className="w-full sm:w-auto sm:min-w-40"
           onClick={handleCancel}
         >

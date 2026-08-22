@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import type { Control } from "react-hook-form";
 import { Controller } from "react-hook-form";
@@ -10,17 +10,74 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { PRODUCT_IMAGE_ACCEPT } from "../../constants";
+import {
+  assertProductImageFile,
+  compressProductImage,
+} from "../../lib/compressProductImage";
+import { formatImageFileSize } from "../../lib/formatImageFileSize";
+import { productImageErrorMessage } from "../../lib/productImageErrorMessage";
 import type { ProductFormValues, ProductInput } from "../../schema";
+import type { ProductImageUploadProgress } from "../../types";
 
 type AdminProductImageFieldProps = {
   control: Control<ProductFormValues, unknown, ProductInput>;
   error?: string;
+  disabled?: boolean;
+  uploadProgress?: ProductImageUploadProgress | null;
+  onBusyChange?: (busy: boolean) => void;
+  onReplaceImage?: () => void | Promise<void>;
 };
 
 export default function AdminProductImageField({
   control,
   error,
+  disabled = false,
+  uploadProgress = null,
+  onBusyChange,
+  onReplaceImage,
 }: AdminProductImageFieldProps) {
+  const prepareRequestIdRef = useRef(0);
+  const [prepareError, setPrepareError] = useState<string | undefined>();
+  const [prepareProgress, setPrepareProgress] =
+    useState<ProductImageUploadProgress | null>(null);
+
+  const progress = uploadProgress ?? prepareProgress;
+  const isBusy = progress !== null;
+
+  async function prepareSelectedFile(
+    event: ChangeEvent<HTMLInputElement>,
+    onChange: (file: File | undefined) => void,
+  ) {
+    const file = event.currentTarget.files?.[0];
+    const input = event.currentTarget;
+    if (!file) return;
+
+    const requestId = ++prepareRequestIdRef.current;
+    setPrepareError(undefined);
+    onBusyChange?.(true);
+    setPrepareProgress({ phase: "compressing", percent: 0 });
+
+    try {
+      assertProductImageFile(file);
+      const compressed = await compressProductImage(file, (percent) => {
+        if (requestId !== prepareRequestIdRef.current) return;
+        setPrepareProgress({ phase: "compressing", percent });
+      });
+      if (requestId !== prepareRequestIdRef.current) return;
+      void onReplaceImage?.();
+      onChange(compressed);
+    } catch (caught) {
+      if (requestId !== prepareRequestIdRef.current) return;
+      input.value = "";
+      setPrepareError(productImageErrorMessage(caught));
+    } finally {
+      if (requestId === prepareRequestIdRef.current) {
+        setPrepareProgress(null);
+        onBusyChange?.(false);
+      }
+    }
+  }
+
   return (
     <div className="space-y-2">
       <Label htmlFor="admin-product-image">صورة المنتج</Label>
@@ -34,7 +91,8 @@ export default function AdminProductImageField({
               type="file"
               accept={PRODUCT_IMAGE_ACCEPT}
               className="cursor-pointer pe-3 ps-2"
-              aria-invalid={!!error}
+              disabled={disabled || isBusy}
+              aria-invalid={!!(prepareError ?? error)}
               aria-describedby="admin-product-image-hint"
               name={field.name}
               onBlur={field.onBlur}
@@ -44,25 +102,61 @@ export default function AdminProductImageField({
                   element.value = "";
                 }
               }}
-              onChange={(event) => handleImageChange(event, field.onChange)}
+              onChange={(event) => {
+                void prepareSelectedFile(event, field.onChange);
+              }}
             />
             <ImageSelectionSummary image={field.value} />
           </>
         )}
       />
+      {progress ? <ImageUploadProgress progress={progress} /> : null}
       <p id="admin-product-image-hint" className="text-sm text-muted-foreground">
-        صورة واحدة لكل المنتج، مشتركة بين كل المقاسات.
+        صورة واحدة لكل المنتج، مشتركة بين كل المقاسات. هتتصغّر وتتحوّل WebP
+        قبل الرفع.
       </p>
-      <FieldError message={error} />
+      <FieldError message={prepareError ?? error} />
     </div>
   );
 }
 
-function handleImageChange(
-  event: ChangeEvent<HTMLInputElement>,
-  onChange: (file: File | undefined) => void,
-) {
-  onChange(event.currentTarget.files?.[0]);
+function ImageUploadProgress({
+  progress,
+}: {
+  progress: ProductImageUploadProgress;
+}) {
+  const label =
+    progress.phase === "compressing"
+      ? "جاري تجهيز الصورة"
+      : "جاري رفع الصورة";
+  const percent = progress.percent;
+  const isIndeterminate = percent === null;
+
+  return (
+    <div className="space-y-1">
+      <p className="text-sm text-muted-foreground">
+        {label}
+        {percent !== null ? ` — ${percent}%` : "…"}
+      </p>
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={isIndeterminate ? undefined : percent}
+        className="h-2 overflow-hidden rounded-full bg-brand-100"
+      >
+        <div
+          className={
+            isIndeterminate
+              ? "h-full w-1/3 animate-pulse rounded-full bg-brand-600"
+              : "h-full rounded-full bg-brand-600 transition-[width]"
+          }
+          style={isIndeterminate ? undefined : { width: `${percent}%` }}
+        />
+      </div>
+    </div>
+  );
 }
 
 function ImageSelectionSummary({
@@ -92,36 +186,32 @@ function ImageSelectionSummary({
 }
 
 function SelectedFilePreview({ file }: { file: File }) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const previewUrl = useMemo(() => URL.createObjectURL(file), [file]);
 
   useEffect(() => {
-    const objectUrl = URL.createObjectURL(file);
-    setPreviewUrl(objectUrl);
     return () => {
-      URL.revokeObjectURL(objectUrl);
+      URL.revokeObjectURL(previewUrl);
     };
-  }, [file]);
+  }, [previewUrl]);
 
   return (
     <div className="flex items-center gap-3">
-      {previewUrl ? (
-        <div className="relative size-24 shrink-0 overflow-hidden rounded-2xl bg-brand-50">
-          <Image
-            src={previewUrl}
-            alt={`معاينة ${file.name}`}
-            fill
-            unoptimized
-            className="object-cover"
-            sizes="96px"
-          />
-        </div>
-      ) : (
-        <div
-          className="size-24 shrink-0 rounded-2xl bg-brand-50"
-          aria-hidden
+      <div className="relative size-24 shrink-0 overflow-hidden rounded-2xl bg-brand-50">
+        <Image
+          src={previewUrl}
+          alt={`معاينة ${file.name}`}
+          fill
+          unoptimized
+          className="object-cover"
+          sizes="96px"
         />
-      )}
-      <p className="min-w-0 text-sm text-foreground">{file.name}</p>
+      </div>
+      <div className="min-w-0 space-y-0.5">
+        <p className="truncate text-sm text-foreground">{file.name}</p>
+        <p className="text-sm text-muted-foreground">
+          {formatImageFileSize(file.size)}
+        </p>
+      </div>
     </div>
   );
 }

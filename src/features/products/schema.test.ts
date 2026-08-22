@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   PRODUCT_CATEGORIES,
   PRODUCT_DESCRIPTION_MAX_LENGTH,
+  PRODUCT_IMAGE_MAX_INPUT_BYTES,
   PRODUCT_NAME_MAX_LENGTH,
   PRODUCT_PRICE_MAX,
   PRODUCT_STATUSES,
@@ -10,6 +11,12 @@ import {
 import { productSchema } from "./schema";
 
 const sampleImage = new File(["x"], "oud.webp", { type: "image/webp" });
+
+function oversizedJpeg() {
+  const file = new File(["x"], "huge.jpg", { type: "image/jpeg" });
+  Object.defineProperty(file, "size", { value: PRODUCT_IMAGE_MAX_INPUT_BYTES + 1 });
+  return file;
+}
 
 const validProduct = {
   name: "عود كمبودي",
@@ -135,6 +142,20 @@ describe("productSchema", () => {
     {
       name: "empty File image",
       override: { image: new File([], "empty.webp") },
+      path: ["image"] as const,
+    },
+    {
+      name: "unsupported image MIME",
+      override: {
+        image: new File(["x"], "notes.pdf", { type: "application/pdf" }),
+      },
+      path: ["image"] as const,
+    },
+    {
+      name: "image larger than 10MB input cap",
+      override: {
+        image: oversizedJpeg(),
+      },
       path: ["image"] as const,
     },
     {

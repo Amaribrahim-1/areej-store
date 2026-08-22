@@ -76,6 +76,19 @@ export type ProductVariant = {
   sortOrder: number;
 };
 
+export type UploadedProductImage = {
+  path: string;
+  publicUrl: string;
+};
+
+export type ProductImageUploadPhase = "compressing" | "uploading";
+
+export type ProductImageUploadProgress = {
+  phase: ProductImageUploadPhase;
+  /** 0–100. `null` = indeterminate (Storage upload has no byte progress events). */
+  percent: number | null;
+};
+
 export type ProductDetail = {
   id: string;
   name: string;

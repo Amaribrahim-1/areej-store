@@ -392,7 +392,8 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 - [x] **13.4 — Add-product form (shared with edit)**: name, slug (auto from name, editable), description, category, status toggle, single image upload with preview, and a variants block (always present; starts with one row).
 - [x] **13.5 — Variant repeater UI**: add/remove variant rows, each with volume label (optional) and price pair (`useFieldArray`). Cannot remove the last remaining row.
       **Done:** `useFieldArray` in `AdminProductVariantsField`. Add/remove rows; delete is hidden on the last remaining row. Each row: optional volume label + price pair. Create mutation stays **13.7**.
-- **13.6 — Image upload to Supabase Storage**: one product image; client-side compress/resize to WebP + size validation before upload (1GB ceiling, §5), progress/error states, and cleanup of the orphaned file if create fails midway.
+- [x] **13.6 — Image upload to Supabase Storage**: one product image; client-side compress/resize to WebP + size validation before upload (1GB ceiling, §5), progress/error states, and cleanup of the orphaned file if create fails midway.
+      **Done:** Pick compresses/resizes to WebP (max 1200px, under the 1MB bucket cap). Submit uploads to `product-images` at `products/{uuid}.webp`. Progress + inline/toast errors. Cancel or picking another image deletes the session object. `withUploadedProductImage` deletes the object if the follow-up write throws (13.7 will pass create as that follow-up). No product row yet.
 - **13.7 — Create mutation** + redirect + toast.
 - **13.8 — Edit form prefill** from existing product + variants, and a diffed update (changed variants updated; removed variants deleted only when safe — e.g. not referenced by `order_items`). Replacing the product image cleans up the old storage object.
 - **13.9 — Status toggle from the table** as a quick action (active/inactive controls storefront visibility).

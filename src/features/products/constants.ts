@@ -63,5 +63,31 @@ export const PRODUCT_SLUG_PATTERN =
 /** Matches `product_variants.original_price` / `current_price` numeric(10, 2). */
 export const PRODUCT_PRICE_MAX = 99_999_999.99;
 
-/** File-picker filter for the admin product image. Size/MIME enforcement is 13.6. */
-export const PRODUCT_IMAGE_ACCEPT = "image/jpeg,image/png,image/webp,image/gif";
+export const PRODUCT_IMAGE_BUCKET = "product-images";
+
+/** Matches the `product-images` bucket `file_size_limit` from the 1.4 migration. */
+export const PRODUCT_IMAGE_MAX_OUTPUT_BYTES = 1_048_576;
+
+/** Reject the original pick before decode so a huge phone dump cannot freeze the tab. */
+export const PRODUCT_IMAGE_MAX_INPUT_BYTES = 10 * 1024 * 1024;
+
+export const PRODUCT_IMAGE_MAX_DIMENSION = 1200;
+
+export const PRODUCT_IMAGE_WEBP_QUALITY = 0.82;
+
+export const PRODUCT_IMAGE_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+] as const;
+
+export type ProductImageMimeType = (typeof PRODUCT_IMAGE_MIME_TYPES)[number];
+
+export function isProductImageMimeType(
+  value: string,
+): value is ProductImageMimeType {
+  return (PRODUCT_IMAGE_MIME_TYPES as readonly string[]).includes(value);
+}
+
+export const PRODUCT_IMAGE_ACCEPT = PRODUCT_IMAGE_MIME_TYPES.join(",");
