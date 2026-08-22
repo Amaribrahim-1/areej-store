@@ -3,9 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { ADMIN_ORDERS_STALE_TIME_MS } from "../../constants";
+import { adminOrdersQueryKey } from "../queryKeys";
 import { getAdminOrders } from "./getAdminOrders";
-
-export const adminOrdersQueryKey = () => ["admin-orders"] as const;
 
 export function useAdminOrders() {
   return useQuery({

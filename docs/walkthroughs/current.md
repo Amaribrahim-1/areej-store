@@ -1,61 +1,63 @@
-# شرح التاسك — 12.3
+# شرح التاسك — 12.4 و 12.5
 
-- التاريخ: 2026-08-20
+- التاريخ: 2026-08-22
 - النوع: full-task
 
 ## المشكلة والحل
 
-علاء من الليستة تشوف الملخص بس. عشان تجهّز الطلب محتاجة صفحة طلب واحد: العميل، عنوان التسليم، والمنتجات بالسعر والكمية. الحل: `/admin/orders/[id]` بتقرأ `getAdminOrder` وتعرض الرجوع + بلوك العميل + جدول المنتجات.
+علاء كانت بتشوف الحالة بادج عرض بس. محتاجة تغيّرها: قيد المراجعة، جاري التوصيل، تم التوصيل، ملغي. الحل: قائمة على صفحة التفاصيل بتكتب `status` في الداتابيز، والـ RLS يمنع غير الأدمن.
 
 ## الصفحات والملفات
 
-- `/admin/orders/[id]` (`src/app/(admin)/admin/(protected)/orders/[id]/page.tsx`) — صفحة رفيعة: ميتاداتا + `orderId` للكمبوننت.
-- `src/features/orders/components/admin/AdminOrderDetailsPage.tsx` — تحميل، غلط، مش موجود، أو التفاصيل.
-- `src/features/orders/components/admin/AdminOrderBackLink.tsx` — «العودة للطلبات» → `/admin/orders`.
-- `src/features/orders/components/admin/AdminOrderDetails.tsx` — اسم العميل، بادج الحالة (عرض فقط)، البلوك، المنتجات، الإجمالي.
-- `src/features/orders/components/admin/AdminOrderCustomerBlock.tsx` — الاسم، الهاتف `tel:`، العنوان الكامل، التاريخ، طريقة الدفع.
-- `src/features/orders/components/admin/AdminOrderItemsList.tsx` — كروت تحت `lg`، جدول من `lg`.
-- `src/features/orders/components/admin/AdminOrderLineItemCard.tsx` — منتج على الموبايل: اسم، سعر، كمية، إجمالي السطر.
-- `src/features/orders/components/admin/AdminOrderItemsTable.tsx` — نفس الأعمدة على الشاشة الواسعة.
-- `src/features/orders/api/admin/useAdminOrder.ts` — قراءة الطلب الواحد.
-- `src/features/orders/api/admin/getAdminOrder.ts` — الـ helper (من شحنة الباك).
-- `supabase/migrations/20260820085421_get_admin_order.sql` — RPC أدمن فقط.
+- `/admin/orders/[id]` — نفس صفحة التفاصيل؛ البادج اتبدلت بقائمة «حالة الطلب».
+- `src/features/orders/components/admin/AdminOrderStatusControl.tsx` — القائمة: القيم من `ORDER_STATUSES` والعناوين من `ORDER_STATUS_LABELS`.
+- `src/features/orders/components/admin/AdminOrderDetails.tsx` — بيركب الكنترول جنب اسم العميل.
+- `src/features/orders/api/admin/updateAdminOrderStatus.ts` — الكتابة لـ `orders.status`.
+- `src/features/orders/api/admin/useUpdateAdminOrderStatus.ts` — الـ mutation + توست.
+- `src/features/orders/schema.ts` — `updateAdminOrderStatusSchema`.
+- `src/features/orders/api/queryKeys.ts` — مفاتيح الكاش المشتركة (ليستة / تفاصيل / طلبات العميلة).
+- الليستة والكروت لسه فيها `OrderStatusBadge` عرض فقط — التغيير من صفحة التفاصيل.
 
 ## عقد الاستخدام (English)
 
-### `getAdminOrder` — `src/features/orders/api/admin/getAdminOrder.ts`
+### `updateAdminOrderStatus` — `src/features/orders/api/admin/updateAdminOrderStatus.ts`
 
-- **Params:** `orderId: string` (UUID). Whitespace trimmed.
-- **Returns:** `AdminOrderDetail | null`
-  - Success: header snapshot (`id`, `status`, `total`, `paymentMethod`, `customerName`, `customerPhone`, `governorate`, `markaz`, `addressText`, `createdAt`) plus `items[]`.
-  - Each item: `id`, `productName`, `variantLabel` (`string | null`), `quantity`, `unitPrice`, `lineTotal`. Purchase snapshots — no live image/slug.
-  - Missing order, empty string, or malformed UUID → `null`.
-- **Errors:** non-admin throws `NOT_ADMIN`. Unexpected status/payment/line shape throws.
+- **Params:** `{ orderId: string, status: "Pending" | "Shipping" | "Delivered" | "Cancelled" }`
+  - `orderId` must be a UUID (whitespace trimmed).
+  - `status` must be one of `ORDER_STATUSES`. Any other string is rejected before the write.
+- **Returns:** `{ status: OrderStatus }` — the value stored on the row.
+- **Errors:**
+  - Invalid id/status → throws `INVALID_ORDER_STATUS_PAYLOAD` (no Supabase call).
+  - No session → throws `UNAUTHENTICATED`.
+  - Row missing, or RLS hides the row (non-admin) → throws `ORDER_NOT_FOUND`.
+  - Unexpected DB `status` shape → throws.
 - **Call:**
 
 ```ts
-const order = await getAdminOrder(orderId)
+const result = await updateAdminOrderStatus({
+  orderId,
+  status: "Shipping",
+})
 ```
 
 ## التدفق
 
-1. من `/admin/orders` زر «التفاصيل» يفتح `/admin/orders/<id>`.
-2. `getAdminOrder` ينادي `get_admin_order`.
-3. مش أدمن → `NOT_ADMIN` → حالة الغلط.
-4. `null` → «الطلب غير موجود».
-5. الطلب موجود → العميل/العنوان من الـ snapshot، والمنتجات بأسعار وقت الشراء.
+1. علاء على `/admin/orders/[id]` تختار حالة من القائمة.
+2. الـ schema يتأكد إن القيمة من الأربع حالات.
+3. `updateAdminOrderStatus` يكتب عمود `status` فقط.
+4. مش أدمن أو الطلب مش موجود → `ORDER_NOT_FOUND` → توست غلط، والقائمة ترجع للحالة القديمة.
+5. نجاح → توست «تم تحديث حالة الطلب»، والليستة وتفاصيل الطلب يتحدّثوا.
 
 ## قرارات مهمة وليه
 
-- **كروت على الموبايل زي الليستة:** أربع أعمدة + اسم منتج عربي طويل تزدحم على الشاشة الصغيرة. نفس حد `lg`.
-- **بادج الحالة عرض مش كنترول:** التحديث تاسك 12.4. من غير البادج علاء تفتح التفاصيل ومش عارفة الطلب Pending ولا Shipping.
-- **سهم الرجوع عكس سهم التفاصيل:** لوسيد مش بيقلب. في RTL الرجوع يمين، والتفاصيل شمال.
-- **`null` = مش موجود مش إكسبشن:** لينك UUID بايظ أو طلب اتمسح يظهر فاضي، مش 500.
-- **العنوان من `formatOrderAddress`:** نفس ترجمة المحافظة في الليستة والإشعار. نسختين هيفرقوا.
+- **الكتابة عمود `status` بس:** الـ grant من Phase 1.3 يمنع تعديل الإجمالي أو عنوان العميل بعد إنشاء الطلب.
+- **مفيش مايجريشن جديد:** سياسة `orders_update_admin_status` موجودة. مايجريشن فاضي كان هيضيف تاريخ من غير شغل.
+- **القيم من `constants.ts`:** سطر `Pending` متعاود في الجدول والـ UI هيفرق يوم ما الحالة تتغير.
+- **الكنترول في التفاصيل مش الليستة:** تغيير الحالة قرار على طلب واحد بعد ما علاء تشوف المنتجات والعنوان.
 
 ## تحقق بنفسك
 
-1. أدمن من الليستة → «التفاصيل»: رجوع، اسم، هاتف يتفتح اتصال، عنوان عربي كامل، منتجات (اسم / سعر / كمية / إجمالي السطر)، إجمالي الطلب. موبايل كروت، شاشة واسعة جدول.
-2. بادج الحالة ظاهرة ومفيش قائمة تغيير حالة.
-3. UUID شكله صح ومش موجود → «الطلب غير موجود» + رجوع.
-4. الجلسة محمية زي باقي `/admin` — عميلة على الرابط تترفض من السيرفر.
+1. أدمن → تفاصيل طلب Pending → اختار «جاري التوصيل»: توست نجاح، القائمة تتحدث، ارجع لليستة وشوف البادج اتغيرت.
+2. حدّث الصفحة: الحالة لسه Shipping — يعني اتكتب في الداتابيز.
+3. اختار «ملغي» ثم «قيد المراجعة»: الأربع قيم مسموحة من غير سلسلة إجبارية.
+4. جلسة مش أدمن ما تقدرش تعدّل الصف (RLS) — الواجهة أصلاً ورا `/admin`.

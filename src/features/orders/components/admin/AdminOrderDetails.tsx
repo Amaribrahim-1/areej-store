@@ -1,10 +1,10 @@
-import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
 import PriceTag from "@/components/shared/PriceTag";
 
 import type { AdminOrderDetail } from "../../types";
 
 import AdminOrderCustomerBlock from "./AdminOrderCustomerBlock";
 import AdminOrderItemsList from "./AdminOrderItemsList";
+import AdminOrderStatusControl from "./AdminOrderStatusControl";
 
 type AdminOrderDetailsProps = {
   order: AdminOrderDetail;
@@ -17,7 +17,7 @@ export default function AdminOrderDetails({ order }: AdminOrderDetailsProps) {
         <h1 className="font-heading text-2xl font-bold tracking-tight text-brand-900 sm:text-3xl">
           {order.customerName}
         </h1>
-        <OrderStatusBadge status={order.status} />
+        <AdminOrderStatusControl orderId={order.id} status={order.status} />
       </header>
 
       <AdminOrderCustomerBlock order={order} />

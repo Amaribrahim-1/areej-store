@@ -6,6 +6,8 @@ import {
 } from "@/lib/egypt-locations";
 import { egyptianPhoneRegex } from "@/lib/egyptianPhoneRegex";
 
+import { ORDER_STATUSES } from "./constants";
+
 function assertValidEgyptLocation(
   data: { governorate: string; markaz: string },
   ctx: z.RefinementCtx,
@@ -68,3 +70,16 @@ export const notifyOrderSchema = z.object({
 });
 
 export type NotifyOrderInput = z.infer<typeof notifyOrderSchema>;
+
+/** Admin status write — values must match `ORDER_STATUSES`, never free text. */
+export const updateAdminOrderStatusSchema = z.object({
+  orderId: z
+    .string()
+    .trim()
+    .uuid({ message: "معرّف الطلب غير صالح" }),
+  status: z.enum(ORDER_STATUSES),
+});
+
+export type UpdateAdminOrderStatusInput = z.infer<
+  typeof updateAdminOrderStatusSchema
+>;

@@ -4,8 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { CUSTOMER_ORDERS_STALE_TIME_MS } from "../constants";
 import { getCustomerOrders } from "./getCustomerOrders";
-
-export const customerOrdersQueryKey = () => ["customer-orders"];
+import { customerOrdersQueryKey } from "./queryKeys";
 
 export function useCustomerOrders() {
   return useQuery({
