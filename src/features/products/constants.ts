@@ -1,14 +1,3 @@
-/**
- * Seeded category slugs. The live list comes from `getCategories` —
- * Alaa can add more from the admin product form.
- */
-export const PRODUCT_CATEGORIES = [
-  "Perfumes",
-  "Musk",
-  "Fermentation",
-  "Hair Oil",
-] as const;
-
 /** Category slug stored on `products.category` (FK to `categories.slug`). */
 export type ProductCategory = string;
 

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  PRODUCT_CATEGORIES,
   PRODUCT_DESCRIPTION_MAX_LENGTH,
   PRODUCT_IMAGE_MAX_INPUT_BYTES,
   PRODUCT_NAME_MAX_LENGTH,
@@ -95,11 +94,14 @@ describe("productSchema", () => {
     ).toBe(true);
   });
 
-  it("accepts the same variant fields for every category", () => {
-    for (const category of PRODUCT_CATEGORIES) {
-      const result = productSchema.safeParse({ ...validProduct, category });
-      expect(result.success).toBe(true);
-    }
+  it("accepts any non-empty category slug and rejects an empty one", () => {
+    expect(
+      productSchema.safeParse({ ...validProduct, category: "Hair Oil" })
+        .success,
+    ).toBe(true);
+    expect(
+      productSchema.safeParse({ ...validProduct, category: "" }).success,
+    ).toBe(false);
   });
 
   it("accepts each product status", () => {
