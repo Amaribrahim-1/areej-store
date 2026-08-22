@@ -1,64 +1,81 @@
-# شرح التاسك — 13.7
+# شرح التاسك — 13.8
 
 - التاريخ: 2026-08-22
 - النوع: full-task
 
 ## المشكلة والحل
 
-الفورم كان بيرفع الصورة وبس. المنتج نفسه ما كانش بيتسجل، فالمقاسات والأسعار والاسم يضيعوا بعد الرفع.
+علاء تقدر تضيف منتج، ومش تقدر تعدّل اللي اتحفظ. المقاسات القديمة لو اتمسحت وفي طلبات عليها، تاريخ الطلب بيتكسّر. لو بدّلت الصورة من غير ما تمسح القديمة، التخزين بيتملّا على الباكت المجاني.
 
-اتشحن: حفظ المنتج بيرفع الصورة لو لسه File، بعدين بيكتب المنتج وكل المقاسات في معاملة واحدة. النجاح توست وتحويل لقائمة المنتجات. لو الكتابة فشلت بعد الرفع، الملف بيتمسح.
+اتشحن: صفحة تعديل بنفس فورم الإضافة، متعبّية من المنتج الحالي. الحفظ بيحدّث الصف والمقاسات في معاملة واحدة. المقاس اللي ظهر في طلبات ما يتمسحش. تبديل الصورة بيمسح الملف القديم بعد نجاح الكتابة.
 
 ## الصفحات والملفات
 
-- `/admin/products/new` (`src/app/(admin)/admin/(protected)/products/new/page.tsx`) — صفحة إضافة منتج. الحفظ بقى إنشاء صف حقيقي، مش رفع صورة لوحده.
-- `/admin/products` — رجوع علاء بعد النجاح. المنتج الجديد يظهر في القائمة (ظاهر أو مخفي حسب الحالة).
-- `src/features/products/components/admin/AdminNewProductPage.tsx` — بيربط الفورم بالإنشاء، شريط تقدم الرفع، وبعد النجاح `replace` للقائمة.
-- `src/features/products/api/admin/createProduct.ts` — إعادة التحقق + تنظيف النص + استدعاء الـ RPC.
-- `src/features/products/api/admin/useCreateProduct.ts` — الـ mutation: رفع إن لزم، إنشاء، توست، وإبطال كاش الكتالوج والأدمن والـ KPI.
-- `src/features/products/api/queryKeys.ts` — مفاتيح الكويري المشتركة (13.1 كانت مستنية اللحظة دي).
-- `supabase/migrations/20260822145230_create_admin_product.sql` — `create_admin_product`: منتج + مقاسات مع بعض. أدمن فقط.
+- `/admin/products/[id]/edit` (`src/app/(admin)/admin/(protected)/products/[id]/edit/page.tsx`) — تعديل منتج موجود. الاسم والوصف والفئة والحالة والصورة والمقاسات متعبّيين. حفظ يرجع لقائمة المنتجات.
+- `/admin/products` — زرار «تعديل» كان واصل للرابط ده من 13.2؛ الصفحة بقت شغالة.
+- `src/features/products/components/admin/AdminEditProductPage.tsx` — تحميل المنتج، حالات التحميل/الغلط/مش موجود، وربط الفورم بالحفظ.
+- `src/features/products/api/admin/getAdminProduct.ts` — منتج واحد للأدمن، شامل المخفي.
+- `src/features/products/api/admin/updateProduct.ts` — إعادة التحقق + تنظيف النص + استدعاء الـ RPC.
+- `src/features/products/api/admin/useUpdateProduct.ts` — الـ mutation: رفع صورة جديدة إن لزم، تحديث، مسح الصورة القديمة، توست، وإبطال الكاش.
+- `src/features/products/api/admin/withReplacedProductImage.ts` — رفع الجديد، كتابة الصف، بعدين مسح القديم. لو الكتابة فشلت، الجديد يتمسح والقديم يفضل.
+- `supabase/migrations/20260822181600_update_admin_product.sql` — `get_admin_product` و `update_admin_product`. أدمن فقط.
 
 ## عقد الاستخدام (English)
 
-### `createProduct` — `src/features/products/api/admin/createProduct.ts`
+### `getAdminProduct` — `src/features/products/api/admin/getAdminProduct.ts`
 
-- **Params:** `{ name, slug, description, category, status, image, variants }`. `image` must be a public URL in the `product-images` bucket (not a `File`). `variants` min 1: `{ volumeLabel: string | null, originalPrice, currentPrice }`.
-- **Returns:** `{ id: string, slug: string }`. Never empty; throws instead.
-- **Errors:** throws `Error` with `message` of `INVALID_PRODUCT_PAYLOAD` | `PRODUCT_SLUG_TAKEN` | `CATEGORY_NOT_FOUND` | `NOT_ADMIN` | `PRODUCT_CREATE_NO_ID`.
+- **Params:** `productId: string` (uuid). Malformed / blank → no RPC call.
+- **Returns:** `{ id, name, slug, description, category, categoryLabel, status, imageUrl, variants }` including inactive products. Missing id → `null`. `variants` ordered by `sort_order`; each `{ id, volumeLabel, originalPrice, currentPrice, sortOrder }`.
+- **Errors:** throws `Error` with `message` of `NOT_ADMIN`. Throws if the row has zero variants.
 - **Call:**
 
 ```ts
-const product = await createProduct({
+const product = await getAdminProduct(productId)
+```
+
+### `updateProduct` — `src/features/products/api/admin/updateProduct.ts`
+
+- **Params:** `(productId, { name, slug, description, category, status, image, variants })`. `image` must be a public URL in the `product-images` bucket (not a `File`). Each variant: `{ id?: uuid, volumeLabel, originalPrice, currentPrice }`. `id` present = update that row; omitted = insert. Rows on the product whose ids are missing from the list are deleted when unused by `order_items`.
+- **Returns:** `{ id, slug, imageUrl }`. Never empty; throws instead.
+- **Errors:** throws `Error` with `message` of `INVALID_PRODUCT_PAYLOAD` | `PRODUCT_SLUG_TAKEN` | `CATEGORY_NOT_FOUND` | `NOT_ADMIN` | `PRODUCT_NOT_FOUND` | `VARIANT_IN_USE` | `VARIANT_NOT_FOUND` | `PRODUCT_UPDATE_NO_ID`.
+- **Call:**
+
+```ts
+const product = await updateProduct(productId, {
   name: "عود كمبودي",
   slug: "oud-cambodi",
   description: "خليط دافئ مناسب للمساء.",
   category: "Perfumes",
   status: "active",
   image: uploaded.publicUrl,
-  variants: [{ volumeLabel: "50ml", originalPrice: 250, currentPrice: 200 }],
+  variants: [
+    { id: existingVariantId, volumeLabel: "50ml", originalPrice: 250, currentPrice: 200 },
+    { volumeLabel: "100ml", originalPrice: 400, currentPrice: 400 },
+  ],
 })
 ```
 
 ## التدفق
 
-1. علاء تملأ الفورم وتضغط حفظ. الزرار يتقفل طول ما العملية شغالة.
-2. لو الصورة لسه `File`: ضغط (اتعمل عند الاختيار) ثم رفع، شريط «جاري رفع الصورة».
-3. `createProduct` يعيد `productSchema`، ينظّف الاسم والوصف، ويرفض رابط صورة مش من باكت `product-images`.
-4. `create_admin_product` يكتب صف المنتج وكل صفوف المقاسات. لو المقاسات فاضية أو الأدمن مش أدمن، المعاملة تتراجع.
-5. نجاح: توست «تم إضافة المنتج»، تحويل لـ `/admin/products`. كاش القائمة والكتالوج والـ Featured/Latest وعدد المنتجات في الداشبورد يتحدث.
-6. رابط مستخدم قبل كده: توست «رابط المنتج ده مستخدم قبل كده»، الفورم تفضل مفتوحة.
-7. فشل بعد رفع الصورة: الملف يتمسح من التخزين، علاء تقدر تحفظ تاني.
+1. من قائمة المنتجات، «تعديل» يفتح `/admin/products/{id}/edit`.
+2. `getAdminProduct` يجيب المنتج حتى لو مخفي. الفورم تتعبّى. تغيير الاسم مش بيغيّر الرابط لوحده.
+3. حفظ: لو الصورة لسه `File`، تترفع أولاً. `updateProduct` يعيد `productSchema` وينظّف الاسم والوصف واسم المقاس.
+4. `update_admin_product` يحدّث صف المنتج. المقاسات اللي ليها `id` تتحدث؛ اللي من غير `id` تتضاف؛ اللي اتشالت من القائمة تتمسح لو مفيش `order_items` عليها.
+5. نجاح: توست «تم تحديث المنتج»، تحويل لـ `/admin/products`. كاش القائمة والكتالوج وصفحة المنتج وHome يتحدث.
+6. محاولة مسح مقاس استخدم في طلب: المعاملة تتراجع، توست «مفيش حذف لمقاس استخدم في طلبات سابقة»، الفورم تفضل مفتوحة.
+7. صورة جديدة بعد نجاح الكتابة: الملف القديم يتمسح. لو الكتابة فشلت، الملف الجديد يتمسح والقديم يفضل.
 
 ## قرارات مهمة وليه
 
-- **منتج + مقاسات في RPC واحد.** مفيش سياسة DELETE على `products` (حذف ناعم بس). لو المنتج اتحط والمقاس فشل، الصف يتيم ومش هيظهر لا في الكتالوج ولا في قائمة الأدمن (الاتنين INNER JOIN على المقاسات).
-- **الصورة URL من باكتنا بس.** `image_url` بيتخزن ويتعرض. رابط برّه الباكت يعدّي `next/image` أو يخزن محتوى مش بتاعنا.
-- **`replace` مش `push`.** بعد النجاح، زرار الرجوع في المتصفح ما يرجعش لفورم تقدر تتبعت تاني بنفس البيانات.
+- **قائمة المقاسات الكاملة على السيرفر، مش فرق من العميل.** العميل يقدر يبعت حذف غلط. السيرفر يقارن بالموجود ويمنع المسح لو في طلبات (`ON DELETE RESTRICT` لوحده كان هيطلع خطأ أجنبي عام زي الفئة الغلط).
+- **المعاملة كاملة تفشل لو مقاس مستخدم اتشال.** حذف جزئي يخلّي علاء تفتكر المقاس اتمسح وهو لسه موجود.
+- **مسح الصورة القديمة بعد نجاح الكتابة بس.** لو عكسنا الترتيب، منتج محفوظ بصورة اتمسحت.
 
 ## تحقق بنفسك
 
-1. `/admin/products/new` — املِي الاسم والوصف والفئة وصورة ومقاس واحد على الأقل. حفظ. المفروض توست «تم إضافة المنتج» والتحول لـ `/admin/products` والصف يظهر.
-2. نفس الرابط (slug) تاني. المفروض توست إن الرابط مستخدم، ومفيش صف مكرر.
-3. علامة «ظاهر في المتجر» مش متعلّمة. الصف يظهر في قائمة الأدمن كـ غير ظاهر، ومش في كتالوج المتجر.
-4. مقاسين بأسعار مختلفة. الاتنين يتسجلوا، وسعر البطاقة هو الأرخص زي باقي القائمة.
+1. `/admin/products` → تعديل منتج. الفورم لازم تتعبّى بالاسم والمقاسات والصورة الحالية.
+2. غيّر السعر أو الوصف. حفظ. توست «تم تحديث المنتج» والرجوع للقائمة. افتح تاني وتأكد إن التغيير اتسجل.
+3. أضف مقاس جديد في نفس الفورم. المفروض يظهر بعد الحفظ. امسح مقاس **ما ظهرش** في أي طلب. المفروض يتمسح.
+4. حاول تمسح مقاس اتطلب قبل كده. المفروض توست إن المسح ممنوع، والمقاس يفضل في الداتابيز.
+5. بدّل الصورة. بعد النجاح الصورة الجديدة تظهر، والقديمة مش المفروض تفضل في Storage.
+6. منتج مخفي (`inactive`) يتفتح ويتعدل. الكتالوج يفضل ما يعرضوش لو الحالة لسه مخفية.

@@ -87,6 +87,26 @@ export type CreatedProduct = {
   slug: string;
 };
 
+/** One product for the admin edit form, including inactive. */
+export type AdminProductDetail = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  category: ProductCategory;
+  categoryLabel: string;
+  status: ProductStatus;
+  imageUrl: string;
+  variants: ProductVariant[];
+};
+
+/** Result of admin product update after the row and variants are saved. */
+export type UpdatedProduct = {
+  id: string;
+  slug: string;
+  imageUrl: string;
+};
+
 export type ProductImageUploadPhase = "compressing" | "uploading";
 
 export type ProductImageUploadProgress = {

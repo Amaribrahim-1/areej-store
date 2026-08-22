@@ -433,6 +433,20 @@ export type Database = {
           total: number
         }[]
       }
+      get_admin_product: {
+        Args: { p_product_id: string }
+        Returns: {
+          category: string
+          category_label: string
+          description: string
+          id: string
+          image_url: string
+          name: string
+          slug: string
+          status: string
+          variants: Json
+        }[]
+      }
       list_admin_orders: {
         Args: never
         Returns: {
@@ -498,6 +512,19 @@ export type Database = {
       }
       submit_contact_message: {
         Args: { p_message: string; p_name: string; p_phone: string }
+        Returns: string
+      }
+      update_admin_product: {
+        Args: {
+          p_category: string
+          p_description: string
+          p_id: string
+          p_image_url: string
+          p_name: string
+          p_slug: string
+          p_status: string
+          p_variants: Json
+        }
         Returns: string
       }
     }

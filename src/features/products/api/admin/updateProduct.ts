@@ -5,21 +5,23 @@ import {
   throwProductWriteError,
   type ProductWriteInput,
 } from "./prepareProductWrite";
-import type { CreatedProduct } from "../../types";
+import type { UpdatedProduct } from "../../types";
 
-export type CreateProductInput = ProductWriteInput;
+export type UpdateProductInput = ProductWriteInput;
 
 /**
- * Inserts a product and its variants via `create_admin_product`.
+ * Updates a product and diffs its variants via `update_admin_product`.
  * Re-validates `productSchema` before the write. Image must already be a
- * public URL in the product-images bucket (upload first).
+ * public URL in the product-images bucket.
  */
-export async function createProduct(
-  input: CreateProductInput,
-): Promise<CreatedProduct> {
+export async function updateProduct(
+  productId: string,
+  input: UpdateProductInput,
+): Promise<UpdatedProduct> {
   const prepared = prepareProductWrite(input);
   const supabase = createClient();
-  const { data, error } = await supabase.rpc("create_admin_product", {
+  const { data, error } = await supabase.rpc("update_admin_product", {
+    p_id: productId,
     p_name: prepared.name,
     p_slug: prepared.slug,
     p_description: prepared.description,
@@ -27,6 +29,7 @@ export async function createProduct(
     p_status: prepared.status,
     p_image_url: prepared.imageUrl,
     p_variants: prepared.variants.map((variant) => ({
+      ...(variant.id ? { id: variant.id } : {}),
       volume_label: variant.volumeLabel,
       original_price: variant.originalPrice,
       current_price: variant.currentPrice,
@@ -38,8 +41,12 @@ export async function createProduct(
   }
 
   if (!data) {
-    throw new Error("PRODUCT_CREATE_NO_ID");
+    throw new Error("PRODUCT_UPDATE_NO_ID");
   }
 
-  return { id: data, slug: prepared.slug };
+  return {
+    id: data,
+    slug: prepared.slug,
+    imageUrl: prepared.imageUrl,
+  };
 }

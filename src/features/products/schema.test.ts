@@ -61,6 +61,7 @@ describe("productSchema", () => {
     expect(result.success).toBe(true);
     if (!result.success) return;
     expect(result.data.variants[0]).toEqual({
+      id: undefined,
       volumeLabel: "5ml",
       originalPrice: 100,
       currentPrice: 80,
@@ -105,6 +106,59 @@ describe("productSchema", () => {
     for (const status of PRODUCT_STATUSES) {
       const result = productSchema.safeParse({ ...validProduct, status });
       expect(result.success).toBe(true);
+    }
+  });
+
+  it("keeps an existing variant id for edit", () => {
+    const variantId = "11111111-2222-4333-8444-555555555555";
+    const result = productSchema.safeParse({
+      ...validProduct,
+      variants: [
+        {
+          id: variantId,
+          volumeLabel: "50ml",
+          originalPrice: 250,
+          currentPrice: 200,
+        },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.variants[0].id).toBe(variantId);
+  });
+
+  it("treats a blank variant id as a new row", () => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      variants: [
+        { id: "", volumeLabel: "50ml", originalPrice: 250, currentPrice: 200 },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.variants[0].id).toBeUndefined();
+  });
+
+  it("rejects a malformed variant id", () => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      variants: [
+        {
+          id: "not-a-uuid",
+          volumeLabel: "50ml",
+          originalPrice: 250,
+          currentPrice: 200,
+        },
+      ],
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(issueHasPath(result.error.issues, ["variants", 0, "id"])).toBe(
+        true,
+      );
     }
   });
 

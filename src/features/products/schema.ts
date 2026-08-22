@@ -35,8 +35,17 @@ function assertCurrentPriceNotAboveOriginal(
   }
 }
 
+/** Blank/missing = new row on edit. UUID = existing `product_variants.id`. */
+const variantIdSchema = z
+  .union([z.uuid(), z.literal("")])
+  .optional()
+  .transform((value) =>
+    value === "" || value === undefined ? undefined : value,
+  );
+
 const productVariantSchema = z
   .object({
+    id: variantIdSchema,
     volumeLabel: z
       .string()
       .trim()

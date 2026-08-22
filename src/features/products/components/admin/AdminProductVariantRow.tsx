@@ -42,6 +42,7 @@ export default function AdminProductVariantRow({
         <p id={headingId} className="text-sm font-medium text-foreground">
           مقاس {variantNumber}
         </p>
+        <input type="hidden" {...register(`variants.${index}.id`)} />
         {onRemove ? (
           <Button
             type="button"

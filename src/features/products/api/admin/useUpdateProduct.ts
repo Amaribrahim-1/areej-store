@@ -3,43 +3,54 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { adminDashboardKpisQueryKey } from "@/features/admin-dashboard/public";
-
 import { productWriteErrorMessage } from "../../lib/productWriteErrorMessage";
 import type { ProductInput } from "../../schema";
 import type { ProductImageUploadProgress } from "../../types";
 import {
+  adminProductQueryKey,
   adminProductsQueryKey,
   featuredProductsQueryKeyRoot,
   latestProductsQueryKeyRoot,
   productQueryKeyRoot,
   productsQueryKeyRoot,
 } from "../queryKeys";
-import { createProduct } from "./createProduct";
-import { withUploadedProductImage } from "./withUploadedProductImage";
+import { updateProduct } from "./updateProduct";
+import { withReplacedProductImage } from "./withReplacedProductImage";
 
-export type CreateProductVariables = {
+export type UpdateProductVariables = {
+  productId: string;
+  currentImageUrl: string;
   input: ProductInput;
   onProgress?: (progress: ProductImageUploadProgress) => void;
 };
 
-export function useCreateProduct() {
+export function useUpdateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ input, onProgress }: CreateProductVariables) => {
+    mutationFn: async ({
+      productId,
+      currentImageUrl,
+      input,
+      onProgress,
+    }: UpdateProductVariables) => {
       if (typeof input.image === "string") {
-        return createProduct({ ...input, image: input.image });
+        return updateProduct(productId, { ...input, image: input.image });
       }
 
-      return withUploadedProductImage(
+      return withReplacedProductImage(
         input.image,
-        (uploaded) => createProduct({ ...input, image: uploaded.publicUrl }),
+        currentImageUrl,
+        (uploaded) =>
+          updateProduct(productId, { ...input, image: uploaded.publicUrl }),
         { onProgress },
       );
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({ queryKey: adminProductsQueryKey() });
+      void queryClient.invalidateQueries({
+        queryKey: adminProductQueryKey(variables.productId),
+      });
       void queryClient.invalidateQueries({ queryKey: productsQueryKeyRoot });
       void queryClient.invalidateQueries({ queryKey: productQueryKeyRoot });
       void queryClient.invalidateQueries({
@@ -48,10 +59,7 @@ export function useCreateProduct() {
       void queryClient.invalidateQueries({
         queryKey: latestProductsQueryKeyRoot,
       });
-      void queryClient.invalidateQueries({
-        queryKey: adminDashboardKpisQueryKey,
-      });
-      toast.success("تم إضافة المنتج");
+      toast.success("تم تحديث المنتج");
     },
     onError: (error) => {
       toast.error(productWriteErrorMessage(error));
