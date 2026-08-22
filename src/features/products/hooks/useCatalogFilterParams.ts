@@ -1,7 +1,5 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { PRODUCT_CATEGORIES } from "../constants";
-
 const VALID_RATINGS = new Set(["3", "4", "5"]);
 const VALID_SORTING = new Set([
   "newest",
@@ -16,11 +14,7 @@ export default function useCatalogFilterParams() {
   const pathname = usePathname();
 
   const categoryRaw = searchParams.get("category") ?? "";
-  const selectedCategory = PRODUCT_CATEGORIES.includes(
-    categoryRaw as (typeof PRODUCT_CATEGORIES)[number],
-  )
-    ? categoryRaw
-    : "";
+  const selectedCategory = categoryRaw;
 
   const ratingRaw = searchParams.get("minRating") ?? "";
   const selectedRating = VALID_RATINGS.has(ratingRaw) ? ratingRaw : "";

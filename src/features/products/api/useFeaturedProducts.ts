@@ -5,10 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { HOME_FEATURED_PAGE_SIZE, PRODUCTS_STALE_TIME_MS } from "../constants";
 import type { FeaturedProductsParams } from "../types";
 import { getFeaturedProducts } from "./getProducts";
-
-export function featuredProductsQueryKey(pageSize: number) {
-  return ["featured-products", { pageSize }] as const;
-}
+import { featuredProductsQueryKey } from "./queryKeys";
 
 export function useFeaturedProducts(params: FeaturedProductsParams = {}) {
   const pageSize = params.pageSize ?? HOME_FEATURED_PAGE_SIZE;

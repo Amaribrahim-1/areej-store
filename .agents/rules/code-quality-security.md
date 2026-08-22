@@ -23,6 +23,6 @@ For every point raised, explain **why**, not just the fix. Keep answering "why" 
 Priority when it comes up: (1) Zod schemas / pure business logic (discount calc, variant price resolution), (2) critical flows (checkout, add-to-cart), (3) full E2E later, not an MVP requirement.
 
 # Scalability Markers
-- A new product category should only touch `features/products/` (plus a DB check migration). Admin category CRUD is out of MVP.
+- A new product category should only touch `features/products/` (plus the `categories` table). Alaa adds labels from the admin product form. No category delete in MVP.
 - Checkout should stay payment-method-agnostic even though COD is hardcoded for MVP.
 - No feature reaches into another feature's internal folder directly.

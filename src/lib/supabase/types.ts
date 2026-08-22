@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          label: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          label: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          label?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -245,7 +266,15 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -338,6 +367,7 @@ export type Database = {
         Row: {
           average_rating: number | null
           category: string | null
+          category_label: string | null
           created_at: string | null
           description: string | null
           discount_depth: number | null
@@ -355,10 +385,30 @@ export type Database = {
           updated_at: string | null
           variant_count: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
     }
     Functions: {
+      create_admin_product: {
+        Args: {
+          p_category: string
+          p_description: string
+          p_image_url: string
+          p_name: string
+          p_slug: string
+          p_status: string
+          p_variants: Json
+        }
+        Returns: string
+      }
       get_admin_dashboard_kpis: {
         Args: never
         Returns: {
@@ -383,6 +433,20 @@ export type Database = {
           total: number
         }[]
       }
+      get_admin_product: {
+        Args: { p_product_id: string }
+        Returns: {
+          category: string
+          category_label: string
+          description: string
+          id: string
+          image_url: string
+          name: string
+          slug: string
+          status: string
+          variants: Json
+        }[]
+      }
       list_admin_orders: {
         Args: never
         Returns: {
@@ -395,6 +459,20 @@ export type Database = {
           markaz: string
           status: string
           total: number
+        }[]
+      }
+      list_admin_products: {
+        Args: never
+        Returns: {
+          category: string
+          category_label: string
+          created_at: string
+          current_price: number
+          id: string
+          name: string
+          original_price: number
+          slug: string
+          status: string
         }[]
       }
       list_home_testimonials: {
@@ -434,6 +512,19 @@ export type Database = {
       }
       submit_contact_message: {
         Args: { p_message: string; p_name: string; p_phone: string }
+        Returns: string
+      }
+      update_admin_product: {
+        Args: {
+          p_category: string
+          p_description: string
+          p_id: string
+          p_image_url: string
+          p_name: string
+          p_slug: string
+          p_status: string
+          p_variants: Json
+        }
         Returns: string
       }
     }

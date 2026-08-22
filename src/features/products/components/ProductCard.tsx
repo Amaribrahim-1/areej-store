@@ -13,7 +13,6 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useCartStore } from "@/features/cart/public";
 import { cn } from "@/lib/utils";
 
-import { PRODUCT_CATEGORY_LABELS } from "../constants";
 import type { ProductListItem } from "../types";
 
 type ProductCardProps = {
@@ -24,7 +23,7 @@ type ProductCardProps = {
 export default function ProductCard({ product, className }: ProductCardProps) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
-  const categoryLabel = PRODUCT_CATEGORY_LABELS[product.category];
+  const categoryLabel = product.categoryLabel;
   const averageRating = product.averageRating;
   const productHref = `/products/${product.slug}`;
 

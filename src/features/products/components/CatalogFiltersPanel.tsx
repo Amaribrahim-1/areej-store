@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-import { PRODUCT_CATEGORIES, PRODUCT_CATEGORY_LABELS } from "../constants";
+import { useCategories } from "../api/useCategories";
 import useCatalogFilterParams from "../hooks/useCatalogFilterParams";
 
 const RATING_OPTIONS = [
@@ -51,6 +51,7 @@ export default function CatalogFiltersPanel({
     setFilterParams,
     removeFilters,
   } = useCatalogFilterParams();
+  const { data: categories = [] } = useCategories();
 
   const [draftMinPrice, setDraftMinPrice] = useState(minPrice);
   const [draftMaxPrice, setDraftMaxPrice] = useState(maxPrice);
@@ -101,20 +102,20 @@ export default function CatalogFiltersPanel({
               الكل
             </label>
           </li>
-          {PRODUCT_CATEGORIES.map((category) => (
-            <li key={category}>
+          {categories.map((category) => (
+            <li key={category.slug}>
               <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground/80">
                 <input
                   type="radio"
                   name={categoryGroupName}
-                  value={category}
+                  value={category.slug}
                   className={radioClassName}
-                  checked={selectedCategory === category}
+                  checked={selectedCategory === category.slug}
                   onChange={(e) =>
                     updateFilterParam("category", e.target.value)
                   }
                 />
-                {PRODUCT_CATEGORY_LABELS[category]}
+                {category.label}
               </label>
             </li>
           ))}

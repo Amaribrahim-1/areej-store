@@ -1,0 +1,306 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  PRODUCT_DESCRIPTION_MAX_LENGTH,
+  PRODUCT_IMAGE_MAX_INPUT_BYTES,
+  PRODUCT_NAME_MAX_LENGTH,
+  PRODUCT_PRICE_MAX,
+  PRODUCT_STATUSES,
+} from "./constants";
+import { productSchema } from "./schema";
+
+const sampleImage = new File(["x"], "oud.webp", { type: "image/webp" });
+
+function oversizedJpeg() {
+  const file = new File(["x"], "huge.jpg", { type: "image/jpeg" });
+  Object.defineProperty(file, "size", { value: PRODUCT_IMAGE_MAX_INPUT_BYTES + 1 });
+  return file;
+}
+
+const validProduct = {
+  name: "عود كمبودي",
+  slug: "عود-كمبودي",
+  description: "خليط دافئ مناسب للمساء.",
+  category: "Perfumes",
+  status: "active" as const,
+  image: sampleImage,
+  variants: [{ volumeLabel: "50ml", originalPrice: 250, currentPrice: 200 }],
+};
+
+function issueHasPath(
+  issues: { path: PropertyKey[] }[],
+  path: readonly PropertyKey[],
+) {
+  return issues.some((issue) =>
+    path.every((segment, index) => issue.path[index] === segment),
+  );
+}
+
+describe("productSchema", () => {
+  it("accepts a valid product with a File image and one sized variant", () => {
+    const result = productSchema.safeParse(validProduct);
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts an existing image URL instead of a File", () => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      image: "https://cdn.example/products/oud.webp",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("coerces string prices from form inputs", () => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      variants: [
+        { volumeLabel: "5ml", originalPrice: "100", currentPrice: "80" },
+      ],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.variants[0]).toEqual({
+      id: undefined,
+      volumeLabel: "5ml",
+      originalPrice: 100,
+      currentPrice: 80,
+    });
+  });
+
+  it("turns blank volume labels into null", () => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      variants: [{ volumeLabel: "   ", originalPrice: 90, currentPrice: 90 }],
+    });
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.variants[0].volumeLabel).toBeNull();
+  });
+
+  it("accepts currentPrice equal to originalPrice (no discount)", () => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      variants: [{ originalPrice: 120, currentPrice: 120 }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts a latin or arabic product slug", () => {
+    expect(
+      productSchema.safeParse({ ...validProduct, slug: "white-musk" }).success,
+    ).toBe(true);
+    expect(
+      productSchema.safeParse({ ...validProduct, slug: "عود-كمبودي" }).success,
+    ).toBe(true);
+  });
+
+  it("accepts any non-empty category slug and rejects an empty one", () => {
+    expect(
+      productSchema.safeParse({ ...validProduct, category: "Hair Oil" })
+        .success,
+    ).toBe(true);
+    expect(
+      productSchema.safeParse({ ...validProduct, category: "" }).success,
+    ).toBe(false);
+  });
+
+  it("accepts each product status", () => {
+    for (const status of PRODUCT_STATUSES) {
+      const result = productSchema.safeParse({ ...validProduct, status });
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it("keeps an existing variant id for edit", () => {
+    const variantId = "11111111-2222-4333-8444-555555555555";
+    const result = productSchema.safeParse({
+      ...validProduct,
+      variants: [
+        {
+          id: variantId,
+          volumeLabel: "50ml",
+          originalPrice: 250,
+          currentPrice: 200,
+        },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.variants[0].id).toBe(variantId);
+  });
+
+  it("treats a blank variant id as a new row", () => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      variants: [
+        { id: "", volumeLabel: "50ml", originalPrice: 250, currentPrice: 200 },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.variants[0].id).toBeUndefined();
+  });
+
+  it("rejects a malformed variant id", () => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      variants: [
+        {
+          id: "not-a-uuid",
+          volumeLabel: "50ml",
+          originalPrice: 250,
+          currentPrice: 200,
+        },
+      ],
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(issueHasPath(result.error.issues, ["variants", 0, "id"])).toBe(
+        true,
+      );
+    }
+  });
+
+  it("strips unknown stock fields from the parsed shape", () => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      quantityAvailable: 12,
+      variants: [
+        {
+          volumeLabel: "50ml",
+          originalPrice: 250,
+          currentPrice: 200,
+          stock: 3,
+        },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data).not.toHaveProperty("quantityAvailable");
+    expect(result.data.variants[0]).not.toHaveProperty("stock");
+  });
+
+  it.each([
+    {
+      name: "empty variants",
+      override: { variants: [] },
+      path: ["variants"] as const,
+    },
+    {
+      name: "missing image",
+      override: { image: undefined },
+      path: ["image"] as const,
+    },
+    {
+      name: "empty File image",
+      override: { image: new File([], "empty.webp") },
+      path: ["image"] as const,
+    },
+    {
+      name: "unsupported image MIME",
+      override: {
+        image: new File(["x"], "notes.pdf", { type: "application/pdf" }),
+      },
+      path: ["image"] as const,
+    },
+    {
+      name: "image larger than 10MB input cap",
+      override: {
+        image: oversizedJpeg(),
+      },
+      path: ["image"] as const,
+    },
+    {
+      name: "blank category",
+      override: { category: "   " },
+      path: ["category"] as const,
+    },
+    {
+      name: "blank slug",
+      override: { slug: "   " },
+      path: ["slug"] as const,
+    },
+    {
+      name: "slug with spaces",
+      override: { slug: "oud cambodi" },
+      path: ["slug"] as const,
+    },
+    {
+      name: "unknown status",
+      override: { status: "archived" },
+      path: ["status"] as const,
+    },
+    {
+      name: "blank name",
+      override: { name: "   " },
+      path: ["name"] as const,
+    },
+    {
+      name: "blank description",
+      override: { description: "   " },
+      path: ["description"] as const,
+    },
+    {
+      name: "zero price",
+      override: {
+        variants: [{ originalPrice: 0, currentPrice: 0 }],
+      },
+      path: ["variants", 0, "originalPrice"] as const,
+    },
+    {
+      name: "currentPrice above originalPrice",
+      override: {
+        variants: [{ originalPrice: 80, currentPrice: 100 }],
+      },
+      path: ["variants", 0, "currentPrice"] as const,
+    },
+    {
+      name: "second variant price inversion",
+      override: {
+        variants: [
+          { originalPrice: 50, currentPrice: 40 },
+          { originalPrice: 90, currentPrice: 120 },
+        ],
+      },
+      path: ["variants", 1, "currentPrice"] as const,
+    },
+    {
+      name: "price above numeric(10,2) max",
+      override: {
+        variants: [
+          {
+            originalPrice: PRODUCT_PRICE_MAX + 0.01,
+            currentPrice: PRODUCT_PRICE_MAX + 0.01,
+          },
+        ],
+      },
+      path: ["variants", 0, "originalPrice"] as const,
+    },
+    {
+      name: "name longer than max",
+      override: { name: "ع".repeat(PRODUCT_NAME_MAX_LENGTH + 1) },
+      path: ["name"] as const,
+    },
+    {
+      name: "description longer than max",
+      override: {
+        description: "و".repeat(PRODUCT_DESCRIPTION_MAX_LENGTH + 1),
+      },
+      path: ["description"] as const,
+    },
+  ])("rejects $name", ({ override, path }) => {
+    const result = productSchema.safeParse({
+      ...validProduct,
+      ...override,
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(issueHasPath(result.error.issues, path)).toBe(true);
+    }
+  });
+});

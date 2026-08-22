@@ -3,7 +3,6 @@ import type { Database } from "@/lib/supabase/types";
 import {
   HOME_FEATURED_PAGE_SIZE,
   HOME_LATEST_PAGE_SIZE,
-  PRODUCT_CATEGORIES,
   PRODUCTS_PAGE_SIZE,
   type ProductCategory,
 } from "../constants";
@@ -47,10 +46,6 @@ function normalizeParams(params: ProductsQueryParams): NormalizedCatalogParams {
   };
 }
 
-function isProductCategory(value: string): value is ProductCategory {
-  return (PRODUCT_CATEGORIES as readonly string[]).includes(value);
-}
-
 function requireCatalogField<T>(
   value: T | null | undefined,
   field: string,
@@ -63,9 +58,6 @@ function requireCatalogField<T>(
 
 function mapCatalogRow(row: CatalogProductRow): ProductListItem {
   const category = requireCatalogField(row.category, "category");
-  if (!isProductCategory(category)) {
-    throw new Error(`Unexpected product category from catalog: ${category}`);
-  }
 
   return {
     id: requireCatalogField(row.id, "id"),
@@ -73,6 +65,7 @@ function mapCatalogRow(row: CatalogProductRow): ProductListItem {
     slug: requireCatalogField(row.slug, "slug"),
     description: row.description,
     category,
+    categoryLabel: requireCatalogField(row.category_label, "category_label"),
     imageUrl: requireCatalogField(row.image_url, "image_url"),
     currentPrice: Number(
       requireCatalogField(row.display_current_price, "display_current_price"),

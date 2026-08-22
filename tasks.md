@@ -76,7 +76,7 @@ The existing scaffold has three concrete deviations from the agreed standards. F
   - `profiles` holds Name, Phone, Address (governorate / markaz / free-text), `role` (`customer`/`admin`), linked to `auth.users`; profile row via trigger on signup.
   - Reviews: `unique(product_id, user_id)`; average rating computed in query/view (no cached columns on products).
   - Place-order: Postgres RPC recalculates totals server-side (task 1.5).
-    🚩 No `stock` / `quantity_available` column (spec decision #5). No `coupons` table, no `orders.coupon_id`, no `orders.shipping_fee` (backlog). No `is_featured` flag — Featured is derived from any variant with `current_price < original_price` (spec decision #10). No `testimonials` table (spec decision #9). No admin category CRUD / no per-variant images (backlog).
+    🚩 No `stock` / `quantity_available` column (spec decision #5). No `coupons` table, no `orders.coupon_id`, no `orders.shipping_fee` (backlog). No `is_featured` flag — Featured is derived from any variant with `current_price < original_price` (spec decision #10). No `testimonials` table (spec decision #9). No per-variant images (backlog). Categories are a table as of Phase 13 (Alaa adds from the product form; no delete).
 
 - [x] **1.2 — Write the migration** for the agreed schema, with constraints (`current_price <= original_price`, rating `1..5`, status enums/checks).
 
@@ -378,23 +378,32 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 
 `[branch: feature/admin-products]` — heaviest feature in the MVP. Split the branch into commits deliberately.
 
-- **13.1 — `api/useAdminProducts.ts`**: all products including inactive ones (the storefront query filters to active only).
-- **13.2 — Products table**: Name, Category, Price, Status, Edit button, "Add Product" button.
-  🚩 No "available quantity" column — MVP has no inventory system (spec decision #5). If a stock column feels missing while building this, that's the deferred feature knocking.
-- **13.3 — `productSchema`** — **`NEW CONCEPT`** (Zod array / `superRefine` for variants):
+- [x] **13.1 — `api/useAdminProducts.ts`**: all products including inactive ones (the storefront query filters to active only).
+      **Done:** `list_admin_products` + `getAdminProducts` / `useAdminProducts` (`adminProductsQueryKey`, 60s staleTime). `/admin/products` shows loading, error, empty, and a count (including how many are inactive). Table UI stays **13.2**.
+      🚩 If admin product mutations (13.7–13.9) need to invalidate the storefront `productsQueryKey` — or vice versa — that is the trigger to move products feature query keys into a shared `queryKeys.ts`.
+- [x] **13.2 — Products table**: Name, Category, Price, Status, Edit button, "Add Product" button.
+      🚩 No "available quantity" column — MVP has no inventory system (spec decision #5). If a stock column feels missing while building this, that's the deferred feature knocking.
+- [x] **13.3 — `productSchema`** — **`NEW CONCEPT`** (Zod array / `superRefine` for variants):
   - Every product: name, description, category, status, one required photo, and **at least one** variant row (optional `volume_label`, `original_price`, `current_price`).
   - `current_price <= original_price` on every price pair.
   - Category is a fixed enum for MVP — it does **not** change the form shape.
     Standalone Zod example first, then apply.
-- **13.4 — Add-product form (shared with edit)**: name, description, category, status toggle, single image upload, and a variants block (always present; starts with one row).
-- **13.5 — Variant repeater UI**: add/remove variant rows, each with volume label (optional) and price pair (`useFieldArray`). Cannot remove the last remaining row.
-- **13.6 — Image upload to Supabase Storage**: one product image; client-side compress/resize to WebP + size validation before upload (1GB ceiling, §5), progress/error states, and cleanup of the orphaned file if create fails midway.
-- **13.7 — Create mutation** + redirect + toast.
-- **13.8 — Edit form prefill** from existing product + variants, and a diffed update (changed variants updated; removed variants deleted only when safe — e.g. not referenced by `order_items`). Replacing the product image cleans up the old storage object.
-- **13.9 — Status toggle from the table** as a quick action (active/inactive controls storefront visibility).
-- **13.10 — Soft delete only.** Deleting a product referenced by past `order_items` corrupts order history — deactivate via `status = 'inactive'` only (agreed in 1.1).
-- **13.11 — Re-validate `productSchema` server-side before the write** (§7).
-- **13.12 — Unit-test the discount and variant price-resolution logic** (§8 priority 1).
+    **Done:** `productSchema` in `features/products/schema.ts`. Fields: name, description, `PRODUCT_CATEGORIES` enum, `PRODUCT_STATUSES` enum, required `image` (File or existing URL), `variants` min 1 (optional `volumeLabel`, required price pair). `superRefine` enforces `currentPrice <= originalPrice` per row. Category does not change the form shape. Tests in `schema.test.ts`. Form UI stays **13.4**.
+- [x] **13.4 — Add-product form (shared with edit)**: name, slug (auto from name, editable), description, category, status toggle, single image upload with preview, and a variants block (always present; starts with one row).
+- [x] **13.5 — Variant repeater UI**: add/remove variant rows, each with volume label (optional) and price pair (`useFieldArray`). Cannot remove the last remaining row.
+      **Done:** `useFieldArray` in `AdminProductVariantsField`. Add/remove rows; delete is hidden on the last remaining row. Each row: optional volume label + price pair. Create mutation stays **13.7**.
+- [x] **13.6 — Image upload to Supabase Storage**: one product image; client-side compress/resize to WebP + size validation before upload (1GB ceiling, §5), progress/error states, and cleanup of the orphaned file if create fails midway.
+      **Done:** Pick compresses/resizes to WebP (max 1200px, under the 1MB bucket cap). Submit uploads to `product-images` at `products/{uuid}.webp`. Progress + inline/toast errors. Cancel or picking another image deletes the session object. `withUploadedProductImage` deletes the object if the follow-up write throws (13.7 will pass create as that follow-up). No product row yet.
+- [x] **13.7 — Create mutation** + redirect + toast.
+      **Done:** `create_admin_product` + `createProduct` / `useCreateProduct`. Re-validates `productSchema`, sanitizes name/description, uploads then inserts product + variants atomically. Success: toast + redirect to `/admin/products`. Duplicate slug → `PRODUCT_SLUG_TAKEN`. Product query keys live in `api/queryKeys.ts` so the storefront catalog, Home sections, and dashboard product KPI invalidate.
+- [x] **13.8 — Edit form prefill** from existing product + variants, and a diffed update (changed variants updated; removed variants deleted only when safe — e.g. not referenced by `order_items`). Replacing the product image cleans up the old storage object.
+- [x] **13.9 — Status toggle from the table** as a quick action (active/inactive controls storefront visibility).
+      **Done:** `setProductStatus` (direct `products` update — `products_update_admin` RLS already gates it, no RPC needed) + `useSetProductStatus` with optimistic `admin-products` cache update and rollback on error. `AdminProductStatusToggle` (shadcn `Switch`) replaces the read-only status badge in both the table and card views.
+- [x] **13.10 — Soft delete only.** Deleting a product referenced by past `order_items` corrupts order history — deactivate via `status = 'inactive'` only (agreed in 1.1).
+- [x] **13.11 — Re-validate `productSchema` server-side before the write** (§7).
+- [x] **13.12 — Unit-test the discount and variant price-resolution logic** (§8 priority 1).
+      **Done:** Already covered — variant price-resolution priority-1 cases live in `schema.test.ts`'s `superRefine` tests (zero price, `currentPrice` above `originalPrice`, multi-variant inversion, numeric(10,2) max) plus the pre-existing `resolveDisplayVariant.test.ts` / `resolveFeaturedDisplayVariant.test.ts`. No new test file needed.
+- [x] **13.13 — Admin-managed categories** (pulled from backlog during 13.4): `categories` table, catalog + admin list read labels from DB, Alaa can add a category from the product form. No delete. Category still does not change the form shape.
 
 `[commit: feat(admin-products): products table, feat(admin-products): product schema, feat(admin-products): create form with image upload, feat(admin-products): edit and deactivate]`
 
@@ -488,7 +497,6 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 | Separate `testimonials` table / admin entry screen                   | 1.1 (schema), 9.5 (Home testimonials)                                                        |
 | Standalone "List by Categories" page (covered by the catalog filter) | 3.7 (catalog filters)                                                                        |
 | Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)                                 |
-| Admin-managed categories (CRUD)                                      | 1.1 (schema), 13.4 (product form category field)                                             |
 | TanStack Query server prefetch + hydrate                             | 3.x (product catalog/detail pages), Providers / QueryClient setup                            |
 | Product bundles / packages (multi-item offer at one price)           | 13.4–13.6 (admin product form), 3.x (catalog/detail), 4.x/6.x (cart/checkout line snapshots) |
 
