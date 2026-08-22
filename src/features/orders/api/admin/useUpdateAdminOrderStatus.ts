@@ -3,6 +3,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { adminDashboardKpisQueryKey } from "@/features/admin-dashboard/public";
+
 import {
   adminOrderQueryKey,
   adminOrdersQueryKey,
@@ -89,6 +91,7 @@ export function useUpdateAdminOrderStatus() {
       });
       queryClient.invalidateQueries({ queryKey: adminOrdersQueryKey() });
       queryClient.invalidateQueries({ queryKey: customerOrdersQueryKey() });
+      queryClient.invalidateQueries({ queryKey: adminDashboardKpisQueryKey });
     },
   });
 }

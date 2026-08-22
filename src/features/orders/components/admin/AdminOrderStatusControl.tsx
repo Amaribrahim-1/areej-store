@@ -29,7 +29,9 @@ export default function AdminOrderStatusControl({
   orderId,
   status,
 }: AdminOrderStatusControlProps) {
-  const { mutate, isPending } = useUpdateAdminOrderStatus();
+  const { mutate, isPending, variables } = useUpdateAdminOrderStatus();
+  const displayedStatus =
+    isPending && variables?.orderId === orderId ? variables.status : status;
 
   function handleStatusChange(event: ChangeEvent<HTMLSelectElement>) {
     const parsed = updateAdminOrderStatusSchema.safeParse({
@@ -37,7 +39,7 @@ export default function AdminOrderStatusControl({
       status: event.target.value,
     });
 
-    if (!parsed.success || parsed.data.status === status) {
+    if (!parsed.success || parsed.data.status === displayedStatus) {
       return;
     }
 
@@ -50,7 +52,7 @@ export default function AdminOrderStatusControl({
       <select
         id="admin-order-status"
         className={selectClassName}
-        value={status}
+        value={displayedStatus}
         disabled={isPending}
         aria-busy={isPending}
         onChange={handleStatusChange}

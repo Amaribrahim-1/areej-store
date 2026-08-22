@@ -4,8 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { ADMIN_DASHBOARD_KPIS_STALE_TIME_MS } from "../constants";
 import { getAdminDashboardKpis } from "./getAdminDashboardKpis";
-
-const adminDashboardKpisQueryKey = ["admin-dashboard-kpis"] as const;
+import { adminDashboardKpisQueryKey } from "./queryKeys";
 
 export function useAdminDashboardKpis() {
   return useQuery({
