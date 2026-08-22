@@ -13,8 +13,9 @@ const sampleImage = new File(["x"], "oud.webp", { type: "image/webp" });
 
 const validProduct = {
   name: "عود كمبودي",
+  slug: "عود-كمبودي",
   description: "خليط دافئ مناسب للمساء.",
-  category: "Perfumes" as const,
+  category: "Perfumes",
   status: "active" as const,
   image: sampleImage,
   variants: [{ volumeLabel: "50ml", originalPrice: 250, currentPrice: 200 }],
@@ -77,6 +78,15 @@ describe("productSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("accepts a latin or arabic product slug", () => {
+    expect(
+      productSchema.safeParse({ ...validProduct, slug: "white-musk" }).success,
+    ).toBe(true);
+    expect(
+      productSchema.safeParse({ ...validProduct, slug: "عود-كمبودي" }).success,
+    ).toBe(true);
+  });
+
   it("accepts the same variant fields for every category", () => {
     for (const category of PRODUCT_CATEGORIES) {
       const result = productSchema.safeParse({ ...validProduct, category });
@@ -128,9 +138,19 @@ describe("productSchema", () => {
       path: ["image"] as const,
     },
     {
-      name: "unknown category",
-      override: { category: "عطور" },
+      name: "blank category",
+      override: { category: "   " },
       path: ["category"] as const,
+    },
+    {
+      name: "blank slug",
+      override: { slug: "   " },
+      path: ["slug"] as const,
+    },
+    {
+      name: "slug with spaces",
+      override: { slug: "oud cambodi" },
+      path: ["slug"] as const,
     },
     {
       name: "unknown status",

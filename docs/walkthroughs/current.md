@@ -1,67 +1,70 @@
-# شرح التاسك — 13.3
+# شرح التاسك — 13.4 + 13.13
 
 - التاريخ: 2026-08-22
 - النوع: full-task
 
 ## المشكلة والحل
 
-فورم إضافة/تعديل المنتج لسه مش موجود، وقبل ما يتبني لازم يبقى في عقد واضح: إيه الحقول المطلوبة، وإزاي الصف الواحد من المقاسات يتقال عليه صح. من غير العقد ده، الفورم (13.4) والـ mutation (13.7) هيخترعوا قواعد مختلفة.
+علاء هتضيف المنتجات من الأدمن (الداتا الحالية سيد). الفورم لازم فيه اسم، رابط، وصف، فئة، حالة، صورة بمعاينة، ومقاس واحد على الأقل. والفئات الأربعة الثابتة في الكود كانت هتمنع أي قسم جديد من غير تعديل كود.
 
-اتشحن `productSchema`: اسم، وصف، فئة، حالة، صورة واحدة إجبارية، وصف مقاس واحد على الأقل. سعر البيع مش مسموح يتجاوز السعر الأصلي على كل صف. الفئة enum ثابت — مش بتغيّر شكل الفورم.
+اتشحن: فورم إضافة على `/admin/products/new`؛ slug بيتولد من الاسم وقابل للتعديل؛ جدول `categories` علاء تضيف منه فئة وهي بتضيف منتج؛ معاينة للصورة بعد الاختيار؛ Placeholder المقاس بالعربي.
 
 ## الصفحات والملفات
 
-مفيش صفحة جديدة. الفورم نفسه تاسك **13.4**.
+- `/admin/products/new` (`src/app/(admin)/admin/(protected)/products/new/page.tsx`) — صفحة إضافة منتج.
+- `src/features/products/components/admin/AdminNewProductPage.tsx` — العنوان + الفورم في نص الشاشة.
+- `src/features/products/components/admin/AdminProductForm.tsx` — الفورم المشترك (إضافة/تعديل لاحقًا): اسم، رابط، وصف، فئة، حالة، صورة، مقاس واحد.
+- `src/features/products/components/admin/AdminProductCategoryField.tsx` — اختيار فئة من الجدول + «إضافة فئة جديدة».
+- `src/features/products/components/admin/AdminProductImageField.tsx` — اختيار صورة + معاينة (ملف جديد أو رابط موجود للتعديل).
+- `src/features/products/components/admin/AdminProductVariantRow.tsx` — صف مقاس واحد (إضافة/حذف صفوف = 13.5).
+- `src/features/products/api/getCategories.ts` — قراءة الفئات.
+- `src/features/products/api/admin/createCategory.ts` — إضافة فئة (أدمن فقط).
+- `src/features/products/lib/slugifyLabel.ts` — تحويل الاسم/الليبل لرابط.
+- `supabase/migrations/20260822131016_admin_managed_categories.sql` — جدول الفئات + FK بدل الـ check الثابت.
+- كتالوج الأدمن والمتجر بيقرأوا `categoryLabel` من الداتابيز.
 
-- `src/features/products/schema.ts` — عقد الفورم والكتابة بعدين: `productSchema` + نوع `ProductInput`.
-- `src/features/products/schema.test.ts` — حالات القبول والرفض للسكيما.
-- `src/features/products/constants.ts` — حدود الاسم/الوصف/المقاس/السعر جنب الـ enums القديمة.
+## عقد الاستخدام (English)
+
+### `getCategories` — `src/features/products/api/getCategories.ts`
+
+- **Params:** none
+- **Returns:** `{ slug, label, sortOrder }[]` ordered by `sort_order`. Empty table → `[]`.
+- **Errors:** throws on Supabase error.
+- **Call:**
+
+```ts
+const categories = await getCategories()
+```
+
+### `createCategory` — `src/features/products/api/admin/createCategory.ts`
+
+- **Params:** `{ label, slug }` (re-validated with `categorySchema`; label sanitized)
+- **Returns:** `{ slug, label, sortOrder }` of the inserted row
+- **Errors:** throws `INVALID_CATEGORY_PAYLOAD`; `CATEGORY_ALREADY_EXISTS` on unique slug/label (`23505`); other Supabase errors throw. Non-admin insert fails via RLS.
+- **Call:**
+
+```ts
+const row = await createCategory({ label: "بخور", slug: "bakhoor" })
+```
 
 ## التدفق
 
-1. الأدمن بعدين هيملأ فورم 13.4. القيم بتتحط في `productSchema`.
-2. Zod بيتحقق من الحقول العادية أولاً (اسم، وصف، فئة من `PRODUCT_CATEGORIES`، حالة من `PRODUCT_STATUSES`، صورة، مصفوفة مقاسات).
-3. لو المصفوفة فاضية → خطأ على `variants`.
-4. لكل صف مقاس: `volumeLabel` فاضي يبقى `null`. السعرين أرقام أكبر من صفر.
-5. `superRefine` يقارن السعرين على نفس الصف. لو `currentPrice > originalPrice` → الخطأ على `variants[i].currentPrice`، مش على المنتج كله.
-6. الصورة: `File` جديد، أو رابط مخزّن لو المنتج اتعدل من غير تغيير الصورة. ضغط WebP والحجم تاسك **13.6**.
+1. الأدمن يكتب اسم المنتج → الـ slug بيتولد. لو عدّل الرابط بإيده، التوليد بيتوقف.
+2. يختار فئة من القائمة (من جدول `categories`). أو «إضافة فئة جديدة» → اسم عربي + slug → `createCategory` → الفئة بتظهر في السيلكت وفي فلتر الكتالوج.
+3. يختار صورة → معاينة + اسم الملف. رابط المعاينة بيتبني في `useEffect` ويتلغى عند التغيير/المغادرة (عشان Strict Mode ميفسدش الـ blob).
+4. الحفظ لسه مش بيكتب المنتج (13.7). الفئة الجديدة بتتحفظ فورًا لأنها صف منفصل.
 
 ## قرارات مهمة وليه
 
-- **Array + `superRefine`، مش `.refine` لوحده.** `.refine` على الأوبجكت بيرجع رسالة واحدة. `superRefine` بيدي `ctx.addIssue` + `path`. من غير الـ path، RHF مش هيعرف يحط الخطأ على صف المقاس الغلط لما يبقى في أكتر من صف.
-
-مثال صغير (مش في المشروع — الفكرة بس):
-
-```ts
-const rowSchema = z
-  .object({
-    listPrice: z.number().positive(),
-    salePrice: z.number().positive(),
-  })
-  .superRefine((row, ctx) => {
-    if (row.salePrice > row.listPrice) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["salePrice"],
-        message: "سعر البيع أكبر من السعر الأصلي",
-      });
-    }
-  });
-
-z.array(rowSchema).min(1);
-```
-
-نفس الشكل اتطبق على `variants`.
-
-- **الفئة مش بتغيّر الحقول.** مخمرية وزيت شعر ليهم نفس صف المقاس. لو عملنا `discriminatedUnion` حسب الفئة، إضافة فئة جديدة هتكسر الفورم — عكس قرار الـ MVP.
-- **`image` = `File` أو string.** الرفع الفعلي 13.6. التعديل من غير صورة جديدة 13.8، وإعادة التحقق قبل الكتابة 13.11، محتاجين يقبلوا رابط موجود. `File` بس كان هيكسر الاتنين.
-- **مفيش `stock` / كمية.** الـ schema بتشيل الحقول الغريبة. المخزون برّه الـ MVP.
-- **رسائل الأدمن محايدة** (`أدخل` / `اختر`)، مش صيغة الزبونة.
+- **الـ slug في الفورم، مش مستخبي لحد 13.7.** كل منتج محتاج رابط `/products/...`. التوليد من الاسم بيوفر الكتابة؛ التعديل لو حابت URL لاتيني جنب اسم عربي.
+- **جدول `categories` مش CRUD كامل.** إضافة من فورم المنتج تكفي. مفيش حذف: `ON DELETE RESTRICT` عشان منتجات قديمة متتكسرش.
+- **الليبل العربي من الداتابيز.** خريطة ثابتة في الكود كانت هتكسر أي فئة جديدة على الكارت والفلتر.
+- **معاينة الملف بـ `next/image` + `unoptimized`.** الـ blob مش على Storage ومش بيتأمّز؛ `createObjectURL` مش ينفع جوه `useMemo` لأن التنضيف في Strict Mode بيلغي الرابط وهو لسه مستخدم.
 
 ## تحقق بنفسك
 
-```bash
-npx vitest run src/features/products/schema.test.ts
-```
-
-المفروض 21 تست يعدّوا. مفيش شاشة تتضغط في 13.3 — الفورم 13.4.
+1. `/admin/products/new` — اكتب اسم عربي. الرابط تحت الحقل لازم يتحدث. عدّل الرابط بإيدك، غيّر الاسم تاني: الرابط يفضل اللي كتبتيه.
+2. اختر صورة: لازم تظهر معاينة + اسم الملف.
+3. «إضافة فئة جديدة» (مثلاً بخور). المفروض toast نجاح، والفئة تظهر في السيلكت. على `/products` الفلتر لازم يعرضها.
+4. Placeholder المقاس: `50ml — متوسط — كبير`.
+5. حفظ المنتج لسه مش بيضيف صف في القائمة (13.7). إضافة مقاس تاني: 13.5.

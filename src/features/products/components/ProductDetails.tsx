@@ -18,7 +18,6 @@ import ProductReviewsList from "@/features/reviews/components/product/ProductRev
 import { toast } from "sonner";
 
 import { useProduct } from "../api/useProduct";
-import { PRODUCT_CATEGORY_LABELS } from "../constants";
 import { resolveDisplayVariant } from "../lib/resolveDisplayVariant";
 import type { ProductDetail } from "../types";
 import VariantSelector from "./VariantSelector";
@@ -70,7 +69,7 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
   );
   const [quantity, setQuantity] = useState(1);
 
-  const categoryLabel = PRODUCT_CATEGORY_LABELS[product.category];
+  const categoryLabel = product.categoryLabel;
   const displayVariant = resolveDisplayVariant(
     product.variants,
     selectedVariantId,

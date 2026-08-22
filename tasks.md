@@ -76,7 +76,7 @@ The existing scaffold has three concrete deviations from the agreed standards. F
   - `profiles` holds Name, Phone, Address (governorate / markaz / free-text), `role` (`customer`/`admin`), linked to `auth.users`; profile row via trigger on signup.
   - Reviews: `unique(product_id, user_id)`; average rating computed in query/view (no cached columns on products).
   - Place-order: Postgres RPC recalculates totals server-side (task 1.5).
-    🚩 No `stock` / `quantity_available` column (spec decision #5). No `coupons` table, no `orders.coupon_id`, no `orders.shipping_fee` (backlog). No `is_featured` flag — Featured is derived from any variant with `current_price < original_price` (spec decision #10). No `testimonials` table (spec decision #9). No admin category CRUD / no per-variant images (backlog).
+    🚩 No `stock` / `quantity_available` column (spec decision #5). No `coupons` table, no `orders.coupon_id`, no `orders.shipping_fee` (backlog). No `is_featured` flag — Featured is derived from any variant with `current_price < original_price` (spec decision #10). No `testimonials` table (spec decision #9). No per-variant images (backlog). Categories are a table as of Phase 13 (Alaa adds from the product form; no delete).
 
 - [x] **1.2 — Write the migration** for the agreed schema, with constraints (`current_price <= original_price`, rating `1..5`, status enums/checks).
 
@@ -389,7 +389,7 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
   - Category is a fixed enum for MVP — it does **not** change the form shape.
     Standalone Zod example first, then apply.
       **Done:** `productSchema` in `features/products/schema.ts`. Fields: name, description, `PRODUCT_CATEGORIES` enum, `PRODUCT_STATUSES` enum, required `image` (File or existing URL), `variants` min 1 (optional `volumeLabel`, required price pair). `superRefine` enforces `currentPrice <= originalPrice` per row. Category does not change the form shape. Tests in `schema.test.ts`. Form UI stays **13.4**.
-- **13.4 — Add-product form (shared with edit)**: name, description, category, status toggle, single image upload, and a variants block (always present; starts with one row).
+- [x] **13.4 — Add-product form (shared with edit)**: name, slug (auto from name, editable), description, category, status toggle, single image upload with preview, and a variants block (always present; starts with one row).
 - **13.5 — Variant repeater UI**: add/remove variant rows, each with volume label (optional) and price pair (`useFieldArray`). Cannot remove the last remaining row.
 - **13.6 — Image upload to Supabase Storage**: one product image; client-side compress/resize to WebP + size validation before upload (1GB ceiling, §5), progress/error states, and cleanup of the orphaned file if create fails midway.
 - **13.7 — Create mutation** + redirect + toast.
@@ -398,6 +398,7 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 - **13.10 — Soft delete only.** Deleting a product referenced by past `order_items` corrupts order history — deactivate via `status = 'inactive'` only (agreed in 1.1).
 - **13.11 — Re-validate `productSchema` server-side before the write** (§7).
 - **13.12 — Unit-test the discount and variant price-resolution logic** (§8 priority 1).
+- [x] **13.13 — Admin-managed categories** (pulled from backlog during 13.4): `categories` table, catalog + admin list read labels from DB, Alaa can add a category from the product form. No delete. Category still does not change the form shape.
 
 `[commit: feat(admin-products): products table, feat(admin-products): product schema, feat(admin-products): create form with image upload, feat(admin-products): edit and deactivate]`
 
@@ -491,7 +492,6 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 | Separate `testimonials` table / admin entry screen                   | 1.1 (schema), 9.5 (Home testimonials)                                                        |
 | Standalone "List by Categories" page (covered by the catalog filter) | 3.7 (catalog filters)                                                                        |
 | Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)                                 |
-| Admin-managed categories (CRUD)                                      | 1.1 (schema), 13.4 (product form category field)                                             |
 | TanStack Query server prefetch + hydrate                             | 3.x (product catalog/detail pages), Providers / QueryClient setup                            |
 | Product bundles / packages (multi-item offer at one price)           | 13.4–13.6 (admin product form), 3.x (catalog/detail), 4.x/6.x (cart/checkout line snapshots) |
 

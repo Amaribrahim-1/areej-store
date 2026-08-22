@@ -1,8 +1,4 @@
 import { createClient } from "@/lib/supabase/client";
-import {
-  PRODUCT_CATEGORIES,
-  type ProductCategory,
-} from "../constants";
 import type {
   ProductDetail,
   ProductQueryParams,
@@ -26,10 +22,6 @@ type VariantRow = {
   current_price: number;
   sort_order: number;
 };
-
-function isProductCategory(value: string): value is ProductCategory {
-  return (PRODUCT_CATEGORIES as readonly string[]).includes(value);
-}
 
 function hasSlug(
   params: ProductQueryParams,
@@ -73,7 +65,7 @@ export async function getProduct(
 
   const ratingQuery = supabase
     .from("catalog_products")
-    .select("average_rating, review_count")
+    .select("average_rating, review_count, category_label")
     .eq("status", "active")
     .eq(filterColumn, filterValue)
     .maybeSingle();
@@ -93,10 +85,6 @@ export async function getProduct(
   const row = productResult.data as ProductRow | null;
   if (!row) {
     return null;
-  }
-
-  if (!isProductCategory(row.category)) {
-    throw new Error(`Unexpected product category: ${row.category}`);
   }
 
   const variants: ProductVariant[] = (row.product_variants ?? []).map(
@@ -121,6 +109,10 @@ export async function getProduct(
     slug: row.slug,
     description: row.description,
     category: row.category,
+    categoryLabel:
+      rating?.category_label === null || rating?.category_label === undefined
+        ? row.category
+        : rating.category_label,
     imageUrl: row.image_url,
     averageRating:
       rating?.average_rating === null || rating?.average_rating === undefined

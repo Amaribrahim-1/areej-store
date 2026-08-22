@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          label: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          label: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          label?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -245,7 +266,15 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -338,6 +367,7 @@ export type Database = {
         Row: {
           average_rating: number | null
           category: string | null
+          category_label: string | null
           created_at: string | null
           description: string | null
           discount_depth: number | null
@@ -355,7 +385,15 @@ export type Database = {
           updated_at: string | null
           variant_count: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["slug"]
+          },
+        ]
       }
     }
     Functions: {
@@ -401,6 +439,7 @@ export type Database = {
         Args: never
         Returns: {
           category: string
+          category_label: string
           created_at: string
           current_price: number
           id: string

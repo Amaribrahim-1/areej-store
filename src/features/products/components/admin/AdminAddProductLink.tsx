@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export default function AdminAddProductLink() {
   return (
-    <Button render={<Link href="/admin/products/new" />}>
+    <Button nativeButton={false} render={<Link href="/admin/products/new" />}>
       <PlusIcon data-icon="inline-start" aria-hidden />
       إضافة منتج
     </Button>

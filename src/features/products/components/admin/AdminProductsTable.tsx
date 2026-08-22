@@ -8,7 +8,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { PRODUCT_CATEGORY_LABELS } from "../../constants";
 import type { AdminProduct } from "../../types";
 
 import AdminProductEditLink from "./AdminProductEditLink";
@@ -46,7 +45,7 @@ export default function AdminProductsTable({
 }
 
 function AdminProductTableRow({ product }: { product: AdminProduct }) {
-  const categoryLabel = PRODUCT_CATEGORY_LABELS[product.category];
+  const categoryLabel = product.categoryLabel;
 
   return (
     <TableRow>

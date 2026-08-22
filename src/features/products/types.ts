@@ -21,12 +21,19 @@ export type LatestProductsParams = {
   pageSize?: number;
 };
 
+export type ProductCategoryItem = {
+  slug: string;
+  label: string;
+  sortOrder: number;
+};
+
 export type ProductListItem = {
   id: string;
   name: string;
   slug: string;
   description: string | null;
   category: ProductCategory;
+  categoryLabel: string;
   imageUrl: string;
   currentPrice: number;
   originalPrice: number;
@@ -52,6 +59,7 @@ export type AdminProduct = {
   name: string;
   slug: string;
   category: ProductCategory;
+  categoryLabel: string;
   status: ProductStatus;
   currentPrice: number;
   originalPrice: number;
@@ -74,6 +82,7 @@ export type ProductDetail = {
   slug: string;
   description: string | null;
   category: ProductCategory;
+  categoryLabel: string;
   imageUrl: string;
   averageRating: number | null;
   reviewCount: number;

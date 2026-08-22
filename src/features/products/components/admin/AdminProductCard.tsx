@@ -1,6 +1,5 @@
 import PriceTag from "@/components/shared/PriceTag";
 
-import { PRODUCT_CATEGORY_LABELS } from "../../constants";
 import type { AdminProduct } from "../../types";
 
 import AdminProductEditLink from "./AdminProductEditLink";
@@ -13,7 +12,7 @@ type AdminProductCardProps = {
 
 export default function AdminProductCard({ product }: AdminProductCardProps) {
   const headingId = `admin-product-${product.id}-heading`;
-  const categoryLabel = PRODUCT_CATEGORY_LABELS[product.category];
+  const categoryLabel = product.categoryLabel;
 
   return (
     <article

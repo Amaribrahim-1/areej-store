@@ -8,7 +8,7 @@ import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
 
 import { useProducts } from "../api/useProducts";
-import { PRODUCTS_PAGE_SIZE, type ProductCategory } from "../constants";
+import { PRODUCTS_PAGE_SIZE } from "../constants";
 import useCatalogFilterParams from "../hooks/useCatalogFilterParams";
 import type { ProductSort } from "../types";
 import CatalogPagination from "./CatalogPagination";
@@ -29,9 +29,7 @@ export default function ProductGrid() {
   const { data, isPending, isError, refetch } = useProducts({
     page,
     pageSize: PRODUCTS_PAGE_SIZE,
-    category: selectedCategory
-      ? (selectedCategory as ProductCategory)
-      : undefined,
+    category: selectedCategory || undefined,
     minRating: toOptionalNumber(selectedRating),
     minPrice: toOptionalNumber(minPrice),
     maxPrice: toOptionalNumber(maxPrice),

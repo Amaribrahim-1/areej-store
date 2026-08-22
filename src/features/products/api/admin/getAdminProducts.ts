@@ -1,9 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 
-import {
-  requireProductCategory,
-  requireProductStatus,
-} from "../../constants";
+import { requireProductStatus } from "../../constants";
 import type { AdminProduct } from "../../types";
 
 type AdminProductRow = {
@@ -11,6 +8,7 @@ type AdminProductRow = {
   name: string;
   slug: string;
   category: string;
+  category_label: string;
   status: string;
   current_price: number | string;
   original_price: number | string;
@@ -46,7 +44,8 @@ function toAdminProduct(product: AdminProductRow): AdminProduct {
     id: product.id,
     name: product.name,
     slug: product.slug,
-    category: requireProductCategory(product.category),
+    category: product.category,
+    categoryLabel: product.category_label,
     status: requireProductStatus(product.status),
     currentPrice,
     originalPrice,
