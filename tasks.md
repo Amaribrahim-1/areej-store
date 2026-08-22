@@ -388,7 +388,7 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
   - `current_price <= original_price` on every price pair.
   - Category is a fixed enum for MVP — it does **not** change the form shape.
     Standalone Zod example first, then apply.
-      **Done:** `productSchema` in `features/products/schema.ts`. Fields: name, description, `PRODUCT_CATEGORIES` enum, `PRODUCT_STATUSES` enum, required `image` (File or existing URL), `variants` min 1 (optional `volumeLabel`, required price pair). `superRefine` enforces `currentPrice <= originalPrice` per row. Category does not change the form shape. Tests in `schema.test.ts`. Form UI stays **13.4**.
+    **Done:** `productSchema` in `features/products/schema.ts`. Fields: name, description, `PRODUCT_CATEGORIES` enum, `PRODUCT_STATUSES` enum, required `image` (File or existing URL), `variants` min 1 (optional `volumeLabel`, required price pair). `superRefine` enforces `currentPrice <= originalPrice` per row. Category does not change the form shape. Tests in `schema.test.ts`. Form UI stays **13.4**.
 - [x] **13.4 — Add-product form (shared with edit)**: name, slug (auto from name, editable), description, category, status toggle, single image upload with preview, and a variants block (always present; starts with one row).
 - [x] **13.5 — Variant repeater UI**: add/remove variant rows, each with volume label (optional) and price pair (`useFieldArray`). Cannot remove the last remaining row.
       **Done:** `useFieldArray` in `AdminProductVariantsField`. Add/remove rows; delete is hidden on the last remaining row. Each row: optional volume label + price pair. Create mutation stays **13.7**.
@@ -399,9 +399,10 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 - [x] **13.8 — Edit form prefill** from existing product + variants, and a diffed update (changed variants updated; removed variants deleted only when safe — e.g. not referenced by `order_items`). Replacing the product image cleans up the old storage object.
 - [x] **13.9 — Status toggle from the table** as a quick action (active/inactive controls storefront visibility).
       **Done:** `setProductStatus` (direct `products` update — `products_update_admin` RLS already gates it, no RPC needed) + `useSetProductStatus` with optimistic `admin-products` cache update and rollback on error. `AdminProductStatusToggle` (shadcn `Switch`) replaces the read-only status badge in both the table and card views.
-- **13.10 — Soft delete only.** Deleting a product referenced by past `order_items` corrupts order history — deactivate via `status = 'inactive'` only (agreed in 1.1).
-- **13.11 — Re-validate `productSchema` server-side before the write** (§7).
-- **13.12 — Unit-test the discount and variant price-resolution logic** (§8 priority 1).
+- [x] **13.10 — Soft delete only.** Deleting a product referenced by past `order_items` corrupts order history — deactivate via `status = 'inactive'` only (agreed in 1.1).
+- [x] **13.11 — Re-validate `productSchema` server-side before the write** (§7).
+- [x] **13.12 — Unit-test the discount and variant price-resolution logic** (§8 priority 1).
+      **Done:** Already covered — variant price-resolution priority-1 cases live in `schema.test.ts`'s `superRefine` tests (zero price, `currentPrice` above `originalPrice`, multi-variant inversion, numeric(10,2) max) plus the pre-existing `resolveDisplayVariant.test.ts` / `resolveFeaturedDisplayVariant.test.ts`. No new test file needed.
 - [x] **13.13 — Admin-managed categories** (pulled from backlog during 13.4): `categories` table, catalog + admin list read labels from DB, Alaa can add a category from the product form. No delete. Category still does not change the form shape.
 
 `[commit: feat(admin-products): products table, feat(admin-products): product schema, feat(admin-products): create form with image upload, feat(admin-products): edit and deactivate]`
