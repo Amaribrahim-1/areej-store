@@ -378,7 +378,9 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 
 `[branch: feature/admin-products]` — heaviest feature in the MVP. Split the branch into commits deliberately.
 
-- **13.1 — `api/useAdminProducts.ts`**: all products including inactive ones (the storefront query filters to active only).
+- [x] **13.1 — `api/useAdminProducts.ts`**: all products including inactive ones (the storefront query filters to active only).
+      **Done:** `list_admin_products` + `getAdminProducts` / `useAdminProducts` (`adminProductsQueryKey`, 60s staleTime). `/admin/products` shows loading, error, empty, and a count (including how many are inactive). Table UI stays **13.2**.
+      🚩 If admin product mutations (13.7–13.9) need to invalidate the storefront `productsQueryKey` — or vice versa — that is the trigger to move products feature query keys into a shared `queryKeys.ts`.
 - **13.2 — Products table**: Name, Category, Price, Status, Edit button, "Add Product" button.
   🚩 No "available quantity" column — MVP has no inventory system (spec decision #5). If a stock column feels missing while building this, that's the deferred feature knocking.
 - **13.3 — `productSchema`** — **`NEW CONCEPT`** (Zod array / `superRefine` for variants):
