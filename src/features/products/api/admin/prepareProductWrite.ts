@@ -25,6 +25,14 @@ export type PreparedProductWrite = {
 /**
  * Re-validates `productSchema`, sanitizes text, and requires a
  * product-images public URL. Shared by create and update writes.
+ *
+ * Re-validation boundary: this runs in the browser immediately before the
+ * `create_admin_product`/`update_admin_product` RPC call, not inside the RPC
+ * itself. Accepted because only an authenticated admin can call those RPCs
+ * and rendered text is React-escaped. Revisit if these RPCs are ever exposed
+ * to a wider role, or if rendered admin content stops going through React's
+ * default escaping (e.g. a future `dangerouslySetInnerHTML` on product name
+ * or description).
  */
 export function prepareProductWrite(
   input: ProductWriteInput,
