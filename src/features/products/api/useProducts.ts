@@ -4,10 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PRODUCTS_STALE_TIME_MS } from "../constants";
 import type { ProductsQueryParams } from "../types";
 import { getProducts } from "./getProducts";
-
-export function productsQueryKey(params: ProductsQueryParams = {}) {
-  return ["products", params] as const;
-}
+import { productsQueryKey } from "./queryKeys";
 
 export function useProducts(params: ProductsQueryParams = {}) {
   return useQuery({

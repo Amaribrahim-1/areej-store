@@ -81,6 +81,12 @@ export type UploadedProductImage = {
   publicUrl: string;
 };
 
+/** Result of admin product create after the row and its variants exist. */
+export type CreatedProduct = {
+  id: string;
+  slug: string;
+};
+
 export type ProductImageUploadPhase = "compressing" | "uploading";
 
 export type ProductImageUploadProgress = {

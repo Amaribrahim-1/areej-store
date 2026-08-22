@@ -397,6 +397,18 @@ export type Database = {
       }
     }
     Functions: {
+      create_admin_product: {
+        Args: {
+          p_category: string
+          p_description: string
+          p_image_url: string
+          p_name: string
+          p_slug: string
+          p_status: string
+          p_variants: Json
+        }
+        Returns: string
+      }
       get_admin_dashboard_kpis: {
         Args: never
         Returns: {

@@ -394,7 +394,8 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
       **Done:** `useFieldArray` in `AdminProductVariantsField`. Add/remove rows; delete is hidden on the last remaining row. Each row: optional volume label + price pair. Create mutation stays **13.7**.
 - [x] **13.6 — Image upload to Supabase Storage**: one product image; client-side compress/resize to WebP + size validation before upload (1GB ceiling, §5), progress/error states, and cleanup of the orphaned file if create fails midway.
       **Done:** Pick compresses/resizes to WebP (max 1200px, under the 1MB bucket cap). Submit uploads to `product-images` at `products/{uuid}.webp`. Progress + inline/toast errors. Cancel or picking another image deletes the session object. `withUploadedProductImage` deletes the object if the follow-up write throws (13.7 will pass create as that follow-up). No product row yet.
-- **13.7 — Create mutation** + redirect + toast.
+- [x] **13.7 — Create mutation** + redirect + toast.
+      **Done:** `create_admin_product` + `createProduct` / `useCreateProduct`. Re-validates `productSchema`, sanitizes name/description, uploads then inserts product + variants atomically. Success: toast + redirect to `/admin/products`. Duplicate slug → `PRODUCT_SLUG_TAKEN`. Product query keys live in `api/queryKeys.ts` so the storefront catalog, Home sections, and dashboard product KPI invalidate.
 - **13.8 — Edit form prefill** from existing product + variants, and a diffed update (changed variants updated; removed variants deleted only when safe — e.g. not referenced by `order_items`). Replacing the product image cleans up the old storage object.
 - **13.9 — Status toggle from the table** as a quick action (active/inactive controls storefront visibility).
 - **13.10 — Soft delete only.** Deleting a product referenced by past `order_items` corrupts order history — deactivate via `status = 'inactive'` only (agreed in 1.1).

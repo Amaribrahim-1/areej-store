@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { categoriesQueryKey } from "../useCategories";
+import { categoriesQueryKey } from "../queryKeys";
 import { createCategory } from "./createCategory";
 import type { CategoryInput } from "../../schema";
 

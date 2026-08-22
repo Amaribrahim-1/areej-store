@@ -3,9 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { ADMIN_PRODUCTS_STALE_TIME_MS } from "../../constants";
+import { adminProductsQueryKey } from "../queryKeys";
 import { getAdminProducts } from "./getAdminProducts";
-
-export const adminProductsQueryKey = () => ["admin-products"] as const;
 
 export function useAdminProducts() {
   return useQuery({
