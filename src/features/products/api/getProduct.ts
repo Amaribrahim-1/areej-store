@@ -1,4 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
+
+import { decodeRouteSlug } from "../lib/decodeRouteSlug";
 import type {
   ProductDetail,
   ProductQueryParams,
@@ -34,7 +36,9 @@ export async function getProduct(
 ): Promise<ProductDetail | null> {
   const supabase = createClient();
   const filterColumn = hasSlug(params) ? "slug" : "id";
-  const filterValue = hasSlug(params) ? params.slug : params.id;
+  const filterValue = hasSlug(params)
+    ? decodeRouteSlug(params.slug)
+    : params.id;
 
   const productQuery = supabase
     .from("products")
