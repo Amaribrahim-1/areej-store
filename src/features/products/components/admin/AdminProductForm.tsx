@@ -8,8 +8,8 @@ import FieldError from "@/components/shared/FieldError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 
 import {
   PRODUCT_DESCRIPTION_MAX_LENGTH,
@@ -30,11 +30,6 @@ import AdminProductImageField from "./AdminProductImageField";
 import AdminProductVariantsField, {
   EMPTY_PRODUCT_VARIANT,
 } from "./AdminProductVariantsField";
-
-const checkboxClassName = cn(
-  "size-4 shrink-0 rounded-sm border border-input accent-primary",
-  "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
-);
 
 const CREATE_DEFAULTS: DefaultValues<ProductFormValues> = {
   name: "",
@@ -192,18 +187,16 @@ export default function AdminProductForm({
             name="status"
             control={control}
             render={({ field }) => (
-              <input
+              <Switch
                 id="admin-product-status"
-                type="checkbox"
                 ref={field.ref}
                 name={field.name}
-                className={checkboxClassName}
                 checked={field.value === "active"}
                 aria-invalid={!!errors.status}
                 aria-describedby="admin-product-status-hint"
                 onBlur={field.onBlur}
-                onChange={(event) =>
-                  field.onChange(event.target.checked ? "active" : "inactive")
+                onCheckedChange={(checked) =>
+                  field.onChange(checked ? "active" : "inactive")
                 }
               />
             )}
