@@ -2,7 +2,7 @@ import { isAuthSessionMissingError } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/client";
 
-import { ORDER_STATUSES, type OrderStatus } from "../../constants";
+import { requireOrderStatus, type OrderStatus } from "../../constants";
 import {
   updateAdminOrderStatusSchema,
   type UpdateAdminOrderStatusInput,
@@ -62,15 +62,4 @@ export async function updateAdminOrderStatus(
   }
 
   return { status: requireOrderStatus(data.status) };
-}
-
-function isOrderStatus(value: string): value is OrderStatus {
-  return (ORDER_STATUSES as readonly string[]).includes(value);
-}
-
-function requireOrderStatus(value: string): OrderStatus {
-  if (!isOrderStatus(value)) {
-    throw new Error(`Unexpected order status: ${value}`);
-  }
-  return value;
 }

@@ -1,10 +1,9 @@
-import type { ReactNode } from "react";
-
 import { PAYMENT_METHOD_LABELS } from "../../constants";
 import { formatOrderAddress } from "../../lib/formatOrderAddress";
 import { formatOrderPlacedAt } from "../../lib/formatOrderPlacedAt";
 import type { AdminOrderDetail } from "../../types";
 
+import AdminOrderField from "./AdminOrderField";
 import AdminOrderPhoneLink from "./AdminOrderPhoneLink";
 
 type AdminOrderCustomerBlockProps = {
@@ -30,33 +29,18 @@ export default function AdminOrderCustomerBlock({
       </h2>
 
       <dl className="mt-3 space-y-2 text-sm">
-        <OrderField label="الاسم">{order.customerName}</OrderField>
-        <OrderField label="الهاتف">
+        <AdminOrderField label="الاسم">{order.customerName}</AdminOrderField>
+        <AdminOrderField label="الهاتف">
           <AdminOrderPhoneLink phone={order.customerPhone} />
-        </OrderField>
-        <OrderField label="العنوان">{address}</OrderField>
-        <OrderField label="التاريخ">
+        </AdminOrderField>
+        <AdminOrderField label="العنوان">{address}</AdminOrderField>
+        <AdminOrderField label="التاريخ">
           <time dateTime={order.createdAt}>{placedAt}</time>
-        </OrderField>
-        <OrderField label="الدفع">
+        </AdminOrderField>
+        <AdminOrderField label="الدفع">
           {PAYMENT_METHOD_LABELS[order.paymentMethod]}
-        </OrderField>
+        </AdminOrderField>
       </dl>
     </section>
-  );
-}
-
-function OrderField({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex flex-wrap gap-x-2 gap-y-1">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="min-w-0 font-medium text-foreground">{children}</dd>
-    </div>
   );
 }

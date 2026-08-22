@@ -18,6 +18,13 @@ export function isOrderStatus(value: string): value is OrderStatus {
   return (ORDER_STATUSES as readonly string[]).includes(value);
 }
 
+export function requireOrderStatus(value: string): OrderStatus {
+  if (!isOrderStatus(value)) {
+    throw new Error(`Unexpected order status: ${value}`);
+  }
+  return value;
+}
+
 export const ADMIN_ORDER_SORTS = ["newest", "oldest", "status"] as const;
 
 export type AdminOrderSort = (typeof ADMIN_ORDER_SORTS)[number];
@@ -42,6 +49,17 @@ export const DEFAULT_PAYMENT_METHOD: PaymentMethod = "cod";
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   cod: "الدفع عند الاستلام",
 };
+
+function isPaymentMethod(value: string): value is PaymentMethod {
+  return (PAYMENT_METHODS as readonly string[]).includes(value);
+}
+
+export function requirePaymentMethod(value: string): PaymentMethod {
+  if (!isPaymentMethod(value)) {
+    throw new Error(`Unexpected payment method: ${value}`);
+  }
+  return value;
+}
 
 /** Customer order history is personal, near-real-time data — shorter than the catalog's 5 min. */
 export const CUSTOMER_ORDERS_STALE_TIME_MS = 2 * 60 * 1000;

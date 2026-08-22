@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 
-import { ORDER_STATUSES, type OrderStatus } from "../../constants";
+import { requireOrderStatus } from "../../constants";
 import type { AdminOrder } from "../../types";
 
 type AdminOrderRow = {
@@ -51,17 +51,6 @@ function toAdminOrder(order: AdminOrderRow): AdminOrder {
     addressText: order.address_text,
     createdAt: order.created_at,
   };
-}
-
-function isOrderStatus(value: string): value is OrderStatus {
-  return (ORDER_STATUSES as readonly string[]).includes(value);
-}
-
-function requireOrderStatus(value: string): OrderStatus {
-  if (!isOrderStatus(value)) {
-    throw new Error(`Unexpected order status: ${value}`);
-  }
-  return value;
 }
 
 function throwAdminOrdersError(error: { message: string }): never {

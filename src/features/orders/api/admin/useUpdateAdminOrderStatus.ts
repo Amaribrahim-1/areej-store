@@ -5,12 +5,13 @@ import { toast } from "sonner";
 
 import { adminDashboardKpisQueryKey } from "@/features/admin-dashboard/public";
 
+import { adminOrderStatusErrorMessage } from "../../lib/adminOrderStatusErrorMessage";
+import type { AdminOrder, AdminOrderDetail } from "../../types";
 import {
   adminOrderQueryKey,
   adminOrdersQueryKey,
   customerOrdersQueryKey,
 } from "../queryKeys";
-import type { AdminOrder, AdminOrderDetail } from "../../types";
 import {
   updateAdminOrderStatus,
   type UpdateAdminOrderStatusInput,
@@ -71,16 +72,7 @@ export function useUpdateAdminOrderStatus() {
         queryClient.setQueryData(adminOrdersQueryKey(), context.previousList);
       }
 
-      const raw = error instanceof Error ? error.message : "";
-      const message =
-        raw === "INVALID_ORDER_STATUS_PAYLOAD"
-          ? "حالة الطلب غير صحيحة"
-          : raw === "UNAUTHENTICATED"
-            ? "جلسة الأدمن انتهت. سجّل الدخول مرة أخرى"
-            : raw === "ORDER_NOT_FOUND"
-              ? "الطلب غير موجود أو لا يمكن تحديثه"
-              : raw || "تعذر تحديث حالة الطلب. جرّب مرة أخرى";
-      toast.error(message);
+      toast.error(adminOrderStatusErrorMessage(error));
     },
     onSuccess: () => {
       toast.success("تم تحديث حالة الطلب");

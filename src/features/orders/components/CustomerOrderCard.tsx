@@ -6,6 +6,7 @@ import PriceTag, { formatPrice } from "@/components/shared/PriceTag";
 import { cn } from "@/lib/utils";
 
 import { PAYMENT_METHOD_LABELS } from "../constants";
+import { formatOrderPlacedAt } from "../lib/formatOrderPlacedAt";
 import type { CustomerOrder, CustomerOrderLineItem } from "../types";
 
 import OrderProductImage from "./OrderProductImage";
@@ -14,12 +15,6 @@ type CustomerOrderCardProps = {
   order: CustomerOrder;
   className?: string;
 };
-
-const compactDateFormatter = new Intl.DateTimeFormat("ar-EG", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-});
 
 const fullDateFormatter = new Intl.DateTimeFormat("ar-EG", {
   weekday: "long",
@@ -92,7 +87,7 @@ function CustomerOrderCardSummary({ order }: { order: CustomerOrder }) {
   const pieceCountLabel = formatPieceCount(totalPieceCount(order.items));
   const itemsPreview = formatItemsPreview(order.items);
   const thumbs = previewThumbs(order.items);
-  const placedAtLabel = compactDateFormatter.format(new Date(order.createdAt));
+  const placedAtLabel = formatOrderPlacedAt(order.createdAt);
 
   return (
     <summary

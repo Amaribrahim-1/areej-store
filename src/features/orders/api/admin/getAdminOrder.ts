@@ -1,10 +1,8 @@
 import { createClient } from "@/lib/supabase/client";
 
 import {
-  ORDER_STATUSES,
-  PAYMENT_METHODS,
-  type OrderStatus,
-  type PaymentMethod,
+  requireOrderStatus,
+  requirePaymentMethod,
 } from "../../constants";
 import type { AdminOrderDetail, AdminOrderLineItem } from "../../types";
 
@@ -119,28 +117,6 @@ function toAdminOrderLineItem(value: unknown): AdminOrderLineItem {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isOrderStatus(value: string): value is OrderStatus {
-  return (ORDER_STATUSES as readonly string[]).includes(value);
-}
-
-function isPaymentMethod(value: string): value is PaymentMethod {
-  return (PAYMENT_METHODS as readonly string[]).includes(value);
-}
-
-function requireOrderStatus(value: string): OrderStatus {
-  if (!isOrderStatus(value)) {
-    throw new Error(`Unexpected order status: ${value}`);
-  }
-  return value;
-}
-
-function requirePaymentMethod(value: string): PaymentMethod {
-  if (!isPaymentMethod(value)) {
-    throw new Error(`Unexpected payment method: ${value}`);
-  }
-  return value;
 }
 
 function throwAdminOrderError(error: { message: string }): never {
