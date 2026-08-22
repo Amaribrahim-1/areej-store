@@ -1,4 +1,4 @@
-import type { ProductCategory } from "./constants";
+import type { ProductCategory, ProductStatus } from "./constants";
 
 export type ProductSort = "newest" | "price-asc" | "price-desc" | "rating-desc";
 
@@ -40,6 +40,22 @@ export type ProductListItem = {
 export type ProductsListResult = {
   items: ProductListItem[];
   total: number;
+};
+
+/**
+ * One row in the admin products list. Newest first.
+ * Includes inactive products the storefront catalog hides.
+ * Display prices are the cheapest variant (same rule as the catalog card).
+ */
+export type AdminProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  category: ProductCategory;
+  status: ProductStatus;
+  currentPrice: number;
+  originalPrice: number;
+  createdAt: string;
 };
 
 export type ProductQueryParams = { slug: string } | { id: string };

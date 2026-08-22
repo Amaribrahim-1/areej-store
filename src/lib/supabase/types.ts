@@ -397,6 +397,19 @@ export type Database = {
           total: number
         }[]
       }
+      list_admin_products: {
+        Args: never
+        Returns: {
+          category: string
+          created_at: string
+          current_price: number
+          id: string
+          name: string
+          original_price: number
+          slug: string
+          status: string
+        }[]
+      }
       list_home_testimonials: {
         Args: { p_limit?: number }
         Returns: {
