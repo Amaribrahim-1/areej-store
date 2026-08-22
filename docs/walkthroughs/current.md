@@ -1,81 +1,267 @@
-# شرح التاسك — 13.8
+# full-task — Execute Phase 13 review fixes
 
-- التاريخ: 2026-08-22
-- النوع: full-task
+> This file is a **self-contained execution plan**. Open a new chat, say "بص
+> على current.md وتنفذه", and the agent should be able to do the whole thing
+> — code fixes, commits, merge, push, branch cleanup — with no other context.
+> Branch: `feature/admin-products` (current branch when this was written).
+> Base: `main`.
 
-## المشكلة والحل
+## Why (one line each)
 
-علاء تقدر تضيف منتج، ومش تقدر تعدّل اللي اتحفظ. المقاسات القديمة لو اتمسحت وفي طلبات عليها، تاريخ الطلب بيتكسّر. لو بدّلت الصورة من غير ما تمسح القديمة، التخزين بيتملّا على الباكت المجاني.
+- `SelectedFilePreview` uses `useMemo` to run a side effect
+  (`URL.createObjectURL`) — fragile under StrictMode re-invocation; belongs in
+  `useEffect`.
+- The status field is a hand-rolled checkbox while the exact same concept
+  (`active`/`inactive`) is a shadcn `Switch` everywhere else — unify it.
+- `PRODUCT_CATEGORIES` is dead in production code since 13.13 moved categories
+  to the `categories` table; the one test using it no longer asserts anything
+  real.
+- 13.12 (variant price-resolution tests) is already covered by existing
+  tests — just check it off, no new test code.
+- `prepareProductWrite.ts` re-validates in the browser right before calling
+  the RPC, not inside the RPC itself. Decision (documented, not changed):
+  keep as-is — only an authenticated admin can call `create_admin_product`/
+  `update_admin_product`, and React escapes rendered text — but leave a
+  comment recording the tradeoff and its revisit trigger so it isn't silently
+  re-discovered later.
 
-اتشحن: صفحة تعديل بنفس فورم الإضافة، متعبّية من المنتج الحالي. الحفظ بيحدّث الصف والمقاسات في معاملة واحدة. المقاس اللي ظهر في طلبات ما يتمسحش. تبديل الصورة بيمسح الملف القديم بعد نجاح الكتابة.
+## Steps
 
-## الصفحات والملفات
+### 1. Fix the object-URL side effect
 
-- `/admin/products/[id]/edit` (`src/app/(admin)/admin/(protected)/products/[id]/edit/page.tsx`) — تعديل منتج موجود. الاسم والوصف والفئة والحالة والصورة والمقاسات متعبّيين. حفظ يرجع لقائمة المنتجات.
-- `/admin/products` — زرار «تعديل» كان واصل للرابط ده من 13.2؛ الصفحة بقت شغالة.
-- `src/features/products/components/admin/AdminEditProductPage.tsx` — تحميل المنتج، حالات التحميل/الغلط/مش موجود، وربط الفورم بالحفظ.
-- `src/features/products/api/admin/getAdminProduct.ts` — منتج واحد للأدمن، شامل المخفي.
-- `src/features/products/api/admin/updateProduct.ts` — إعادة التحقق + تنظيف النص + استدعاء الـ RPC.
-- `src/features/products/api/admin/useUpdateProduct.ts` — الـ mutation: رفع صورة جديدة إن لزم، تحديث، مسح الصورة القديمة، توست، وإبطال الكاش.
-- `src/features/products/api/admin/withReplacedProductImage.ts` — رفع الجديد، كتابة الصف، بعدين مسح القديم. لو الكتابة فشلت، الجديد يتمسح والقديم يفضل.
-- `supabase/migrations/20260822181600_update_admin_product.sql` — `get_admin_product` و `update_admin_product`. أدمن فقط.
+File: `src/features/products/components/admin/AdminProductImageField.tsx`
 
-## عقد الاستخدام (English)
+Replace:
 
-### `getAdminProduct` — `src/features/products/api/admin/getAdminProduct.ts`
+```tsx
+function SelectedFilePreview({ file }: { file: File }) {
+  const previewUrl = useMemo(() => URL.createObjectURL(file), [file]);
 
-- **Params:** `productId: string` (uuid). Malformed / blank → no RPC call.
-- **Returns:** `{ id, name, slug, description, category, categoryLabel, status, imageUrl, variants }` including inactive products. Missing id → `null`. `variants` ordered by `sort_order`; each `{ id, volumeLabel, originalPrice, currentPrice, sortOrder }`.
-- **Errors:** throws `Error` with `message` of `NOT_ADMIN`. Throws if the row has zero variants.
-- **Call:**
+  useEffect(() => {
+    return () => {
+      URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
-```ts
-const product = await getAdminProduct(productId)
+  return (
 ```
 
-### `updateProduct` — `src/features/products/api/admin/updateProduct.ts`
+with:
 
-- **Params:** `(productId, { name, slug, description, category, status, image, variants })`. `image` must be a public URL in the `product-images` bucket (not a `File`). Each variant: `{ id?: uuid, volumeLabel, originalPrice, currentPrice }`. `id` present = update that row; omitted = insert. Rows on the product whose ids are missing from the list are deleted when unused by `order_items`.
-- **Returns:** `{ id, slug, imageUrl }`. Never empty; throws instead.
-- **Errors:** throws `Error` with `message` of `INVALID_PRODUCT_PAYLOAD` | `PRODUCT_SLUG_TAKEN` | `CATEGORY_NOT_FOUND` | `NOT_ADMIN` | `PRODUCT_NOT_FOUND` | `VARIANT_IN_USE` | `VARIANT_NOT_FOUND` | `PRODUCT_UPDATE_NO_ID`.
-- **Call:**
+```tsx
+function SelectedFilePreview({ file }: { file: File }) {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-```ts
-const product = await updateProduct(productId, {
-  name: "عود كمبودي",
-  slug: "oud-cambodi",
-  description: "خليط دافئ مناسب للمساء.",
-  category: "Perfumes",
-  status: "active",
-  image: uploaded.publicUrl,
-  variants: [
-    { id: existingVariantId, volumeLabel: "50ml", originalPrice: 250, currentPrice: 200 },
-    { volumeLabel: "100ml", originalPrice: 400, currentPrice: 400 },
-  ],
-})
+  useEffect(() => {
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [file]);
+
+  if (!previewUrl) return null;
+
+  return (
 ```
 
-## التدفق
+- Remove `useMemo` from the `react` import at the top of the file (no longer
+  used anywhere else in it) — keep `useEffect`, `useRef`, `useState`.
+- Leave the rest of `SelectedFilePreview`'s JSX (the `<Image src={previewUrl} ...>`
+  block) unchanged — `previewUrl` is now `string` inside that branch since the
+  early return handles `null`.
 
-1. من قائمة المنتجات، «تعديل» يفتح `/admin/products/{id}/edit`.
-2. `getAdminProduct` يجيب المنتج حتى لو مخفي. الفورم تتعبّى. تغيير الاسم مش بيغيّر الرابط لوحده.
-3. حفظ: لو الصورة لسه `File`، تترفع أولاً. `updateProduct` يعيد `productSchema` وينظّف الاسم والوصف واسم المقاس.
-4. `update_admin_product` يحدّث صف المنتج. المقاسات اللي ليها `id` تتحدث؛ اللي من غير `id` تتضاف؛ اللي اتشالت من القائمة تتمسح لو مفيش `order_items` عليها.
-5. نجاح: توست «تم تحديث المنتج»، تحويل لـ `/admin/products`. كاش القائمة والكتالوج وصفحة المنتج وHome يتحدث.
-6. محاولة مسح مقاس استخدم في طلب: المعاملة تتراجع، توست «مفيش حذف لمقاس استخدم في طلبات سابقة»، الفورم تفضل مفتوحة.
-7. صورة جديدة بعد نجاح الكتابة: الملف القديم يتمسح. لو الكتابة فشلت، الملف الجديد يتمسح والقديم يفضل.
+### 2. Unify the status control on `Switch`
 
-## قرارات مهمة وليه
+File: `src/features/products/components/admin/AdminProductForm.tsx`
 
-- **قائمة المقاسات الكاملة على السيرفر، مش فرق من العميل.** العميل يقدر يبعت حذف غلط. السيرفر يقارن بالموجود ويمنع المسح لو في طلبات (`ON DELETE RESTRICT` لوحده كان هيطلع خطأ أجنبي عام زي الفئة الغلط).
-- **المعاملة كاملة تفشل لو مقاس مستخدم اتشال.** حذف جزئي يخلّي علاء تفتكر المقاس اتمسح وهو لسه موجود.
-- **مسح الصورة القديمة بعد نجاح الكتابة بس.** لو عكسنا الترتيب، منتج محفوظ بصورة اتمسحت.
+- Add `import { Switch } from "@/components/ui/switch";` near the other UI
+  imports.
+- Delete the now-unused `checkboxClassName` constant and the `cn` import
+  (both become dead once the checkbox is gone — confirm with a search for
+  `cn(` and `checkboxClassName` in this file before deleting; nothing else in
+  the file uses either).
+- Replace the status `Controller` block:
 
-## تحقق بنفسك
+```tsx
+<Controller
+  name="status"
+  control={control}
+  render={({ field }) => (
+    <input
+      id="admin-product-status"
+      type="checkbox"
+      ref={field.ref}
+      name={field.name}
+      className={checkboxClassName}
+      checked={field.value === "active"}
+      aria-invalid={!!errors.status}
+      aria-describedby="admin-product-status-hint"
+      onBlur={field.onBlur}
+      onChange={(event) =>
+        field.onChange(event.target.checked ? "active" : "inactive")
+      }
+    />
+  )}
+/>
+```
 
-1. `/admin/products` → تعديل منتج. الفورم لازم تتعبّى بالاسم والمقاسات والصورة الحالية.
-2. غيّر السعر أو الوصف. حفظ. توست «تم تحديث المنتج» والرجوع للقائمة. افتح تاني وتأكد إن التغيير اتسجل.
-3. أضف مقاس جديد في نفس الفورم. المفروض يظهر بعد الحفظ. امسح مقاس **ما ظهرش** في أي طلب. المفروض يتمسح.
-4. حاول تمسح مقاس اتطلب قبل كده. المفروض توست إن المسح ممنوع، والمقاس يفضل في الداتابيز.
-5. بدّل الصورة. بعد النجاح الصورة الجديدة تظهر، والقديمة مش المفروض تفضل في Storage.
-6. منتج مخفي (`inactive`) يتفتح ويتعدل. الكتالوج يفضل ما يعرضوش لو الحالة لسه مخفية.
+with:
+
+```tsx
+<Controller
+  name="status"
+  control={control}
+  render={({ field }) => (
+    <Switch
+      id="admin-product-status"
+      ref={field.ref}
+      name={field.name}
+      checked={field.value === "active"}
+      aria-invalid={!!errors.status}
+      aria-describedby="admin-product-status-hint"
+      onBlur={field.onBlur}
+      onCheckedChange={(checked) =>
+        field.onChange(checked ? "active" : "inactive")
+      }
+    />
+  )}
+/>
+```
+
+- Keep the `<Label htmlFor="admin-product-status">` and the hint `<p>` exactly
+  as they are — only the control itself changes.
+- After editing, run `ReadLints` on this file to confirm `Switch`'s prop types
+  accept `ref`/`name`/`aria-invalid`/`aria-describedby` (it wraps
+  `@base-ui/react/switch`, `Root.Props` — these should pass through). If TS
+  complains about any one of those props, drop only that prop rather than
+  reworking the whole control.
+
+### 3. Drop the stale category enum
+
+File: `src/features/products/constants.ts`
+
+- Delete the `PRODUCT_CATEGORIES` export (and its doc comment) — it is
+  superseded by `getCategories()` / the `categories` table since 13.13.
+- Keep the `ProductCategory` type alias (`export type ProductCategory =
+  string;`) — that one is still used.
+
+File: `src/features/products/schema.test.ts`
+
+- Remove the `PRODUCT_CATEGORIES` import.
+- Replace this test (it no longer asserts anything category-specific since
+  `category` is just `z.string().trim().min(1)`):
+
+```ts
+it("accepts the same variant fields for every category", () => {
+  for (const category of PRODUCT_CATEGORIES) {
+    const result = productSchema.safeParse({ ...validProduct, category });
+    expect(result.success).toBe(true);
+  }
+});
+```
+
+  with a test of the actual current contract (any non-empty category string
+  is accepted, empty is rejected):
+
+```ts
+it("accepts any non-empty category slug and rejects an empty one", () => {
+  expect(
+    productSchema.safeParse({ ...validProduct, category: "Hair Oil" })
+      .success,
+  ).toBe(true);
+  expect(
+    productSchema.safeParse({ ...validProduct, category: "" }).success,
+  ).toBe(false);
+});
+```
+
+- Run the products test suite after this change (`npx vitest run
+  src/features/products`) to confirm nothing else referenced
+  `PRODUCT_CATEGORIES`.
+
+### 4. Document the re-validation boundary decision
+
+File: `src/features/products/api/admin/prepareProductWrite.ts`
+
+Add this comment directly above the `prepareProductWrite` function (do not
+change its behavior):
+
+```ts
+/**
+ * Re-validation boundary: this runs in the browser immediately before the
+ * `create_admin_product`/`update_admin_product` RPC call, not inside the RPC
+ * itself. Accepted because only an authenticated admin can call those RPCs
+ * and rendered text is React-escaped. Revisit if these RPCs are ever exposed
+ * to a wider role, or if rendered admin content stops going through React's
+ * default escaping (e.g. a future `dangerouslySetInnerHTML` on product name
+ * or description).
+ */
+```
+
+### 5. Update `tasks.md`
+
+- Check off **13.12** with a done-note pointing at existing coverage, matching
+  the style of the other done-notes in Phase 13 (e.g. see 13.9's `**Done:**`
+  line): variant price-resolution priority-1 testing is already covered by
+  `schema.test.ts`'s `superRefine` cases plus the pre-existing
+  `resolveDisplayVariant.test.ts` / `resolveFeaturedDisplayVariant.test.ts` —
+  no new test file needed.
+
+### 6. Verify
+
+- `npx vitest run src/features/products`
+- `ReadLints` on the three edited component/lib files.
+- Confirm the dev server still renders `/admin/products/new` and the status
+  switch toggles visually (quick manual check is enough, not a full browser
+  session).
+
+## Git (do this after steps 1–6 pass)
+
+Follow `.cursor/rules/git-conventions.mdc`. Commit at logical checkpoints, not
+one giant commit:
+
+```bash
+git add src/features/products/components/admin/AdminProductImageField.tsx
+git commit -m "fix(admin-products): create object URLs in an effect, not useMemo"
+
+git add src/features/products/components/admin/AdminProductForm.tsx
+git commit -m "fix(admin-products): unify status field on the shared Switch"
+
+git add src/features/products/constants.ts src/features/products/schema.test.ts
+git commit -m "chore(admin-products): drop the pre-categories-table category enum"
+
+git add src/features/products/api/admin/prepareProductWrite.ts
+git commit -m "docs(admin-products): record the re-validation boundary tradeoff"
+
+git add tasks.md
+git commit -m "docs(tasks): check off 13.12, variant pricing already covered"
+```
+
+Then merge into `main` with an explicit merge commit (never fast-forward),
+push, and delete the finished branch:
+
+```bash
+git checkout main
+git pull
+git merge --no-ff feature/admin-products -m "Merge branch 'feature/admin-products'"
+git push origin main
+git branch -d feature/admin-products
+git push origin --delete feature/admin-products
+```
+
+If `git push origin --delete feature/admin-products` fails because the branch
+was never pushed to the remote, skip that line — it only matters if the
+branch exists on `origin`.
+
+## Self-check before calling this done
+
+- [ ] All 5 code/doc edits applied exactly as shown above.
+- [ ] `vitest run src/features/products` passes.
+- [ ] No new lint errors in the 4 edited files.
+- [ ] `tasks.md` 13.12 checked off.
+- [ ] 5 commits exist on `feature/admin-products`, each scoped as shown.
+- [ ] `main` has a `Merge branch 'feature/admin-products'` commit (`--no-ff`,
+      not a fast-forward) and is pushed.
+- [ ] `feature/admin-products` branch deleted locally (and on `origin` if it
+      was pushed there).
