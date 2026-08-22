@@ -1,67 +1,62 @@
-# شرح التاسك — 12.5
+# شرح التاسك — 12.6
 
 - التاريخ: 2026-08-22
 - النوع: full-task
 
 ## المشكلة والحل
 
-علاء كانت تقدر تشوف حالة الطلب وتتغيّرها من القائمة (12.4)، بس التغيير لازم يتكتب في الداتابيز ويتظهر فورًا في التفاصيل والليستة والداشبورد. الحل: `updateAdminOrderStatus` بيكتب عمود `status` بس، والـ mutation بتعمل optimistic update + invalidate + توست. الـ RLS من Phase 1.3 هو حارس الكتابة، مش الواجهة.
+لما قائمة الطلبات تكبر، علاء محتاجة تلاقي «قيد المراجعة» من غير ما تعدّي على كل الصفوف. الحل: فلتر بالحالة وترتيب (الأحدث / الأقدم / حسب الحالة) على `/admin/orders`. الرابط بيحفظ الاختيار. الليستة لسه بتيجي كاملة من `getAdminOrders`؛ الفلترة بعد الجلب.
 
 ## الصفحات والملفات
 
-- `/admin/orders/[id]` — صفحة التفاصيل؛ قائمة «حالة الطلب» بتحفظ القيمة المختارة.
-- `src/features/orders/components/admin/AdminOrderStatusControl.tsx` — الكنترول: القيم من `ORDER_STATUSES`، والعناوين من `ORDER_STATUS_LABELS`. الاختيار بيروح للـ mutation.
-- `src/features/orders/components/admin/AdminOrderDetails.tsx` — بيركب الكنترول جنب اسم العميل.
-- `src/features/orders/api/admin/updateAdminOrderStatus.ts` — الكتابة لـ `orders.status`.
-- `src/features/orders/api/admin/useUpdateAdminOrderStatus.ts` — الـ mutation: optimistic على التفاصيل والليستة، توست، وبعدين invalidate.
-- `src/features/orders/schema.ts` — `updateAdminOrderStatusSchema`.
-- `src/features/orders/api/queryKeys.ts` — مفاتيح كاش الطلبات (ليستة أدمن / تفاصيل / طلبات العميلة).
-- `src/features/admin-dashboard/public.ts` — مفتاح كاش الـ KPIs؛ الطلبات بتبطّله من هنا مش من جوه ملفات الداشبورد.
-- الليستة والكروت لسه فيها `OrderStatusBadge` عرض فقط — التغيير من صفحة التفاصيل.
+- `/admin/orders` (`src/app/(admin)/admin/(protected)/orders/page.tsx`) — قائمة الأدمن؛ فوق الجدول/الكروت قائمتين: الحالة والترتيب.
+- `src/features/orders/components/admin/AdminOrdersPage.tsx` — بيركب الفلتر على نتيجة `useAdminOrders`، ويفرق بين محل فاضي وفلتر مالوش نتائج.
+- `src/features/orders/components/admin/AdminOrdersToolbar.tsx` — قائمتي الحالة والترتيب. العناوين عربية من `constants.ts`.
+- `src/features/orders/hooks/useAdminOrdersListParams.ts` — بيقرأ ويكتب `?status=` و `?sort=` زي كتالوج المنتجات.
+- `src/features/orders/lib/filterAndSortAdminOrders.ts` — فلترة وترتيب نقي على الليستة الجاهزة.
+- `src/features/orders/constants.ts` — `ADMIN_ORDER_SORTS` + حراس `isOrderStatus` / `isAdminOrderSort`. قيمة URL غلط بتترمي ويتتعامل كأنها الافتراضي.
 
 ## عقد الاستخدام (English)
 
-### `updateAdminOrderStatus` — `src/features/orders/api/admin/updateAdminOrderStatus.ts`
+### `filterAndSortAdminOrders` — `src/features/orders/lib/filterAndSortAdminOrders.ts`
 
-- **Params:** `{ orderId: string, status: "Pending" | "Shipping" | "Delivered" | "Cancelled" }`
-  - `orderId` must be a UUID (whitespace trimmed).
-  - `status` must be one of `ORDER_STATUSES`. Any other string is rejected before the write.
-- **Returns:** `{ status: OrderStatus }` — the value stored on the row.
-- **Errors:**
-  - Invalid id/status → throws `INVALID_ORDER_STATUS_PAYLOAD` (no Supabase call).
-  - No session → throws `UNAUTHENTICATED`.
-  - Row missing, or RLS hides the row (non-admin) → throws `ORDER_NOT_FOUND`.
-  - Unexpected DB `status` shape → throws.
+- **Params:** `(orders: AdminOrder[], params: { status?: OrderStatus; sort: AdminOrderSort })`
+  - Omit `status` (or pass `undefined`) to keep every order.
+  - `sort`: `"newest"` | `"oldest"` | `"status"`.
+  - `"status"` follows `ORDER_STATUSES` (Pending → Shipping → Delivered → Cancelled), then newest within a status.
+  - Equal `createdAt` breaks with `id` descending (same idea as `list_admin_orders`).
+- **Returns:** a **new** array. Empty input or no matches → `[]`. Does not throw.
+- **Errors:** none. Invalid URL values are rejected in the hook before this runs.
 - **Call:**
 
 ```ts
-const result = await updateAdminOrderStatus({
-  orderId,
-  status: "Shipping",
+const visible = filterAndSortAdminOrders(orders, {
+  status: "Pending",
+  sort: "newest",
 })
 ```
 
+`getAdminOrders` is unchanged: no extra RPC args, still all orders, newest first, `[]` when the shop has none, `NOT_ADMIN` for a non-admin session.
+
 ## التدفق
 
-1. علاء على `/admin/orders/[id]` تختار حالة من القائمة.
-2. الـ schema يتأكد إن القيمة من الأربع حالات.
-3. القائمة تفضل على القيمة الجديدة طول ما الكتابة شغالة (من غير ما ترجع للقديمة لحظة).
-4. `updateAdminOrderStatus` يكتب عمود `status` فقط.
-5. مش أدمن أو الطلب مش موجود → `ORDER_NOT_FOUND` → توست غلط، والقائمة ترجع للحالة القديمة.
-6. نجاح → توست «تم تحديث حالة الطلب»، ويتحدّث كاش التفاصيل والليستة وطلبات العميلة وكروت الداشبورد (المعلّق والمبيعات).
+1. علاء تفتح `/admin/orders` → كل الطلبات، الأحدث أولاً.
+2. تختار حالة → `?status=Pending` (مثلًا) → الصفوف دي بس.
+3. تختار ترتيب → `?sort=oldest` أو `?sort=status`. الأحدث هو الافتراضي ومش بيتكتب في الرابط.
+4. فلتر مالوش صفوف → رسالة «لا توجد طلبات بهذه الحالة» وزر «عرض كل الطلبات».
+5. محل من غير طلبات أصلًا → الرسالة القديمة، ومن غير قوائم الفلتر.
+6. تغيير حالة طلب من صفحة التفاصيل لسه بيحدّث نفس كاش الليستة؛ الفلتر بيتطبّق تاني على النسخة الجديدة.
 
 ## قرارات مهمة وليه
 
-- **الكتابة عمود `status` بس:** الـ grant من Phase 1.3 يمنع تعديل الإجمالي أو عنوان العميل بعد إنشاء الطلب.
-- **مفيش مايجريشن جديد:** سياسة `orders_update_admin_status` موجودة. مايجريشن فاضي كان هيضيف تاريخ من غير شغل.
-- **القيم من `constants.ts`:** سطر `Pending` متعاود في الجدول والـ UI هيفرق يوم ما الحالة تتغير.
-- **الكنترول في التفاصيل مش الليستة:** تغيير الحالة قرار على طلب واحد بعد ما علاء تشوف المنتجات والعنوان.
-- **Invalidate للـ KPIs من `admin-dashboard/public`:** عدد المعلّق ومبيعات «تم التوصيل» بيتغيروا مع الحالة. الاستيراد من `public.ts` مش من جوه `api/` — نفس أسلوب المنتجات مع الريفيوهات.
+- **فلترة على الكلاينت، مش RPC جديد:** العدد دلوقتي صغير، وكاش 12.5 فضل مفتاح واحد (`admin-orders`). لو بكرة في pagination، الفلتر ساعتها يدخل `list_admin_orders`.
+- **الرابط مصدر الاختيار، مش Zustand:** نفس أسلوب الكتالوج. ريفرش و«رجوع» يفضلوا على نفس العرض. قيمة مش من `ORDER_STATUSES` / `ADMIN_ORDER_SORTS` بتتجاهل.
+- **ترتيب «حسب الحالة» = ترتيب الـ pipeline:** قيد المراجعة فوق، لأن ده شغل علاء اليومي، مش ترتيب أبجدي.
 
 ## تحقق بنفسك
 
-1. أدمن → تفاصيل طلب Pending → اختار «جاري التوصيل»: توست نجاح، القائمة تتحدث، ارجع لليستة وشوف البادج اتغيرت.
-2. حدّث الصفحة: الحالة لسه Shipping — يعني اتكتب في الداتابيز.
-3. روح `/admin`: كارت المعلّق ينقص (ولو غيّرتها لـ «تم التوصيل» رقم المبيعات يزيد).
-4. اختار «ملغي» ثم «قيد المراجعة»: الأربع قيم مسموحة من غير سلسلة إجبارية.
-5. جلسة مش أدمن ما تقدرش تعدّل الصف (RLS) — الواجهة أصلاً ورا `/admin`.
+1. أدمن → `/admin/orders` → اختار «قيد المراجعة»: الباقي يختفي، والرابط فيه `status=Pending`.
+2. حدّث الصفحة: الفلتر لسه واقف.
+3. رتّب «حسب الحالة»: Pending ثم Shipping ثم Delivered ثم Cancelled، وجوّه كل حالة الأحدث فوق.
+4. حالة مالهاش طلبات: رسالة فاضية و«عرض كل الطلبات» يمسح `status` من الرابط.
+5. محل فاضي (لو عندك بيئة كده): مفيش قوائم فلتر، ونفس رسالة «لا توجد طلبات بعد».

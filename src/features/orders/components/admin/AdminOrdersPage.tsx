@@ -4,15 +4,47 @@ import { PackageIcon } from "lucide-react";
 
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { useAdminOrders } from "../../api/admin/useAdminOrders";
+import useAdminOrdersListParams from "../../hooks/useAdminOrdersListParams";
+import { filterAndSortAdminOrders } from "../../lib/filterAndSortAdminOrders";
 
 import AdminOrdersList from "./AdminOrdersList";
+import AdminOrdersToolbar from "./AdminOrdersToolbar";
 
 export default function AdminOrdersPage() {
   const { data: orders, isPending, isError, refetch } = useAdminOrders();
+  const { selectedStatus, selectedSort, updateListParam } =
+    useAdminOrdersListParams();
   const orderList = orders ?? [];
+  const visibleOrders = filterAndSortAdminOrders(orderList, {
+    status: selectedStatus,
+    sort: selectedSort,
+  });
+  const hasStatusFilter = selectedStatus !== undefined;
+  const showToolbar =
+    !isPending && !isError && (orderList.length > 0 || hasStatusFilter);
+  const showShopEmpty =
+    !isPending && !isError && orderList.length === 0 && !hasStatusFilter;
+  const showFilterEmpty =
+    !isPending &&
+    !isError &&
+    visibleOrders.length === 0 &&
+    (orderList.length > 0 || hasStatusFilter);
+
+  function handleStatusChange(value: string) {
+    updateListParam("status", value);
+  }
+
+  function handleSortChange(value: string) {
+    updateListParam("sort", value);
+  }
+
+  function clearStatusFilter() {
+    updateListParam("status", "");
+  }
 
   return (
     <div className="space-y-6">
@@ -21,6 +53,15 @@ export default function AdminOrdersPage() {
           الطلبات
         </h1>
       </header>
+
+      {showToolbar ? (
+        <AdminOrdersToolbar
+          selectedStatus={selectedStatus}
+          selectedSort={selectedSort}
+          onStatusChange={handleStatusChange}
+          onSortChange={handleSortChange}
+        />
+      ) : null}
 
       {isPending ? <AdminOrdersSkeleton /> : null}
 
@@ -32,7 +73,7 @@ export default function AdminOrdersPage() {
         />
       ) : null}
 
-      {!isPending && !isError && orderList.length === 0 ? (
+      {showShopEmpty ? (
         <EmptyState
           icon={<PackageIcon />}
           title="لا توجد طلبات بعد"
@@ -40,8 +81,27 @@ export default function AdminOrdersPage() {
         />
       ) : null}
 
-      {!isPending && !isError && orderList.length > 0 ? (
-        <AdminOrdersList orders={orderList} />
+      {showFilterEmpty ? (
+        <EmptyState
+          icon={<PackageIcon />}
+          title="لا توجد طلبات بهذه الحالة"
+          description="جرّب حالة أخرى أو اعرض كل الطلبات."
+          action={
+            hasStatusFilter ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={clearStatusFilter}
+              >
+                عرض كل الطلبات
+              </Button>
+            ) : null
+          }
+        />
+      ) : null}
+
+      {!isPending && !isError && visibleOrders.length > 0 ? (
+        <AdminOrdersList orders={visibleOrders} />
       ) : null}
     </div>
   );

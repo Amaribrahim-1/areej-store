@@ -14,6 +14,24 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   Cancelled: "ملغي",
 };
 
+export function isOrderStatus(value: string): value is OrderStatus {
+  return (ORDER_STATUSES as readonly string[]).includes(value);
+}
+
+export const ADMIN_ORDER_SORTS = ["newest", "oldest", "status"] as const;
+
+export type AdminOrderSort = (typeof ADMIN_ORDER_SORTS)[number];
+
+export const ADMIN_ORDER_SORT_LABELS: Record<AdminOrderSort, string> = {
+  newest: "الأحدث",
+  oldest: "الأقدم",
+  status: "حسب الحالة",
+};
+
+export function isAdminOrderSort(value: string): value is AdminOrderSort {
+  return (ADMIN_ORDER_SORTS as readonly string[]).includes(value);
+}
+
 /** DB / API payment method values. MVP ships COD only. */
 export const PAYMENT_METHODS = ["cod"] as const;
 
