@@ -10,7 +10,7 @@ export default function NavbarCartLink({ badgeCount }: NavbarCartLinkProps) {
     <Link
       href="/cart"
       aria-label={badgeCount > 0 ? `السلة، ${badgeCount} عناصر` : "السلة"}
-      className="relative inline-flex size-9 items-center justify-center rounded-4xl text-foreground transition-colors hover:bg-muted hover:text-text-accent"
+      className="relative inline-flex size-11 items-center justify-center rounded-4xl text-foreground transition-colors hover:bg-muted hover:text-text-accent"
     >
       <ShoppingCartIcon className="size-5" aria-hidden />
       {badgeCount > 0 ? (

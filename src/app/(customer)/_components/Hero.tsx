@@ -9,7 +9,7 @@ export default function Hero() {
     <section className="relative isolate -mt-14 h-svh overflow-hidden bg-brand-50 sm:-mt-16">
       <div className="relative h-full w-full">
         <Image
-          src="/home_hero.jpg"
+          src="/hero.jpeg"
           alt="زجاجة عطر أريج على رخام مع ورود وخشب مطعّم بالذهب"
           fill
           priority
@@ -35,7 +35,7 @@ export default function Hero() {
         />
 
         <div className="absolute inset-0 flex items-end md:items-center">
-          <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-16 sm:px-6 sm:pb-12 md:pt-20 md:pb-0">
+          <div className="mx-auto w-full max-w-6xl px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-16 sm:px-6 sm:pb-12 md:pt-20 md:pb-0">
             <div className="max-w-md space-y-3 text-start sm:space-y-4 md:space-y-5">
               <h1 className="font-heading text-balance text-2xl font-bold leading-snug tracking-tight text-brand-900 sm:text-3xl md:text-4xl lg:text-5xl">
                 عطور تلامس الحواس
@@ -45,7 +45,7 @@ export default function Hero() {
               </p>
               <Link
                 href="/products"
-                className={cn(buttonVariants({ size: "lg" }))}
+                className={cn(buttonVariants({ size: "lg" }), "min-h-11")}
               >
                 تسوّقي المنتجات
               </Link>

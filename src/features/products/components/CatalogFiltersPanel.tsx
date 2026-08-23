@@ -18,8 +18,8 @@ const RATING_OPTIONS = [
 ] as const;
 
 const selectClassName = cn(
-  "h-9 w-full min-w-0 rounded-4xl border border-input bg-background px-3 text-sm",
-  "text-foreground outline-none transition-colors",
+  "h-11 w-full min-w-0 rounded-4xl border border-input bg-background px-3 text-base",
+  "text-foreground outline-none transition-colors md:h-9 md:text-sm",
   "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
 );
 
@@ -78,8 +78,7 @@ export default function CatalogFiltersPanel({
         <Button
           type="button"
           variant="outline"
-          size="sm"
-          className="mt-2 border-border-accent text-text-accent hover:bg-brand-50"
+          className="mt-2 min-h-11 border-border-accent text-text-accent hover:bg-brand-50"
           onClick={removeFilters}
         >
           مسح الفلاتر
@@ -90,7 +89,7 @@ export default function CatalogFiltersPanel({
         <legend className="text-sm font-medium text-foreground">الأقسام</legend>
         <ul className="space-y-2.5">
           <li>
-            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground/80">
+            <label className="flex min-h-11 cursor-pointer items-center gap-2.5 py-2 text-sm text-foreground/80">
               <input
                 type="radio"
                 name={categoryGroupName}
@@ -104,7 +103,7 @@ export default function CatalogFiltersPanel({
           </li>
           {categories.map((category) => (
             <li key={category.slug}>
-              <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground/80">
+              <label className="flex min-h-11 cursor-pointer items-center gap-2.5 py-2 text-sm text-foreground/80">
                 <input
                   type="radio"
                   name={categoryGroupName}
@@ -171,8 +170,7 @@ export default function CatalogFiltersPanel({
           <Button
             type="button"
             variant="secondary"
-            size="sm"
-            className="w-full"
+            className="min-h-11 w-full"
             onClick={applyPriceFilters}
           >
             تطبيق

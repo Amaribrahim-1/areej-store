@@ -43,7 +43,7 @@ export default function NavbarMobileMenu({
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="size-11 md:hidden"
             aria-label="فتح القائمة"
           />
         }

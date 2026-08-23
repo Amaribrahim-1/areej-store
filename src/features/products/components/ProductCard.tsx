@@ -149,10 +149,10 @@ function CardActions({
         href={productHref}
         className={cn(
           buttonVariants({
-            size: compact ? "xs" : "sm",
+            size: compact ? "default" : "sm",
             variant: "secondary",
           }),
-          compact && "w-full justify-center",
+          compact && "min-h-11 w-full justify-center",
           !compact &&
             "bg-background/95 text-foreground shadow-sm hover:bg-background",
           className,
@@ -163,8 +163,12 @@ function CardActions({
       </Link>
       <Button
         type="button"
-        size={compact ? "xs" : "sm"}
-        className={cn(compact && "w-full justify-center", !compact && "shadow-sm", className)}
+        size={compact ? "default" : "sm"}
+        className={cn(
+          compact && "min-h-11 w-full justify-center",
+          !compact && "shadow-sm",
+          className,
+        )}
         onClick={onAddToCart}
         aria-label={`إضافة ${productName} إلى السلة`}
       >

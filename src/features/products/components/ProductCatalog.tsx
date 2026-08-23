@@ -26,8 +26,8 @@ const SORT_OPTIONS = [
 ] as const;
 
 const selectClassName = cn(
-  "h-9 min-w-0 rounded-4xl border border-input bg-background px-3 text-sm",
-  "text-foreground outline-none transition-colors",
+  "h-11 min-w-0 rounded-4xl border border-input bg-background px-3 text-base",
+  "text-foreground outline-none transition-colors md:h-9 md:text-sm",
   "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
 );
 
@@ -87,41 +87,43 @@ export default function ProductCatalog({ children }: ProductCatalogProps) {
         </aside>
 
         <div className="min-w-0 flex-1 space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <Sheet>
               <SheetTrigger
                 render={
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
-                    className="md:hidden"
+                    className="h-11 w-full sm:w-auto md:hidden"
                   />
                 }
               >
                 <FilterIcon className="size-4" aria-hidden />
                 تصفية
               </SheetTrigger>
-              <SheetContent side="right" className="w-[min(100%,20rem)] p-0">
-                <SheetHeader className="border-b border-border px-4 py-4 text-start">
+              <SheetContent
+                side="right"
+                className="flex w-[min(100%,20rem)] flex-col p-0"
+              >
+                <SheetHeader className="shrink-0 border-b border-border px-4 py-4 text-start">
                   <SheetTitle className="font-heading text-brand">
                     تصفية المنتجات
                   </SheetTitle>
                 </SheetHeader>
-                <div className="overflow-y-auto p-4">
+                <div className="min-h-0 flex-1 overflow-y-auto p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
                   <CatalogFiltersPanel idPrefix="catalog-mobile" />
                 </div>
               </SheetContent>
             </Sheet>
 
-            <div className="ms-auto flex items-center gap-2">
+            <div className="flex w-full items-center gap-2 sm:ms-auto sm:w-auto">
               <Label htmlFor="catalog-sort" className="sr-only">
                 الترتيب
               </Label>
               <select
                 id="catalog-sort"
                 name="sort"
-                className={cn(selectClassName, "w-auto max-w-[12rem]")}
+                className={cn(selectClassName, "w-full sm:w-auto sm:max-w-[12rem]")}
                 value={selectedSorting}
                 onChange={(e) => updateFilterParam("sort", e.target.value)}
               >

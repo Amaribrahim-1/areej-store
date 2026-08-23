@@ -440,8 +440,8 @@ After admin feature work (Phases 11–14), before Hardening & Launch. Park essen
 
 `[branch: chore/hardening]`
 
-- **15.1 — Full RTL/accessibility pass** against `accessibility-rtl.mdc`: logical properties everywhere (no `pl-`/`pr-`/`text-left`), directional icons flipped, every image has a meaningful Arabic `alt`, every input has a `<label>`, focus states visible, star ratings labelled.
-- **15.2 — Mobile-first pass** on every page — spec says most customers are on mobile, so this is the primary target, not a final check.
+- [x] **15.1 — Full RTL/accessibility pass** against `accessibility-rtl.mdc`: logical properties everywhere (no `pl-`/`pr-`/`text-left`), directional icons flipped, every image has a meaningful Arabic `alt`, every input has a `<label>`, focus states visible, star ratings labelled.
+- [x] **15.2 — Mobile-first pass** on every page — spec says most customers are on mobile, so this is the primary target, not a final check.
 - **15.3 — Security review**: run the checklist in `code-quality-security.mdc` end to end. Verify RLS by attempting cross-user reads (customer A reading customer B's order), confirm no service-role key in any client bundle, confirm admin routes reject a non-admin session server-side.
 - **15.4 — Performance pass**: confirm every product image goes through `next/image`, check for query waterfalls, review `staleTime` per resource, check bundle size. Note where the React Compiler already handles memoization — manual `useMemo`/`useCallback` should be near-absent (`code-quality-security.mdc`).
 - **15.5 — Supabase advisors re-run** + fix findings.

@@ -20,8 +20,8 @@ import { slugifyLabel } from "../../lib/slugifyLabel";
 import { categorySchema, type ProductFormValues } from "../../schema";
 
 const selectClassName = cn(
-  "h-9 w-full min-w-0 rounded-4xl border border-input bg-input/30 px-3 text-sm",
-  "text-foreground outline-none transition-colors",
+  "h-11 w-full min-w-0 rounded-4xl border border-input bg-input/30 px-3 text-base",
+  "text-foreground outline-none transition-colors md:h-9 md:text-sm",
   "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
   "disabled:cursor-not-allowed disabled:opacity-50",
   "aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20",

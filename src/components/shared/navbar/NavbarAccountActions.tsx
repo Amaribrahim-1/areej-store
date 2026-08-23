@@ -43,7 +43,7 @@ export default function NavbarAccountActions({
       <Link
         href={accountHref}
         aria-label={accountLabel}
-        className="inline-flex size-9 items-center justify-center rounded-4xl text-foreground transition-colors hover:bg-muted hover:text-text-accent md:hidden"
+        className="inline-flex size-11 items-center justify-center rounded-4xl text-foreground transition-colors hover:bg-muted hover:text-text-accent md:hidden"
       >
         <UserIcon className="size-5" aria-hidden />
       </Link>

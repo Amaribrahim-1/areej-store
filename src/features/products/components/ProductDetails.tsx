@@ -111,7 +111,7 @@ function ProductDetailsContent({ product }: ProductDetailsContentProps) {
             {categoryLabel}
           </Badge>
 
-          <h1 className="font-heading text-3xl font-bold leading-tight text-foreground sm:text-4xl">
+          <h1 className="font-heading text-2xl font-bold leading-tight text-foreground sm:text-3xl md:text-4xl">
             {product.name}
           </h1>
 

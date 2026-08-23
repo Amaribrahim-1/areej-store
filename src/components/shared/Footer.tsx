@@ -47,7 +47,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto border-t border-border bg-bg-accent">
+    <footer className="mt-auto border-t border-border bg-bg-accent pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 md:grid-cols-3 md:gap-8 md:py-12">
         <div className="space-y-3">
           <BrandLogo className="size-16" />
@@ -64,7 +64,7 @@ export default function Footer() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-text-accent"
+                  className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-text-accent"
                 >
                   {link.label}
                 </Link>
@@ -79,7 +79,7 @@ export default function Footer() {
             <li>
               <a
                 href={CONTACT.phoneHref}
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-text-accent"
+                className="inline-flex min-h-11 items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-text-accent"
               >
                 <PhoneIcon className="size-4 shrink-0" aria-hidden />
                 <span dir="ltr">{CONTACT.phoneDisplay}</span>
@@ -88,7 +88,7 @@ export default function Footer() {
             <li>
               <Link
                 href="/contact"
-                className="text-sm text-muted-foreground transition-colors hover:text-text-accent"
+                className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-text-accent"
               >
                 نموذج التواصل
               </Link>
@@ -98,7 +98,7 @@ export default function Footer() {
                 href={CONTACT.whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-muted-foreground transition-colors hover:text-text-accent"
+                className="inline-flex min-h-11 items-center text-sm text-muted-foreground transition-colors hover:text-text-accent"
               >
                 واتساب
               </a>
@@ -113,7 +113,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="inline-flex size-9 items-center justify-center rounded-4xl text-brand-700 transition-colors hover:bg-brand-100 hover:text-text-accent"
+                className="inline-flex size-11 items-center justify-center rounded-4xl text-brand-700 transition-colors hover:bg-brand-100 hover:text-text-accent"
               >
                 <Icon className="size-5" aria-hidden />
               </a>

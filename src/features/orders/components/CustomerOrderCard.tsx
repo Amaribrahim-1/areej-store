@@ -114,7 +114,7 @@ function CustomerOrderCardSummary({ order }: { order: CustomerOrder }) {
 
             <p className="truncate text-sm text-foreground">{itemsPreview}</p>
 
-            <p className="whitespace-nowrap text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               <time dateTime={order.createdAt}>{placedAtLabel}</time>
               <span aria-hidden> · </span>
               {pieceCountLabel}
