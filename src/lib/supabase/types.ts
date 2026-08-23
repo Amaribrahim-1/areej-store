@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -445,6 +445,18 @@ export type Database = {
           slug: string
           status: string
           variants: Json
+        }[]
+      }
+      list_admin_reviews: {
+        Args: never
+        Returns: {
+          id: string
+          product_id: string
+          product_name: string
+          rating: number
+          comment: string | null
+          author_name: string
+          created_at: string
         }[]
       }
       list_admin_orders: {
