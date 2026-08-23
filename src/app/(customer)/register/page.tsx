@@ -4,8 +4,9 @@ import RegisterForm from "@/features/auth/components/RegisterForm";
 import { getSafeNextPath } from "@/features/auth/lib/getSafeNextPath";
 
 export const metadata: Metadata = {
-  title: "إنشاء حساب | أريج",
+  title: "إنشاء حساب",
   description: "سجّلي حساب جديد في متجر أريج لإتمام الطلب ومتابعة طلباتك.",
+  robots: { index: false, follow: false },
 };
 
 type RegisterPageProps = {

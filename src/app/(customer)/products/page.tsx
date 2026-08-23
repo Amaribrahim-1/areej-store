@@ -1,5 +1,14 @@
+import type { Metadata } from "next";
+
 import ProductCatalog from "@/features/products/components/ProductCatalog";
 import ProductGrid from "@/features/products/components/ProductGrid";
+
+export const metadata: Metadata = {
+  title: "المنتجات",
+  description: "تصفّح مجموعة عطور ومسك ومخمريات زيوت الشعر من أريج.",
+  alternates: { canonical: "/products" },
+  openGraph: { url: "/products" },
+};
 
 export default function ProductsCatalogPage() {
   return (

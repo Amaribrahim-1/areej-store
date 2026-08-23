@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
+
 import AccountSectionNav from "@/components/shared/AccountSectionNav";
 import { getMyProfile } from "@/features/auth/api/getMyProfile";
 import AccountForm from "@/features/auth/components/AccountForm";
+
+export const metadata: Metadata = {
+  title: "حسابي",
+  robots: { index: false, follow: false },
+};
 
 export default async function AccountPage() {
   const profile = await getMyProfile();

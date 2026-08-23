@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
+
 import AccountSectionNav from "@/components/shared/AccountSectionNav";
 import CustomerOrdersPage from "@/features/orders/components/CustomerOrdersPage";
+
+export const metadata: Metadata = {
+  title: "طلباتي",
+  robots: { index: false, follow: false },
+};
 
 export default function OrdersRoutePage() {
   return (
