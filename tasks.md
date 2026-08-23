@@ -415,7 +415,8 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 
 - [x] **14.1 — `api/useAllReviews.ts`**: all reviews across products, newest first, each joined with its product name.
 - [x] **14.2 — Reviews list**: product label, star rating, comment, customer, date.
-- **14.3 — Decide the scope of "new"**: the spec says "new reviews." Either a read/unread flag on `reviews`, or simply newest-first with no state. Pick the simpler one that satisfies Alaa's actual need — she wants to avoid checking each product page.
+- [x] **14.3 — Decide the scope of "new"**: the spec says "new reviews." Either a read/unread flag on `reviews`, or simply newest-first with no state. Pick the simpler one that satisfies Alaa's actual need — she wants to avoid checking each product page.
+      **Done:** Picked newest-first, no state — no `is_read`/`read_at` column on `reviews`. `list_admin_reviews` (14.1) already does `order by r.created_at desc`, and the list (14.2) renders that order as-is. This alone satisfies "avoid checking each product page"; a read/unread flag would add write-on-view complexity (mutation + RLS + cache invalidation) for no real gain in an admin-only, single-user (Alaa) context.
   🚩 No real-time notifications for new reviews (backlog) — Alaa checks this page. Do not extend the Phase 6.6 notification channel to reviews.
 - **14.4 — Admin review moderation (decided):** Alaa can **delete** any review; she cannot **edit** customer reviews (no rewriting someone else’s rating/comment). Wire the delete action in **Phase A** after this list UI exists — Phase 14 stays read/list-first.
 
