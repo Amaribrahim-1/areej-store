@@ -39,3 +39,14 @@ export type MyProductReview = {
   comment: string | null;
   createdAt: string;
 };
+
+/** Admin view: a single review with its product name, for the all-reviews list. */
+export type AdminReview = {
+  id: string;
+  productId: string;
+  productName: string;
+  rating: number;
+  comment: string | null;
+  authorName: string;
+  createdAt: string;
+};

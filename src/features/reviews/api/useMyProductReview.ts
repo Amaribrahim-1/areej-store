@@ -11,6 +11,8 @@ export const myProductReviewQueryKey = (params: MyProductReviewQueryParams) => [
   params,
 ];
 
+export const myProductReviewQueryKeyRoot = ["my-product-review"] as const;
+
 export function useMyProductReview(
   params: MyProductReviewQueryParams,
   enabled: boolean,
