@@ -23,7 +23,7 @@ export default function AdminDashboardPage() {
 
       {isPending ? <DashboardKpiCardsSkeleton /> : null}
 
-      {isError ? (
+      {isError || (!isPending && !kpis) ? (
         <ErrorState
           title="تعذر تحميل أرقام اللوحة"
           description="تعذّر جلب ملخص المتجر. جرّب إعادة المحاولة."

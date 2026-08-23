@@ -54,6 +54,7 @@ export default function LoginForm({ nextPath = "/" }: LoginFormProps) {
     <form
       className="w-full space-y-6 text-start"
       noValidate
+      aria-busy={isPending}
       onSubmit={handleSubmit(onSubmit)}
     >
       <header className="space-y-1">

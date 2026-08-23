@@ -6,6 +6,7 @@ import { PackageSearchIcon } from "lucide-react";
 import { ProductGridSkeleton } from "@/components/shared/ContentSkeleton";
 import EmptyState from "@/components/shared/EmptyState";
 import ErrorState from "@/components/shared/ErrorState";
+import { Button } from "@/components/ui/button";
 
 import { useProducts } from "../api/useProducts";
 import { PRODUCTS_PAGE_SIZE } from "../constants";
@@ -24,6 +25,8 @@ export default function ProductGrid() {
     searchValue,
     page,
     setPage,
+    hasActiveFilters,
+    removeFilters,
   } = useCatalogFilterParams();
 
   const { data, isPending, isError, refetch } = useProducts({
@@ -53,7 +56,7 @@ export default function ProductGrid() {
     return <ProductGridSkeleton count={PRODUCTS_PAGE_SIZE} />;
   }
 
-  if (isError) {
+  if (isError || !data) {
     return (
       <ErrorState
         title="فشل تحميل المنتجات"
@@ -68,11 +71,26 @@ export default function ProductGrid() {
   }
 
   if (data.items.length === 0) {
+    if (hasActiveFilters) {
+      return (
+        <EmptyState
+          icon={<PackageSearchIcon />}
+          title="لا توجد منتجات مطابقة"
+          description="لم نعثر على منتجات تطابق البحث أو الفلاتر الحالية. جرّبي تعديل التصفية."
+          action={
+            <Button type="button" variant="outline" onClick={removeFilters}>
+              مسح الفلاتر
+            </Button>
+          }
+        />
+      );
+    }
+
     return (
       <EmptyState
         icon={<PackageSearchIcon />}
-        title="لا توجد منتجات"
-        description="لم نعثر على منتجات تطابق البحث أو الفلاتر الحالية. جرّبي تعديل التصفية."
+        title="لا توجد منتجات بعد"
+        description="لما تُضاف منتجات للمتجر، هتظهر هنا."
       />
     );
   }

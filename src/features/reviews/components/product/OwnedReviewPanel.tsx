@@ -58,7 +58,7 @@ function DeleteReviewConfirm({
 
   return (
     <Dialog open={open} onOpenChange={changeOpen}>
-      <DialogContent showCloseButton={false}>
+      <DialogContent showCloseButton={false} aria-busy={isPending}>
         <DialogHeader>
           <DialogTitle>حذف التقييم؟</DialogTitle>
           <DialogDescription>
@@ -202,6 +202,7 @@ export default function OwnedReviewPanel({
     <form
       className="space-y-4 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5"
       noValidate
+      aria-busy={isBusy}
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="space-y-1">

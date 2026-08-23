@@ -30,6 +30,7 @@ export default function AdminProductStatusToggle({
       <Switch
         checked={checked}
         disabled={isPending}
+        aria-busy={isPending}
         onCheckedChange={(nextChecked) => {
           mutate({
             productId,

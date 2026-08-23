@@ -97,6 +97,11 @@ export default function AdminProductCategoryField({
         ))}
       </select>
       <FieldError message={error?.message} />
+      {!isPending && !isError && categories.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          لا توجد فئات بعد. أضف فئة جديدة للمتابعة.
+        </p>
+      ) : null}
       {isError ? (
         <p className="text-sm text-destructive" role="alert">
           تعذّر تحميل الفئات.{" "}
@@ -111,7 +116,10 @@ export default function AdminProductCategoryField({
       ) : null}
 
       {isAdding ? (
-        <div className="space-y-3 rounded-2xl border border-border bg-card p-3">
+        <div
+          className="space-y-3 rounded-2xl border border-border bg-card p-3"
+          aria-busy={isCreating}
+        >
           <div className="space-y-2">
             <Label htmlFor="admin-new-category-label">اسم الفئة الجديد</Label>
             <Input

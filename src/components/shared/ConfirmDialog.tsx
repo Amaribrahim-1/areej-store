@@ -45,7 +45,11 @@ export default function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton={false} className="text-start">
+      <DialogContent
+        showCloseButton={false}
+        className="text-start"
+        aria-busy={isPending}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>

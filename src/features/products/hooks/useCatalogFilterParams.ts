@@ -60,6 +60,14 @@ export default function useCatalogFilterParams() {
     router.replace(pathname, { scroll: false });
   }
 
+  const hasActiveFilters = Boolean(
+    selectedCategory ||
+      selectedRating ||
+      minPrice ||
+      maxPrice ||
+      searchValue,
+  );
+
   return {
     selectedCategory,
     selectedRating,
@@ -72,5 +80,6 @@ export default function useCatalogFilterParams() {
     setFilterParams,
     removeFilters,
     searchValue,
+    hasActiveFilters,
   };
 }
