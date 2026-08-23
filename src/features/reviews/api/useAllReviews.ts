@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { ADMIN_REVIEWS_STALE_TIME_MS } from "../constants";
 import { getAllReviews } from "./getAllReviews";
 
 export const allReviewsQueryKey = ["admin-reviews"] as const;
@@ -11,8 +12,6 @@ export function useAllReviews() {
   return useQuery({
     queryKey: allReviewsQueryKey,
     queryFn: getAllReviews,
-    // Admin checks this page periodically — 1 min stale time balances freshness
-    // with avoiding hammering the RPC on every re-focus.
-    staleTime: 60 * 1000,
+    staleTime: ADMIN_REVIEWS_STALE_TIME_MS,
   });
 }

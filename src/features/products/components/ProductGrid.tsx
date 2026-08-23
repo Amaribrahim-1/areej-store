@@ -81,9 +81,13 @@ export default function ProductGrid() {
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">عرض {data.total} منتج</p>
       <ul className="grid list-none grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3">
-        {data.items.map((product) => (
+        {data.items.map((product, index) => (
           <li key={product.id}>
-            <ProductCard product={product} />
+            <ProductCard
+              product={product}
+              priority={page === 1 && index < 2}
+              sizes="(max-width: 1023px) 50vw, 33vw"
+            />
           </li>
         ))}
       </ul>
