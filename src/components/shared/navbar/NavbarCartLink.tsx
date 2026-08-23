@@ -1,16 +1,33 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ShoppingCartIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import { isNavActive } from "./nav-links";
 
 type NavbarCartLinkProps = {
   badgeCount: number;
 };
 
 export default function NavbarCartLink({ badgeCount }: NavbarCartLinkProps) {
+  const pathname = usePathname();
+  const isActive = isNavActive(pathname, "/cart");
+
   return (
     <Link
       href="/cart"
       aria-label={badgeCount > 0 ? `السلة، ${badgeCount} عناصر` : "السلة"}
-      className="relative inline-flex size-11 items-center justify-center rounded-4xl text-foreground transition-colors hover:bg-muted hover:text-text-accent"
+      aria-current={isActive ? "page" : undefined}
+      className={cn(
+        "relative inline-flex size-11 items-center justify-center rounded-4xl transition-colors",
+        "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        isActive
+          ? "bg-bg-accent text-text-accent"
+          : "text-foreground hover:bg-bg-accent hover:text-text-accent",
+      )}
     >
       <ShoppingCartIcon className="size-5" aria-hidden />
       {badgeCount > 0 ? (
