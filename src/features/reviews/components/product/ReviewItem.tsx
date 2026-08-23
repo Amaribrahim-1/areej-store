@@ -2,13 +2,8 @@ import StarRating from "@/components/shared/StarRating";
 import UserAvatar from "@/components/shared/UserAvatar";
 import { sanitizePlainText } from "@/lib/sanitizePlainText";
 
+import { formatReviewDate } from "../../lib/formatReviewDate";
 import type { ProductReview } from "../../types";
-
-const dateFormatter = new Intl.DateTimeFormat("ar-EG", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
 
 type ReviewItemProps = {
   review: ProductReview;
@@ -36,7 +31,7 @@ export default function ReviewItem({ review }: ReviewItemProps) {
             dateTime={review.createdAt}
             className="text-xs text-muted-foreground"
           >
-            {dateFormatter.format(new Date(review.createdAt))}
+            {formatReviewDate(review.createdAt)}
           </time>
         </div>
 
