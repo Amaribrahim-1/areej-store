@@ -331,6 +331,8 @@ After customer storefront work (Phases 2–10), before Admin. Park essential cus
 - [x] **C.4 — Show/hide password toggle** on customer login and register (password + confirm password): an eye control so the customer can reveal the typed value. Shared control, Lucide eye icons, Arabic `aria-label` (e.g. «إظهار كلمة المرور» / «إخفاء كلمة المرور»), visible focus. Reuse the same control in admin login when **11.1** is built — do not fork a second toggle.
       **Done:** Shared `PasswordInput` (Lucide eye, Arabic aria-label, visible focus) on login + register password/confirm. Same control is ready for admin login in **11.1** — do not fork.
       🚩 Not Forgot Password / reset (backlog). Toggle visibility only; do not email or change the password.
+- [x] **C.5 — Contact form prefills name and phone** from the signed-in profile when present. Guests still start empty. Message stays blank.
+- [x] **C.6 — Catalog price filter applies a single bound.** Filling only «من» (or only «إلى») and applying filters products at/above that min (or at/below that max). Both bounds remain optional and independent.
 
 `[commit: feat(reviews): customer edit and delete own review, feat(shell): overlay navbar on home hero, feat(auth): password visibility toggle]`
 
@@ -431,8 +433,9 @@ After admin feature work (Phases 11–14), before Hardening & Launch. Park essen
 
 - [x] **A.1 — Admin can delete any review** (moderation). Delete only — no admin edit of rating/comment. RLS: admin-only delete (customers keep owner edit/delete from Phase C). Confirm step + toast; invalidate admin reviews list and affected product review queries.
       🚩 No hide/unread-only soft-moderation beyond what 14.3 already chose. No real-time review notifications (backlog).
+- [x] **A.2 — Admin contact inbox.** List `contact_messages` on `/admin/messages` (newest first, name/phone/message/date). Sanitize on read. Nav entry next to Reviews. No email send (backlog).
 
-`[commit: feat(admin-reviews): admin delete review]`
+`[commit: feat(admin-reviews): admin delete review, feat(admin-contact): messages inbox]`
 
 ---
 
