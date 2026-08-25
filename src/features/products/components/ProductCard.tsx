@@ -15,12 +15,23 @@ import { cn } from "@/lib/utils";
 
 import type { ProductListItem } from "../types";
 
+const DEFAULT_IMAGE_SIZES =
+  "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw";
+
 type ProductCardProps = {
   product: ProductListItem;
   className?: string;
+  /** First visible cards on a listing — LCP. Off by default (below-fold home grids). */
+  priority?: boolean;
+  sizes?: string;
 };
 
-export default function ProductCard({ product, className }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  className,
+  priority = false,
+  sizes = DEFAULT_IMAGE_SIZES,
+}: ProductCardProps) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
   const categoryLabel = product.categoryLabel;
@@ -58,7 +69,8 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             src={product.imageUrl}
             alt={`صورة ${product.name}`}
             fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            priority={priority}
+            sizes={sizes}
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           />
         </Link>
@@ -149,10 +161,10 @@ function CardActions({
         href={productHref}
         className={cn(
           buttonVariants({
-            size: compact ? "xs" : "sm",
+            size: compact ? "default" : "sm",
             variant: "secondary",
           }),
-          compact && "w-full justify-center",
+          compact && "min-h-11 w-full justify-center",
           !compact &&
             "bg-background/95 text-foreground shadow-sm hover:bg-background",
           className,
@@ -163,8 +175,12 @@ function CardActions({
       </Link>
       <Button
         type="button"
-        size={compact ? "xs" : "sm"}
-        className={cn(compact && "w-full justify-center", !compact && "shadow-sm", className)}
+        size={compact ? "default" : "sm"}
+        className={cn(
+          compact && "min-h-11 w-full justify-center",
+          !compact && "shadow-sm",
+          className,
+        )}
         onClick={onAddToCart}
         aria-label={`إضافة ${productName} إلى السلة`}
       >

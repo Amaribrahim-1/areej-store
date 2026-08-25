@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 import { useCategories } from "../api/useCategories";
@@ -18,8 +19,8 @@ const RATING_OPTIONS = [
 ] as const;
 
 const selectClassName = cn(
-  "h-9 w-full min-w-0 rounded-4xl border border-input bg-background px-3 text-sm",
-  "text-foreground outline-none transition-colors",
+  "h-11 w-full min-w-0 rounded-4xl border border-input bg-background px-3 text-base",
+  "text-foreground outline-none transition-colors md:h-9 md:text-sm",
   "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
 );
 
@@ -27,6 +28,9 @@ const radioClassName = cn(
   "size-4 shrink-0 border border-border text-brand-500",
   "accent-brand-700 focus-visible:ring-[3px] focus-visible:ring-ring/50",
 );
+
+const categoryLabelClassName =
+  "flex min-h-11 cursor-pointer items-center gap-2.5 py-2 text-sm text-foreground/80 md:min-h-0 md:py-1";
 
 type CatalogFiltersPanelProps = {
   className?: string;
@@ -51,7 +55,8 @@ export default function CatalogFiltersPanel({
     setFilterParams,
     removeFilters,
   } = useCatalogFilterParams();
-  const { data: categories = [] } = useCategories();
+  const { data: categories = [], isPending, isError, refetch } =
+    useCategories();
 
   const [draftMinPrice, setDraftMinPrice] = useState(minPrice);
   const [draftMaxPrice, setDraftMaxPrice] = useState(maxPrice);
@@ -69,6 +74,10 @@ export default function CatalogFiltersPanel({
     });
   }
 
+  function handleCategoryChange(event: ChangeEvent<HTMLInputElement>) {
+    updateFilterParam("category", event.target.value);
+  }
+
   return (
     <div className={cn("space-y-8 text-start", className)}>
       <div>
@@ -78,8 +87,7 @@ export default function CatalogFiltersPanel({
         <Button
           type="button"
           variant="outline"
-          size="sm"
-          className="mt-2 border-border-accent text-text-accent hover:bg-brand-50"
+          className="mt-2 min-h-11 border-border-accent text-text-accent hover:bg-brand-50"
           onClick={removeFilters}
         >
           مسح الفلاتر
@@ -88,38 +96,73 @@ export default function CatalogFiltersPanel({
 
       <fieldset className="space-y-3">
         <legend className="text-sm font-medium text-foreground">الأقسام</legend>
-        <ul className="space-y-2.5">
-          <li>
-            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground/80">
-              <input
-                type="radio"
-                name={categoryGroupName}
-                value=""
-                className={radioClassName}
-                checked={selectedCategory === ""}
-                onChange={() => updateFilterParam("category", "")}
-              />
-              الكل
-            </label>
-          </li>
-          {categories.map((category) => (
-            <li key={category.slug}>
-              <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground/80">
+        {isPending ? (
+          <ul
+            className="space-y-1 md:space-y-0.5"
+            aria-busy="true"
+            aria-label="جاري تحميل الأقسام"
+          >
+            {Array.from({ length: 4 }, (_, index) => (
+              <li key={index}>
+                <Skeleton className="h-11 w-full rounded-2xl md:h-8" />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul className="space-y-1 md:space-y-0.5">
+            <li>
+              <label className={categoryLabelClassName}>
                 <input
                   type="radio"
                   name={categoryGroupName}
-                  value={category.slug}
+                  value=""
                   className={radioClassName}
-                  checked={selectedCategory === category.slug}
-                  onChange={(e) =>
-                    updateFilterParam("category", e.target.value)
-                  }
+                  checked={selectedCategory === ""}
+                  onChange={() => updateFilterParam("category", "")}
                 />
-                {category.label}
+                الكل
               </label>
             </li>
-          ))}
-        </ul>
+            {isError ? (
+              <li>
+                <p className="text-sm text-destructive" role="alert">
+                  تعذّر تحميل الأقسام.{" "}
+                  <button
+                    type="button"
+                    className="underline underline-offset-4"
+                    onClick={() => refetch()}
+                  >
+                    إعادة المحاولة
+                  </button>
+                </p>
+              </li>
+            ) : null}
+            {!isError && categories.length === 0 ? (
+              <li>
+                <p className="text-sm text-muted-foreground">
+                  لا توجد أقسام بعد.
+                </p>
+              </li>
+            ) : null}
+            {!isError
+              ? categories.map((category) => (
+                  <li key={category.slug}>
+                    <label className={categoryLabelClassName}>
+                      <input
+                        type="radio"
+                        name={categoryGroupName}
+                        value={category.slug}
+                        className={radioClassName}
+                        checked={selectedCategory === category.slug}
+                        onChange={handleCategoryChange}
+                      />
+                      {category.label}
+                    </label>
+                  </li>
+                ))
+              : null}
+          </ul>
+        )}
       </fieldset>
 
       <div className="space-y-3">
@@ -171,8 +214,7 @@ export default function CatalogFiltersPanel({
           <Button
             type="button"
             variant="secondary"
-            size="sm"
-            className="w-full"
+            className="min-h-11 w-full"
             onClick={applyPriceFilters}
           >
             تطبيق

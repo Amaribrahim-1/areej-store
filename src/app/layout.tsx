@@ -1,18 +1,56 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 import { Providers } from "./Providers";
 
 const cairo = Cairo({
   subsets: ["arabic"],
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
   variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
-  title: "أريج | للمنتجات العطرية",
-  description: "متجر أريج للعطور، المسك، المخمرية، وُزيوت الشعر",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    template: `%s | ${SITE_NAME}`,
+    default: SITE_TAGLINE,
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "ar_EG",
+    siteName: SITE_NAME,
+    title: SITE_TAGLINE,
+    description: SITE_DESCRIPTION,
+    url: "/",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "أريج — عطور فاخرة",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TAGLINE,
+    description: SITE_DESCRIPTION,
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

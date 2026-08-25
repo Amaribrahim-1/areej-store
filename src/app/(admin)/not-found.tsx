@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import EmptyState from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "الصفحة غير موجودة",
+  robots: { index: false, follow: false },
+};
 
 export default function AdminNotFound() {
   return (

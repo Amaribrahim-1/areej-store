@@ -91,7 +91,7 @@ export default function Navbar({ initialUser }: NavbarProps) {
       )}
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:h-16 sm:px-6">
-        <BrandLogo priority className="size-8 sm:size-9" />
+        <BrandLogo priority className="size-10 sm:size-9" />
 
         <nav
           className="ms-4 hidden items-center gap-6 md:flex"

@@ -33,6 +33,7 @@ export default function BrandLogo({
         alt=""
         width={1024}
         height={1024}
+        sizes="64px"
         priority={priority}
         className="size-full object-cover"
       />

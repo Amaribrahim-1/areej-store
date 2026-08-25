@@ -14,8 +14,8 @@ import {
 import { updateAdminOrderStatusSchema } from "../../schema";
 
 const selectClassName = cn(
-  "h-9 w-full min-w-0 rounded-4xl border border-input bg-input/30 px-3 text-sm sm:w-48",
-  "text-foreground outline-none transition-colors",
+  "h-11 w-full min-w-0 rounded-4xl border border-input bg-input/30 px-3 text-base sm:w-48",
+  "text-foreground outline-none transition-colors md:h-9 md:text-sm",
   "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
   "disabled:cursor-not-allowed disabled:opacity-50",
 );

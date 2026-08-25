@@ -74,10 +74,10 @@ export default function CartLineItem({
           <Button
             type="button"
             variant="ghost"
-            size="icon-sm"
+            size="icon"
             onClick={onRemove}
             aria-label={`حذف ${line.name} من السلة`}
-            className="shrink-0 text-muted-foreground hover:text-destructive"
+            className="size-11 shrink-0 text-muted-foreground hover:text-destructive"
           >
             <Trash2Icon />
           </Button>

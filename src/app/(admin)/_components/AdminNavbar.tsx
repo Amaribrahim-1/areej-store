@@ -44,7 +44,7 @@ export default function AdminNavbar() {
           href="/admin"
           aria-label="أريج — لوحة التحكم"
           priority
-          className="size-8 sm:size-9"
+          className="size-10 sm:size-9"
         />
 
         <nav

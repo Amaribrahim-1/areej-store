@@ -4,8 +4,9 @@ import LoginForm from "@/features/auth/components/LoginForm";
 import { getSafeNextPath } from "@/features/auth/lib/getSafeNextPath";
 
 export const metadata: Metadata = {
-  title: "تسجيل الدخول | أريج",
+  title: "تسجيل الدخول",
   description: "سجّلي دخولك إلى متجر أريج لإتمام الطلب ومتابعة طلباتك.",
+  robots: { index: false, follow: false },
 };
 
 type LoginPageProps = {

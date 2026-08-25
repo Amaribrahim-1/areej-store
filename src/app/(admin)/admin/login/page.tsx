@@ -6,6 +6,7 @@ import { getSafeAdminNextPath } from "@/features/auth/lib/getSafeNextPath";
 export const metadata: Metadata = {
   title: "تسجيل دخول المدير | أريج",
   description: "دخول لوحة تحكم متجر أريج.",
+  robots: { index: false, follow: false },
 };
 
 type AdminLoginPageProps = {

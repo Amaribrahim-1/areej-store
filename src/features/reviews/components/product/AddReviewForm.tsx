@@ -56,6 +56,7 @@ function CreateReviewForm({ slug }: { slug: string }) {
     <form
       className="space-y-4 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5"
       noValidate
+      aria-busy={isPending}
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="space-y-1">
@@ -126,6 +127,7 @@ export default function AddReviewForm({
     data: myReview,
     isLoading: isLoadingMyReview,
     isError: isMyReviewError,
+    refetch: refetchMyReview,
   } = useMyProductReview({ slug }, !!user);
 
   if (!user) {
@@ -162,13 +164,24 @@ export default function AddReviewForm({
 
   if (isMyReviewError) {
     return (
-      <div className="space-y-2 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5">
+      <div
+        className="space-y-3 rounded-3xl border border-border bg-brand-50/40 p-4 text-start sm:p-5"
+        role="alert"
+      >
         <h3 className="font-heading text-lg font-semibold text-foreground">
           أضيفي تقييمك
         </h3>
         <p className="text-sm text-muted-foreground">
-          تعذّر التحقق من تقييمك الحالي. تقدري تحاولي تاني بعد شوية.
+          تعذّر التحقق من تقييمك الحالي. حاولي مرة أخرى.
         </p>
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          onClick={() => refetchMyReview()}
+        >
+          إعادة المحاولة
+        </Button>
       </div>
     );
   }

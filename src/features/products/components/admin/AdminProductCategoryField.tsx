@@ -20,8 +20,8 @@ import { slugifyLabel } from "../../lib/slugifyLabel";
 import { categorySchema, type ProductFormValues } from "../../schema";
 
 const selectClassName = cn(
-  "h-9 w-full min-w-0 rounded-4xl border border-input bg-input/30 px-3 text-sm",
-  "text-foreground outline-none transition-colors",
+  "h-11 w-full min-w-0 rounded-4xl border border-input bg-input/30 px-3 text-base",
+  "text-foreground outline-none transition-colors md:h-9 md:text-sm",
   "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
   "disabled:cursor-not-allowed disabled:opacity-50",
   "aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20",
@@ -97,6 +97,11 @@ export default function AdminProductCategoryField({
         ))}
       </select>
       <FieldError message={error?.message} />
+      {!isPending && !isError && categories.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          لا توجد فئات بعد. أضف فئة جديدة للمتابعة.
+        </p>
+      ) : null}
       {isError ? (
         <p className="text-sm text-destructive" role="alert">
           تعذّر تحميل الفئات.{" "}
@@ -111,7 +116,10 @@ export default function AdminProductCategoryField({
       ) : null}
 
       {isAdding ? (
-        <div className="space-y-3 rounded-2xl border border-border bg-card p-3">
+        <div
+          className="space-y-3 rounded-2xl border border-border bg-card p-3"
+          aria-busy={isCreating}
+        >
           <div className="space-y-2">
             <Label htmlFor="admin-new-category-label">اسم الفئة الجديد</Label>
             <Input

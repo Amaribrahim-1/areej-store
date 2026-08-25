@@ -36,7 +36,10 @@ export default function FeaturedProducts() {
           </h2>
           <Link
             href="/products"
-            className={cn(buttonVariants({ variant: "link" }))}
+            className={cn(
+              buttonVariants({ variant: "link" }),
+              "inline-flex min-h-11 items-center",
+            )}
           >
             تسوّقي المنتجات
           </Link>

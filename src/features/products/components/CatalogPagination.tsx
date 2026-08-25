@@ -41,7 +41,7 @@ export default function CatalogPagination({
       <Button
         type="button"
         variant="outline"
-        size="sm"
+        className="min-h-11 min-w-11"
         onClick={goPrevious}
         disabled={atStart}
       >
@@ -55,7 +55,7 @@ export default function CatalogPagination({
       <Button
         type="button"
         variant="outline"
-        size="sm"
+        className="min-h-11 min-w-11"
         onClick={goNext}
         disabled={atEnd}
       >

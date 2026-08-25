@@ -9,6 +9,7 @@ export const metadata: Metadata = {
     template: "%s | لوحة التحكم | أريج",
     default: "لوحة التحكم | أريج",
   },
+  robots: { index: false, follow: false },
 };
 
 /**

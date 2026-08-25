@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
+
 import CartPageClient from "@/features/cart/components/CartPageClient";
+
+export const metadata: Metadata = {
+  title: "عربة التسوّق",
+  robots: { index: false, follow: false },
+};
 
 export default function CartRoutePage() {
   return (

@@ -43,7 +43,7 @@ export default function VariantSelector({
               aria-checked={selected}
               onClick={() => onSelect(variant.id)}
               className={cn(
-                "rounded-4xl border px-4 py-2 text-sm font-medium transition-colors outline-none",
+                "min-h-11 rounded-4xl border px-4 py-2 text-sm font-medium transition-colors outline-none",
                 "focus-visible:ring-[3px] focus-visible:ring-ring/50 cursor-pointer",
                 selected
                   ? "border-brand bg-brand text-primary-foreground"

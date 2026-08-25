@@ -165,3 +165,92 @@
     @apply font-sans;
   }
 }
+
+/* Brand scrollbar — warm amber track/thumb (Firefox + WebKit) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-500) var(--brand-100);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--brand-100);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    var(--brand-400) 0%,
+    var(--brand-500) 50%,
+    var(--brand-600) 100%
+  );
+  border-radius: 9999px;
+  border: 2px solid var(--brand-100);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    var(--brand-500) 0%,
+    var(--brand-600) 50%,
+    var(--brand-700) 100%
+  );
+  border: 2px solid var(--brand-100);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/*
+  Brand cursors — desktop / fine pointers only.
+  Touch devices keep the system cursor (custom cursors don't apply there).
+*/
+@media (hover: hover) and (pointer: fine) {
+  html,
+  body {
+    cursor: url("/cursors/default.svg") 6 2, auto;
+  }
+
+  a,
+  button,
+  [role="button"],
+  [role="link"],
+  [role="menuitem"],
+  [role="option"],
+  [role="tab"],
+  [role="switch"],
+  [role="checkbox"],
+  [role="radio"],
+  summary,
+  label[for],
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"],
+  input[type="range"],
+  .cursor-pointer {
+    cursor: url("/cursors/pointer.svg") 6 2, pointer;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(
+      [type="file"]
+    ):not([type="submit"]):not([type="button"]):not([type="reset"]),
+  textarea,
+  [contenteditable="true"] {
+    cursor: text;
+  }
+
+  :disabled,
+  [aria-disabled="true"],
+  .cursor-not-allowed {
+    cursor: not-allowed;
+  }
+}
