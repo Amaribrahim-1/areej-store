@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,11 +66,14 @@ export default function CatalogFiltersPanel({
     setDraftMaxPrice(maxPrice);
   }, [minPrice, maxPrice]);
 
-  function applyPriceFilters() {
-    if (draftMinPrice === minPrice && draftMaxPrice === maxPrice) return;
+  function applyPriceFilters(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextMinPrice = draftMinPrice.trim();
+    const nextMaxPrice = draftMaxPrice.trim();
+    if (nextMinPrice === minPrice && nextMaxPrice === maxPrice) return;
     setFilterParams({
-      minPrice: draftMinPrice,
-      maxPrice: draftMaxPrice,
+      minPrice: nextMinPrice,
+      maxPrice: nextMaxPrice,
     });
   }
 
@@ -165,7 +168,7 @@ export default function CatalogFiltersPanel({
         )}
       </fieldset>
 
-      <div className="space-y-3">
+      <form className="space-y-3" noValidate onSubmit={applyPriceFilters}>
         <p className="text-sm font-medium text-foreground">السعر (ج.م)</p>
         <div className="flex flex-col gap-2">
           <div className="flex min-w-0 items-center gap-2">
@@ -183,9 +186,6 @@ export default function CatalogFiltersPanel({
                 className="bg-background text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 value={draftMinPrice}
                 onChange={(e) => setDraftMinPrice(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") applyPriceFilters();
-                }}
               />
             </div>
             <span className="shrink-0 text-muted-foreground" aria-hidden>
@@ -205,22 +205,14 @@ export default function CatalogFiltersPanel({
                 className="bg-background text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 value={draftMaxPrice}
                 onChange={(e) => setDraftMaxPrice(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") applyPriceFilters();
-                }}
               />
             </div>
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            className="min-h-11 w-full"
-            onClick={applyPriceFilters}
-          >
+          <Button type="submit" variant="secondary" className="min-h-11 w-full">
             تطبيق
           </Button>
         </div>
-      </div>
+      </form>
 
       <div className="space-y-2">
         <Label htmlFor={ratingId} className="text-sm font-medium">

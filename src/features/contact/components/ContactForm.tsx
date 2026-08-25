@@ -19,8 +19,13 @@ import {
   CONTACT_NAME_MAX_LENGTH,
 } from "../constants";
 import { contactSchema, type ContactInput } from "../schema";
+import type { ContactFormPrefill } from "../types";
 
-export default function ContactForm() {
+type ContactFormProps = {
+  prefill?: ContactFormPrefill;
+};
+
+export default function ContactForm({ prefill }: ContactFormProps) {
   const honeypotRef = useRef<HTMLInputElement>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -32,8 +37,8 @@ export default function ContactForm() {
     mode: "onBlur",
     resolver: zodResolver(contactSchema),
     defaultValues: {
-      name: "",
-      phone: "",
+      name: prefill?.name ?? "",
+      phone: prefill?.phone ?? "",
       message: "",
     },
   });
@@ -72,6 +77,7 @@ export default function ContactForm() {
     <form
       className="relative space-y-4 text-start"
       noValidate
+      autoComplete="on"
       aria-busy={isPending}
       onSubmit={handleSubmit(onSubmit)}
     >

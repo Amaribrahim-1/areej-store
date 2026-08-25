@@ -1,6 +1,13 @@
 import ContactForm from "@/features/contact/components/ContactForm";
+import type { ContactFormPrefill } from "@/features/contact/types";
 
-export default function ContactPageContent() {
+type ContactPageContentProps = {
+  prefill?: ContactFormPrefill;
+};
+
+export default function ContactPageContent({
+  prefill,
+}: ContactPageContentProps) {
   return (
     <section className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
       <div className="grid gap-10 md:grid-cols-2 md:items-start md:gap-14">
@@ -21,7 +28,7 @@ export default function ContactPageContent() {
         </div>
 
         <div className="relative rounded-3xl border border-border bg-brand-50/40 p-4 sm:p-6">
-          <ContactForm />
+          <ContactForm prefill={prefill} />
         </div>
       </div>
     </section>

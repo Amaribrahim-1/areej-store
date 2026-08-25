@@ -447,6 +447,16 @@ export type Database = {
           variants: Json
         }[]
       }
+      list_admin_contact_messages: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          message: string
+          name: string
+          phone: string
+        }[]
+      }
       list_admin_reviews: {
         Args: never
         Returns: {

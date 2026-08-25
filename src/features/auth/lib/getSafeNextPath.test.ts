@@ -36,6 +36,7 @@ describe("getSafeAdminNextPath", () => {
     expect(getSafeAdminNextPath("/admin")).toBe("/admin");
     expect(getSafeAdminNextPath("/admin?tab=orders")).toBe("/admin?tab=orders");
     expect(getSafeAdminNextPath("/admin/orders")).toBe("/admin/orders");
+    expect(getSafeAdminNextPath("/admin/messages")).toBe("/admin/messages");
   });
 
   it("rejects the login page so the next path cannot loop", () => {
