@@ -23,11 +23,6 @@ export default function Hero() {
           className="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-brand-50/90 via-brand-50/40 to-transparent sm:h-32 md:from-brand-50/65 md:via-brand-50/20"
           aria-hidden
         />
-        {/* Mobile: bottom wash so copy stays readable on the photo */}
-        <div
-          className="absolute inset-0 bg-linear-to-t from-brand-50 from-28% via-brand-50/80 to-transparent md:hidden"
-          aria-hidden
-        />
         {/* Desktop: light wash on the copy side only — keep the bottle vivid */}
         <div
           className="absolute inset-0 hidden bg-linear-to-l from-brand-50/75 from-4% via-brand-50/35 via-28% to-transparent to-48% md:block"
@@ -35,7 +30,7 @@ export default function Hero() {
         />
 
         <div className="absolute inset-0 flex items-end md:items-center">
-          <div className="mx-auto w-full max-w-6xl px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-16 sm:px-6 sm:pb-12 md:pt-20 md:pb-0">
+          <div className="mx-auto w-full max-w-6xl bg-linear-to-t from-brand-50 from-45% via-brand-50/85 via-[78%] to-transparent px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-20 sm:px-6 sm:pb-12 md:bg-none md:pt-20 md:pb-0">
             <div className="max-w-md space-y-3 text-start sm:space-y-4 md:space-y-5">
               <h1 className="font-heading text-balance text-2xl font-bold leading-snug tracking-tight text-brand-900 sm:text-3xl md:text-4xl lg:text-5xl">
                 عطور تلامس الحواس
