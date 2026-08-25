@@ -1,4 +1,7 @@
-import { createClient } from "@/lib/supabase/client";
+import {
+  createClient,
+  type AppSupabaseClient,
+} from "@/lib/supabase/client";
 import { sanitizePlainText } from "@/lib/sanitizePlainText";
 
 import { HOME_TESTIMONIALS_PAGE_SIZE } from "../constants";
@@ -13,9 +16,9 @@ function requireField<T>(value: T | null | undefined, field: string): T {
 
 export async function getHomeTestimonials(
   params: HomeTestimonialsParams = {},
+  supabase: AppSupabaseClient = createClient(),
 ): Promise<HomeTestimonial[]> {
   const pageSize = params.pageSize ?? HOME_TESTIMONIALS_PAGE_SIZE;
-  const supabase = createClient();
 
   const { data, error } = await supabase.rpc("list_home_testimonials", {
     p_limit: pageSize,

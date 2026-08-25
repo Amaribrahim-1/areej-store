@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useProducts } from "../api/useProducts";
 import { PRODUCTS_PAGE_SIZE } from "../constants";
 import useCatalogFilterParams from "../hooks/useCatalogFilterParams";
-import type { ProductSort } from "../types";
+import { toCatalogProductsQueryParams } from "../lib/catalogProductsParams";
 import CatalogPagination from "./CatalogPagination";
 import ProductCard from "./ProductCard";
 
@@ -29,16 +29,17 @@ export default function ProductGrid() {
     removeFilters,
   } = useCatalogFilterParams();
 
-  const { data, isPending, isError, refetch } = useProducts({
-    page,
-    pageSize: PRODUCTS_PAGE_SIZE,
-    category: selectedCategory || undefined,
-    minRating: toOptionalNumber(selectedRating),
-    minPrice: toOptionalNumber(minPrice),
-    maxPrice: toOptionalNumber(maxPrice),
-    sort: selectedSorting as ProductSort,
-    search: searchValue,
-  });
+  const { data, isPending, isError, refetch } = useProducts(
+    toCatalogProductsQueryParams({
+      page,
+      category: selectedCategory,
+      minRating: selectedRating,
+      minPrice,
+      maxPrice,
+      sort: selectedSorting,
+      search: searchValue,
+    }),
+  );
 
   const totalPages = data
     ? Math.max(1, Math.ceil(data.total / PRODUCTS_PAGE_SIZE))
@@ -118,8 +119,3 @@ export default function ProductGrid() {
   );
 }
 
-function toOptionalNumber(raw: string): number | undefined {
-  if (!raw) return undefined;
-  const n = Number(raw);
-  return Number.isFinite(n) ? n : undefined;
-}

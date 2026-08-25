@@ -4,9 +4,11 @@ import { productQueryKeyRoot } from "@/features/products/public";
 
 import { HOME_TESTIMONIALS_PAGE_SIZE } from "../constants";
 import { allReviewsQueryKey } from "./useAllReviews";
-import { homeTestimonialsQueryKey } from "./useHomeTestimonials";
+import {
+  homeTestimonialsQueryKey,
+  productReviewsQueryKeyRoot,
+} from "./queryKeys";
 import { myProductReviewQueryKeyRoot } from "./useMyProductReview";
-import { productReviewsQueryKeyRoot } from "./useProductReviews";
 
 /**
  * Invalidate after an admin review delete. Unlike the customer-side helper,

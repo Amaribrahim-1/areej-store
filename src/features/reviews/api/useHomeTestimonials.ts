@@ -8,10 +8,9 @@ import {
 } from "../constants";
 import type { HomeTestimonialsParams } from "../types";
 import { getHomeTestimonials } from "./getHomeTestimonials";
+import { homeTestimonialsQueryKey } from "./queryKeys";
 
-export function homeTestimonialsQueryKey(pageSize: number) {
-  return ["home-testimonials", { pageSize }] as const;
-}
+export { homeTestimonialsQueryKey } from "./queryKeys";
 
 export function useHomeTestimonials(params: HomeTestimonialsParams = {}) {
   const pageSize = params.pageSize ?? HOME_TESTIMONIALS_PAGE_SIZE;

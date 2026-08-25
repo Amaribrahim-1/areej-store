@@ -1,4 +1,7 @@
-import { createClient } from "@/lib/supabase/client";
+import {
+  createClient,
+  type AppSupabaseClient,
+} from "@/lib/supabase/client";
 
 import { decodeRouteSlug } from "../lib/decodeRouteSlug";
 import type {
@@ -33,8 +36,8 @@ function hasSlug(
 
 export async function getProduct(
   params: ProductQueryParams,
+  supabase: AppSupabaseClient = createClient(),
 ): Promise<ProductDetail | null> {
-  const supabase = createClient();
   const filterColumn = hasSlug(params) ? "slug" : "id";
   const filterValue = hasSlug(params)
     ? decodeRouteSlug(params.slug)

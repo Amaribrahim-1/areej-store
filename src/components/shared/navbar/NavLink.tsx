@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import LinkPendingBar from "@/components/shared/LinkPendingBar";
 import { cn } from "@/lib/utils";
 
 import { isNavActive } from "./nav-links";
@@ -52,6 +53,7 @@ export default function NavLink({
       )}
     >
       {label}
+      <LinkPendingBar />
     </Link>
   );
 }

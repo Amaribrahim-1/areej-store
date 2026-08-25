@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShoppingCartIcon } from "lucide-react";
 
+import LinkPendingBar from "@/components/shared/LinkPendingBar";
 import { cn } from "@/lib/utils";
 
 import { isNavActive } from "./nav-links";
@@ -35,6 +36,7 @@ export default function NavbarCartLink({ badgeCount }: NavbarCartLinkProps) {
           {badgeCount > 99 ? "99+" : badgeCount}
         </span>
       ) : null}
+      <LinkPendingBar />
     </Link>
   );
 }
