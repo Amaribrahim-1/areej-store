@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 
 import ProductCatalog from "@/features/products/components/ProductCatalog";
 import ProductGrid from "@/features/products/components/ProductGrid";
+import { Suspense } from "react";
+import { ProductGridSkeleton } from "@/components/shared/ContentSkeleton";
+import { PRODUCTS_PAGE_SIZE } from "@/features/products/constants";
 
 export const metadata: Metadata = {
   title: "المنتجات",
@@ -22,9 +25,11 @@ export default function ProductsCatalogPage() {
         </p>
       </header>
 
-      <ProductCatalog>
-        <ProductGrid />
-      </ProductCatalog>
+      <Suspense fallback={<ProductGridSkeleton count={PRODUCTS_PAGE_SIZE} />}>
+        <ProductCatalog>
+          <ProductGrid />
+        </ProductCatalog>
+      </Suspense>
     </section>
   );
 }
