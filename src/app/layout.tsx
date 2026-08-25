@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { storefrontOpenGraph, storefrontTwitter } from "@/lib/seo";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 import { Providers } from "./Providers";
 
@@ -19,28 +20,8 @@ export const metadata: Metadata = {
     default: SITE_TAGLINE,
   },
   description: SITE_DESCRIPTION,
-  openGraph: {
-    type: "website",
-    locale: "ar_EG",
-    siteName: SITE_NAME,
-    title: SITE_TAGLINE,
-    description: SITE_DESCRIPTION,
-    url: "/",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "أريج — عطور فاخرة",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TAGLINE,
-    description: SITE_DESCRIPTION,
-    images: ["/og-image.png"],
-  },
+  openGraph: storefrontOpenGraph({ url: "/" }),
+  twitter: storefrontTwitter(),
   robots: {
     index: true,
     follow: true,

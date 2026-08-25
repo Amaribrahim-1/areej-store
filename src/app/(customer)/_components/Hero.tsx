@@ -13,8 +13,7 @@ export default function Hero() {
           alt="زجاجة عطر أريج على رخام مع ورود وخشب مطعّم بالذهب"
           fill
           priority
-          quality={90}
-          sizes="100vw"
+          unoptimized
           className="object-cover object-[28%_center] md:object-[20%_40%] md:contrast-[1.08] md:saturate-[1.12]"
         />
 

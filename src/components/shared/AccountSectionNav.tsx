@@ -18,7 +18,7 @@ export default function AccountSectionNav({
 }: AccountSectionNavProps) {
   return (
     <nav aria-label="أقسام الحساب">
-      <ul className="flex w-full rounded-4xl bg-muted p-[3px] sm:inline-flex sm:w-auto">
+      <ul className="flex w-full rounded-full bg-muted p-[3px] sm:inline-flex sm:w-auto">
         {ACCOUNT_SECTION_LINKS.map((link) => {
           const isCurrent = link.id === current;
 
@@ -28,7 +28,7 @@ export default function AccountSectionNav({
                 href={link.href}
                 aria-current={isCurrent ? "page" : undefined}
                 className={cn(
-                  "inline-flex min-h-11 w-full min-w-24 items-center justify-center rounded-xl px-4 text-sm font-medium transition-colors",
+                  "inline-flex min-h-11 w-full min-w-24 items-center justify-center rounded-full px-4 text-sm font-medium transition-colors",
                   "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
                   isCurrent
                     ? "bg-background text-foreground"

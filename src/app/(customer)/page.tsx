@@ -20,6 +20,7 @@ import {
   createPrefetchQueryClient,
   prefetchQuerySafe,
 } from "@/lib/query/prefetch";
+import { storefrontOpenGraph, storefrontTwitter } from "@/lib/seo";
 import { SITE_DESCRIPTION, SITE_TAGLINE } from "@/lib/site";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
@@ -30,7 +31,8 @@ export const metadata: Metadata = {
   title: SITE_TAGLINE,
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
-  openGraph: { url: "/" },
+  openGraph: storefrontOpenGraph({ url: "/" }),
+  twitter: storefrontTwitter(),
 };
 
 export default async function Home() {

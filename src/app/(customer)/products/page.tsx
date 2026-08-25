@@ -17,13 +17,18 @@ import {
   createPrefetchQueryClient,
   prefetchQuerySafe,
 } from "@/lib/query/prefetch";
+import { storefrontOpenGraph, storefrontTwitter } from "@/lib/seo";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
+const title = "المنتجات";
+const description = "تصفّح مجموعة عطور ومسك ومخمريات زيوت الشعر من أريج.";
+
 export const metadata: Metadata = {
-  title: "المنتجات",
-  description: "تصفّح مجموعة عطور ومسك ومخمريات زيوت الشعر من أريج.",
+  title,
+  description,
   alternates: { canonical: "/products" },
-  openGraph: { url: "/products" },
+  openGraph: storefrontOpenGraph({ url: "/products", title, description }),
+  twitter: storefrontTwitter({ title, description }),
 };
 
 type ProductsCatalogPageProps = {

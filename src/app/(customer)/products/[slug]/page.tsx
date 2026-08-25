@@ -12,6 +12,7 @@ import {
   createPrefetchQueryClient,
   prefetchQuerySafe,
 } from "@/lib/query/prefetch";
+import { storefrontOpenGraph, storefrontTwitter } from "@/lib/seo";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
 type ProductDetailsPageProps = {
@@ -39,15 +40,11 @@ export async function generateMetadata({
     description,
     alternates: { canonical: url },
     openGraph: {
-      url,
-      title: product.name,
-      description,
+      ...storefrontOpenGraph({ url, title: product.name, description }),
       images: [{ url: product.imageUrl, alt: `صورة ${product.name}` }],
     },
     twitter: {
-      card: "summary_large_image",
-      title: product.name,
-      description,
+      ...storefrontTwitter({ title: product.name, description }),
       images: [product.imageUrl],
     },
   };
