@@ -3,6 +3,7 @@ export const ADMIN_NAV_LINKS = [
   { href: "/admin/orders", label: "الطلبات" },
   { href: "/admin/products", label: "المنتجات" },
   { href: "/admin/reviews", label: "التقييمات" },
+  { href: "/admin/messages", label: "الرسائل" },
 ] as const;
 
 export function isAdminNavActive(pathname: string, href: string): boolean {
