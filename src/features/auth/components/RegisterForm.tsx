@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 import { registerSchema, type RegisterType } from "../schema";
 import { useRegister } from "../api/useRegister";
-import { useRouter } from "next/navigation";
+import AuthSwitchLink from "./AuthSwitchLink";
 
 const ADDRESS_HINT = "قرية قراجة، جانب الموقف";
 
@@ -247,15 +247,11 @@ export default function RegisterForm({ nextPath = "/" }: RegisterFormProps) {
         {isPending ? "جاري الإنشاء..." : "إنشاء حساب"}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
-        عندك حساب؟{" "}
-        <Link
-          href={loginHref}
-          className="font-medium text-text-accent underline-offset-4 hover:underline"
-        >
-          سجّلي الدخول
-        </Link>
-      </p>
+      <AuthSwitchLink
+        prompt="عندك حساب؟"
+        href={loginHref}
+        actionLabel="سجّلي الدخول"
+      />
     </form>
   );
 }

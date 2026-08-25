@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -13,6 +12,7 @@ import { Label } from "@/components/ui/label";
 
 import { useLogin } from "../api/useLogin";
 import { loginSchema, type LoginType } from "../schema";
+import AuthSwitchLink from "./AuthSwitchLink";
 
 type LoginFormProps = {
   /** Already-sanitized relative path from the login page. */
@@ -95,15 +95,11 @@ export default function LoginForm({ nextPath = "/" }: LoginFormProps) {
         {isPending ? "جاري الدخول..." : "دخول"}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
-        مش عندك حساب؟{" "}
-        <Link
-          href={registerHref}
-          className="font-medium text-text-accent underline-offset-4 hover:underline"
-        >
-          أنشئي حساب
-        </Link>
-      </p>
+      <AuthSwitchLink
+        prompt="مش عندك حساب؟"
+        href={registerHref}
+        actionLabel="أنشئي حساب"
+      />
     </form>
   );
 }
