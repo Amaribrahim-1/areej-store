@@ -1,4 +1,7 @@
-import { createClient } from "@/lib/supabase/client";
+import {
+  createClient,
+  type AppSupabaseClient,
+} from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/types";
 import {
   HOME_FEATURED_PAGE_SIZE,
@@ -114,9 +117,9 @@ function sortColumn(sort: ProductSort): {
 
 export async function getProducts(
   params: ProductsQueryParams = {},
+  supabase: AppSupabaseClient = createClient(),
 ): Promise<ProductsListResult> {
   const normalized = normalizeParams(params);
-  const supabase = createClient();
   const { column, ascending, nullsFirst } = sortColumn(normalized.sort);
 
   let query = supabase
@@ -210,9 +213,9 @@ function applyFeaturedDisplayPrices(
 
 export async function getLatestProducts(
   params: LatestProductsParams = {},
+  supabase: AppSupabaseClient = createClient(),
 ): Promise<ProductListItem[]> {
   const pageSize = params.pageSize ?? HOME_LATEST_PAGE_SIZE;
-  const supabase = createClient();
 
   const { data, error } = await supabase
     .from("catalog_products")
@@ -230,9 +233,9 @@ export async function getLatestProducts(
 
 export async function getFeaturedProducts(
   params: FeaturedProductsParams = {},
+  supabase: AppSupabaseClient = createClient(),
 ): Promise<ProductListItem[]> {
   const pageSize = params.pageSize ?? HOME_FEATURED_PAGE_SIZE;
-  const supabase = createClient();
 
   const { data, error } = await supabase
     .from("catalog_products")

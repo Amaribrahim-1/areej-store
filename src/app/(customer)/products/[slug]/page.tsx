@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
+import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 
 import { getCurrentUser } from "@/features/auth/api/getCurrentUser";
 import { getProduct } from "@/features/products/api/getProduct";
+import { productQueryKey } from "@/features/products/api/queryKeys";
 import ProductDetails from "@/features/products/components/ProductDetails";
 import { decodeRouteSlug } from "@/features/products/lib/decodeRouteSlug";
+import { getProductReviews } from "@/features/reviews/api/getProductReviews";
+import { productReviewsQueryKey } from "@/features/reviews/api/queryKeys";
+import {
+  createPrefetchQueryClient,
+  prefetchQuerySafe,
+} from "@/lib/query/prefetch";
+import { createClient as createServerClient } from "@/lib/supabase/server";
 
 type ProductDetailsPageProps = {
   params: Promise<{ slug: string }>;
@@ -47,15 +56,31 @@ export async function generateMetadata({
 export default async function ProductDetailsPage({
   params,
 }: ProductDetailsPageProps) {
-  const [{ slug: rawSlug }, initialUser] = await Promise.all([
+  const queryClient = createPrefetchQueryClient();
+  const [{ slug: rawSlug }, initialUser, supabase] = await Promise.all([
     params,
     getCurrentUser(),
+    createServerClient(),
   ]);
   const slug = decodeRouteSlug(rawSlug);
+  const productParams = { slug };
+
+  await Promise.all([
+    prefetchQuerySafe(queryClient, {
+      queryKey: productQueryKey(productParams),
+      queryFn: () => getProduct(productParams, supabase),
+    }),
+    prefetchQuerySafe(queryClient, {
+      queryKey: productReviewsQueryKey(productParams),
+      queryFn: () => getProductReviews(productParams, supabase),
+    }),
+  ]);
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-      <ProductDetails slug={slug} initialUser={initialUser} />
-    </section>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+        <ProductDetails slug={slug} initialUser={initialUser} />
+      </section>
+    </HydrationBoundary>
   );
 }

@@ -9,7 +9,7 @@ import { categoriesQueryKey } from "./queryKeys";
 export function useCategories() {
   return useQuery({
     queryKey: categoriesQueryKey(),
-    queryFn: getCategories,
+    queryFn: () => getCategories(),
     staleTime: CATEGORIES_STALE_TIME_MS,
   });
 }

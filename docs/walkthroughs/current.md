@@ -1,80 +1,81 @@
-# مراجعة — Phase 14 + Phase A (Admin Reviews)
+# نفذ — لاندنج موبايل + تأخير النافيجيشن
 
-- النوع: review
+- التاريخ: 2026-08-25
+- النوع: full-task
 
-## must
-
-none
-
-## should
-
-- في `src/features/reviews/components/admin/AdminReviewCard.tsx` (الدالة `DeleteAdminReviewConfirm`, سطور 26-78): بتعيد بناء دايالوج تأكيد كامل (open/cancel/pending/destructive button) من الصفر، مع إن `src/components/shared/ConfirmDialog.tsx` عامل بالظبط لنفس الغرض وقابل للاستخدام مباشرة (`title` / `description` / `confirmLabel` / `isPending` / `onConfirm`). الحل: استبدال `DeleteAdminReviewConfirm` باستخدام `ConfirmDialog` بالـ props المناسبة، ومسح الكومبوننت المحلي.
-
-## ذوق
-
-- في `src/features/reviews/api/invalidateAdminReviewRelatedQueries.ts` (سطر invalidate الخاص بـ testimonials): بتعمل invalidate لـ `homeTestimonialsQueryKey(HOME_TESTIMONIALS_PAGE_SIZE)` بمفتاح محدد (default page size) لا بـ root key، عكس باقي الأربع invalidations اللي بتستخدم root keys. لو `useHomeTestimonials` استُخدم يوم بـ `pageSize` مختلف، الكاش بتاعه هيفضل قديم بعد حذف الأدمن. غير مستعجلة دلوقتي لأن الكولر الوحيد بنفس الـ page size — لا يتعدل الآن.
-- Git: فرع `feature/admin-reviews` فيه كل كوميتات Phase 14 و Phase A (`6b14bad`, `e017d37`, `873bb40`, `b6a0fd8`) لكن لسه متدمجش في `main`. ده الوقت المناسب للدمج بـ `git merge --no-ff feature/admin-reviews` من `main` قبل البدء في Phase 15، عشان الـ branch history يفضل واضح في اللوج.
-
-## اللي هيتعدل
-
-- استبدال `DeleteAdminReviewConfirm` في `AdminReviewCard.tsx` بالـ `ConfirmDialog` المشترك
-- دمج `feature/admin-reviews` في `main` بـ `--no-ff`
+الشات الجاي يقول «نفذ». نفّذ الاتنين تحت بس. متلمسش حاجة تانية.
 
 ---
 
-## خطة تنفيذ فورية (لشات جديد — نفّذ زي ما هي، بدون سؤال)
+## 1. اللاندنج على الموبايل
 
-السياق: الشغل الحالي على فرع `feature/admin-reviews`، كل الكوميتات موجودة، الملفات دي committed بالفعل. ده تعديل واحد بسيط + عملية git، مفيش تصميم أو قرارات مفتوحة.
+الصورة (`public/hero.jpeg`) قوية. المشكلة القصّ والغسيل على الموبايل، مش المحتوى.
 
-### الخطوة 1 — استبدال الدايالوج المحلي بـ `ConfirmDialog` المشترك
+الملف: `src/app/(customer)/_components/Hero.tsx`
 
-الملف: `src/features/reviews/components/admin/AdminReviewCard.tsx`
+الوضع الحالي:
 
-1. شيل الـ import بتاع `Dialog` / `DialogContent` / `DialogDescription` / `DialogFooter` / `DialogHeader` / `DialogTitle` من `@/components/ui/dialog`.
-2. ضيف: `import ConfirmDialog from "@/components/shared/ConfirmDialog";`
-3. مسح تعريف `type DeleteAdminReviewConfirmProps` وكومبوننت `DeleteAdminReviewConfirm` بالكامل (سطور 26-78 تقريبًا).
-4. في `AdminReviewCard`، استبدل استخدام `<DeleteAdminReviewConfirm ... />` في الآخر بـ:
+- اللاب: النص في النص، غسيل خفيف على جنب النسخ، القزازة باينة (`object-[20%_40%]` + contrast/saturate).
+- الموبايل: النص تحت (`items-end`)، غسيل كريمي تقيل يغطي جزء كبير (`from-brand-50 from-28%`)، القص `object-[28%_center]` ممكن يقصّ القزازة، العنوان `text-2xl`.
 
-```tsx
-<ConfirmDialog
-  open={isConfirmOpen}
-  onOpenChange={setIsConfirmOpen}
-  title="حذف التقييم؟"
-  description="التقييم هيتشال نهائيًا من المنتج. الخطوة دي مش هترجع."
-  confirmLabel={isDeleting ? "جاري الحذف..." : "حذف التقييم"}
-  isPending={isDeleting}
-  onConfirm={confirmDelete}
-/>
-```
+المطلوب (موبايل بس — الديسكتوب يفضل زي ما هو قدر الإمكان):
 
-ملاحظة: `ConfirmDialog` نفسه بيعمل `variant="destructive"` على زرار التأكيد ويعطّل الأزرار وقت `isPending` — نفس السلوك الحالي بالظبط، فمفيش تغيير سلوك أو نص للمستخدم، بس شيل تكرار كود. مرجع استخدام حي بنفس الشكل: `src/features/cart/components/CartPage.tsx` (سطر ~128).
+1. قص يركّز على القزازة (عدّل `object-position` على الشاشات الصغيرة، أو صورة موبايل منفصلة لو القص مش كفاية).
+2. خفّف الغسيل الكريمي: جراديانت صغير ورا النص بس، مش طبقة تغطي تلت الشاشة.
+3. عنوان أكبر على الموبايل (`text-3xl` أو `text-4xl`) وCTA بعرض أوضح.
+4. اختياري لو لسه فاضي: الهيرو حوالي `80vh` / `85svh` بدل `h-svh` عشان سطر من السيكشن اللي بعده يبان.
 
-5. بعد التعديل: شغّل linter check على الملف (`ReadLints`)، وتأكد إن مفيش imports غير مستخدمة فاضلة.
+متغيّرش نصوص ألاء، ومتعملش كروسل (باك لوج).
 
-### الخطوة 2 — كوميت التعديل
+---
 
-على نفس الفرع `feature/admin-reviews`:
+## 2. تأخير النافيجيشن — بما فيه الـ prefetch
 
-```
-git add src/features/reviews/components/admin/AdminReviewCard.tsx
-git commit -m "refactor(admin-reviews): reuse shared ConfirmDialog instead of a local dialog"
-```
+التأخير من تلات حاجات مع بعض: مفيش إشارة تحميل، كل راوت ديناميك بسبب السيشن، وبعد الرسم TanStack بيجيب الداتا من جديد من العميل.
 
-### الخطوة 3 — دمج الفرع في main
+### أ) Prefetch + hydrate — مش باك لوج، اتنفذ دلوقت
 
-```
-git checkout main
-git merge --no-ff feature/admin-reviews
-```
+كان مؤجّل في `docs/backlog.md`. اتنفذ دلوقت لأنه جزء من الإحساس بالسرعة.
 
-بعد الدمج: اعرض `git status` و `git log --oneline -5` للتأكيد إن فيه merge commit ظاهر، واسأل المستخدم قبل أي `git push` (الدمج والـ push المحليين بس تلقائيين، الـ push للريموت يستأذن الأول لو المستخدم مركزلوش صريح).
+النمط:
 
-### الخطوة 4 — تحديث `tasks.md`
+- في الـ Server Component بتاع الصفحة: `QueryClient` → `prefetchQuery` → `dehydrate` → `HydrationBoundary`.
+- نفس `queryKey` ونفس `get*` اللي الـ `use*` بتستخدمهم. متستبدلش الكاش ولا الـ invalidation.
 
-لا تعديل مطلوب في `tasks.md` — Phase 14 و Phase A كلها `[x]` بالفعل. لو حابب توثيق إن فيه refactor بسيط اتعمل بعد المراجعة، ده اختياري وممكن يترك كوميت الرسالة يشرح نفسه.
+الصفحات:
 
-### ما لا يُفعل
+| الصفحة | المفاتيح | الدوال |
+|---|---|---|
+| `/` | `latestProductsQueryKey`، `featuredProductsQueryKey`، `homeTestimonialsQueryKey` | `getLatestProducts`، `getFeaturedProducts`، `getHomeTestimonials` |
+| `/products` | `productsQueryKey` (نفس بارامز الكتالوج الافتراضية) + التصنيفات لو `useCategories` شغالة هناك | `getProducts`، و`getCategories` لو مستخدمة |
+| `/products/[slug]` | `productQueryKey({ slug })` + ريفيوهات المنتج لو الصفحة بتطلبها من أول رسم | `getProduct`، و`getProductReviews` لو الـ hook بيشتغل مع أول رسم |
 
-- لا تلمس `invalidateAdminReviewRelatedQueries.ts` (بند الـ ذوق) — قررنا إنه غير مستعجل.
-- لا تعمل `git push` بدون سؤال المستخدم أولًا.
-- لا تفتح Phase 15 في نفس الطلب ده — الطلب المطلوب هنا هو تنفيذ نتيجة المراجعة بس.
+الثوابت جاهزة: `HOME_LATEST_PAGE_SIZE` / `HOME_FEATURED_PAGE_SIZE` / `HOME_TESTIMONIALS_PAGE_SIZE` / `PRODUCTS_PAGE_SIZE`.
+
+`HydrationBoundary` جوه `QueryClientProvider` (موجود في `src/app/Providers.tsx`). الصفحة تقدر تلف المحتوى بـ `HydrationBoundary` من غير ما تكسّر الـ Providers.
+
+ملاحظة على `get*`: دلوقت بتستخدم `createClient` من `src/lib/supabase/client.ts` (browser). قراءة الكتالوج عامة (anon + RLS) ومش محتاجة كوكيز. لو الـ prefetch من الـ RSC وقع، حوّل استدعاءات الـ prefetch دي على `createClient` من `src/lib/supabase/server.ts` — من غير ما تغيّر شكل الـ `use*`.
+
+متعملش prefetch لأوردرات العميل أو الأدمن في الجولة دي (محتاجة سيشن).
+
+### ب) إشارة تحميل أثناء التنقل
+
+مفيش `loading.tsx`. ضيف `src/app/(customer)/loading.tsx` (سكيلتون بسيط، مش سبينر عشوائي) عشان الانتقال ميتحسّش تجميد. الـ layout (نافبار/فوتر) يفضل ظاهر.
+
+اختياري فوق ده: شريط رفيع أعلى الصفحة (`useLinkStatus` في Next 16، أو مكوّن خفيف بنفس الفكرة). مش بديل للـ prefetch.
+
+### ج) منطقة Vercel
+
+لو الدالة بتشتغل بعيد عن مصر، حط `preferredRegion` أقرب (`fra1` أو `dub1`) على مستوى التطبيق/الراوتات العامة. ده RTT، مش بديل للـ prefetch.
+
+### د) Link prefetch
+
+`next/link` أصلًا بيعمل prefetch للينكات الظاهرة. راجع لينكات النافبار والهيرو وCTA السلة إنها `Link` مش `router.push` من غير سبب. متقفلش الـ prefetch.
+
+---
+
+## تحقق بعد التنفيذ
+
+- موبايل `/`: القزازة باينة، النص مقروء، مفيش طبقة كريمية ماسحة الصورة.
+- أول دخول `/` و`/products` وصفحة منتج: الداتا تظهر من غير ووترفول العميل (Network: مفيش طلب كتالوج تاني فوري بعد الـ hydrate لو الكاش اتملّى).
+- تنقل بين صفحات العميل: سكيلتون أو شريط يظهر، وبعدين المحتوى. السكرول لسه من فوق (`ScrollToTop` موجود، متكسرهوش).

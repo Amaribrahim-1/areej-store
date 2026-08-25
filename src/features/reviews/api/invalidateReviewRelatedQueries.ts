@@ -3,9 +3,8 @@ import type { QueryClient } from "@tanstack/react-query";
 import { productQueryKey } from "@/features/products/public";
 
 import { HOME_TESTIMONIALS_PAGE_SIZE } from "../constants";
-import { homeTestimonialsQueryKey } from "./useHomeTestimonials";
+import { homeTestimonialsQueryKey, productReviewsQueryKey } from "./queryKeys";
 import { myProductReviewQueryKey } from "./useMyProductReview";
-import { productReviewsQueryKey } from "./useProductReviews";
 
 /** Invalidate every query a review create/update/delete can change. */
 export function invalidateReviewRelatedQueries(

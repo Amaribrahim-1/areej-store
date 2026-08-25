@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserIcon } from "lucide-react";
 
+import LinkPendingBar from "@/components/shared/LinkPendingBar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +46,7 @@ export default function NavbarAccountActions({
         )}
       >
         {accountLabel}
+        <LinkPendingBar />
       </Link>
 
       {isLoggedIn ? (
@@ -76,6 +78,7 @@ export default function NavbarAccountActions({
         )}
       >
         <UserIcon className="size-5" aria-hidden />
+        <LinkPendingBar />
       </Link>
     </>
   );

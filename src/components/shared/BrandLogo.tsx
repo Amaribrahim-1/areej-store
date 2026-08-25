@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import LinkPendingBar from "@/components/shared/LinkPendingBar";
 import { cn } from "@/lib/utils";
 
 type BrandLogoProps = {
@@ -37,6 +38,7 @@ export default function BrandLogo({
         priority={priority}
         className="size-full object-cover"
       />
+      <LinkPendingBar />
     </Link>
   );
 }

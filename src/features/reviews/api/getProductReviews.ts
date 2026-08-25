@@ -1,4 +1,7 @@
-import { createClient } from "@/lib/supabase/client";
+import {
+  createClient,
+  type AppSupabaseClient,
+} from "@/lib/supabase/client";
 import { sanitizePlainText } from "@/lib/sanitizePlainText";
 
 import { PRODUCT_REVIEWS_DEFAULT_LIMIT } from "../constants";
@@ -6,8 +9,8 @@ import type { ProductReview, ProductReviewsQueryParams } from "../types";
 
 export async function getProductReviews(
   params: ProductReviewsQueryParams,
+  supabase: AppSupabaseClient = createClient(),
 ): Promise<ProductReview[]> {
-  const supabase = createClient();
   const limit = params.limit ?? PRODUCT_REVIEWS_DEFAULT_LIMIT;
 
   const { data, error } = await supabase.rpc("list_product_reviews", {

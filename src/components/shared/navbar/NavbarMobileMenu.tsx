@@ -13,6 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import BrandLogo from "@/components/shared/BrandLogo";
+import LinkPendingBar from "@/components/shared/LinkPendingBar";
 import { cn } from "@/lib/utils";
 
 import NavLink from "./NavLink";
@@ -97,6 +98,7 @@ export default function NavbarMobileMenu({
           >
             <UserIcon className="size-5" aria-hidden />
             {accountLabel}
+            <LinkPendingBar />
           </Link>
 
           {isLoggedIn ? (
