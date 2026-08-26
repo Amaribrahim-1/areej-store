@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 
+/** 1200×630 JPEG. The previous 1536×1024 PNG was ~1.7 MB — WhatsApp and several scrapers drop images that large. */
 export const OG_IMAGE = {
-  url: "/og-image.png",
-  width: 1536,
-  height: 1024,
+  url: "/og-image.jpg",
+  width: 1200,
+  height: 630,
   alt: "أريج — عطور فاخرة",
+  type: "image/jpeg",
 } as const;
 
 type StorefrontShareMeta = {
