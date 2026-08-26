@@ -509,6 +509,7 @@ Everything below is **deferred**. Each item is listed with the task where it wou
 | Per-variant product photos                                           | 1.1 (schema), 1.4 (storage), 13.5–13.6 (admin form / upload)                                 |
 | TanStack Query server prefetch + hydrate                             | 3.x (product catalog/detail pages), Providers / QueryClient setup                            |
 | Product bundles / packages (multi-item offer at one price)           | 13.4–13.6 (admin product form), 3.x (catalog/detail), 4.x/6.x (cart/checkout line snapshots) |
+| List pagination beyond the storefront catalog                        | Catalog already pages (3.2 / 3.5). Would creep in: 7.1 (product reviews — cap, not pager), 8.2 (customer orders), 12.1/12.6 (admin orders + client-side filter), 13.1 (admin products), 14.1 (admin reviews), A.2 (contact inbox) |
 
 ## Open Dependencies (not blocked on code)
 
