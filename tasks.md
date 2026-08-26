@@ -457,9 +457,9 @@ After admin feature work (Phases 11–14), before Hardening & Launch. Park essen
       **Done:** Root `metadataBase` + Arabic title template, default OG/Twitter card pointing at `public/og-image.png`. Public pages (`/`, `/products`, `/products/[slug]`, `/about`, `/contact`) get Arabic titles/descriptions + canonical/OG; product pages use `generateMetadata` (name, description, product image). Private/auth/admin routes (`/cart`, `/checkout`, `/account`, `/orders`, `/login`, `/register`, `/admin/**`, not-found) set `robots: noindex`. `src/app/robots.ts` + `src/app/sitemap.ts` (static public routes + all active product slugs). `NEXT_PUBLIC_SITE_URL` documented in `.env.example` (falls back to localhost).
 - [x] **15.8 — Storage audit**: measure actual usage against the 1GB budget and record the number, so the compression decision (spec decision #2) is data-driven.
       **Done (2026-08-23, project `Areej-Store` / `yfstovcbpzeuzwjkejzv`):** Queried `storage.objects` for bucket `product-images`. **4 objects / 568,551 bytes (~555 KB) ≈ 0.05% of the 1GB free-tier budget** (1,073,741,824 bytes). Breakdown: seed `natural-body-butter-plain-background.webp` 360,810 B; seed/shared `areej.jpg` 85,095 B; two admin-pipeline uploads under `products/*.webp` 48,874 B + 73,772 B (avg ~61 KB — compression caps working). 10 products share those 4 files (8 products reuse the two seed URLs). Headroom: at ~61 KB/unique image, thousands of products fit before 1GB; even at the larger seed-sized ~350 KB/image, budget is still far off. **Conclusion:** keep the existing client-side WebP compress/resize (max 1200px, under 1MB bucket cap) — no need to tighten or loosen for MVP. Re-measure when catalog grows materially or before considering paid storage.
-- **15.9 — Deploy** (Vercel) with production env vars, then a real end-to-end order placed on production to confirm the WhatsApp notification actually fires.
+- [x] **15.9 — Deploy** (Vercel) with production env vars, then a real end-to-end order placed on production to confirm the WhatsApp notification actually fires.
 - **15.10 — Handover to Alaa**: how to add a product, how to update an order status. Arabic.
-- **15.11 — Portfolio README & project writeup.**
+- [x] **15.11 — Portfolio README & project writeup.**
   A GitHub-facing `README.md` and a short project writeup usable for the
   CV/LinkedIn, written _from the accumulated project history_ — not
   generated from a fresh read of the final codebase alone. Source material
@@ -480,6 +480,7 @@ After admin feature work (Phases 11–14), before Hardening & Launch. Park essen
   of real screenshots/GIFs belong in the README, and those should already
   exist from having been captured feature-by-feature during Phases 2–14
   (plus Phase C / Phase A gaps), not staged retroactively here.
+      **Done:** `README.md` rewritten from git log + spec decisions + migration comments + backlog (not a Create Next App template). Live link: https://areej-store-kappa.vercel.app/. Writeup: `docs/portfolio-writeup.md`. Production screenshots in `docs/screenshots/` (home, catalog, product, admin orders, admin order details). Share OG image compressed to 1200×630 JPEG (`public/og-image.jpg`, ~73 KB) so WhatsApp/etc. actually render it. Vercel Analytics mounted in the root layout.
 
 `[commit: chore(a11y): rtl audit fixes, chore(security): rls verification fixes, chore(release): production deploy config, docs(readme): portfolio project writeup]`
 

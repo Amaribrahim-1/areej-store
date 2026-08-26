@@ -1,81 +1,43 @@
-# نفذ — لاندنج موبايل + تأخير النافيجيشن
+# شرح التاسك — 15.11
 
-- التاريخ: 2026-08-25
+- التاريخ: 2026-08-26
 - النوع: full-task
 
-الشات الجاي يقول «نفذ». نفّذ الاتنين تحت بس. متلمسش حاجة تانية.
+## المشكلة والحل
 
----
+الـ `README.md` كان قالب Create Next App، والشير على المنصات كان بيظهر من غير صورة. السبب في الـ OG مش التاجز: التاجز كانت صح وبتشير لـ `https://areej-store-kappa.vercel.app/og-image.png`، لكن الملف كان PNG بحجم ~1.7 MB. واتساب وسكرابرز كتير بيسكتوا الصورة لو تعدّت ~300 KB.
 
-## 1. اللاندنج على الموبايل
+اتكتب README ورايت أب من تاريخ المشروع، اتحطت سكاشوتات البرودكشن، واتضغطت صورة الشير لـ JPEG 1200×630 (~73 KB)، واتركب Vercel Analytics في الـ layout.
 
-الصورة (`public/hero.jpeg`) قوية. المشكلة القصّ والغسيل على الموبايل، مش المحتوى.
+## الصفحات والملفات
 
-الملف: `src/app/(customer)/_components/Hero.tsx`
+- [https://areej-store-kappa.vercel.app/](https://areej-store-kappa.vercel.app/) — المتجر اللايف.
+- `README.md` — واجهة GitHub + السكاشوتات.
+- `docs/portfolio-writeup.md` — نصوص CV / LinkedIn.
+- `docs/screenshots/home.png` — الهوم.
+- `docs/screenshots/catalog.png` — الكاتالوج.
+- `docs/screenshots/product.png` — تفاصيل منتج.
+- `docs/screenshots/admin-orders.png` — قائمة طلبات الأدمن.
+- `docs/screenshots/admin-order-details.png` — تفاصيل طلب (حالة + عنوان + أسطر).
+- `public/og-image.jpg` — صورة الشير (اتبدّل الـ PNG الكبير).
+- `src/lib/seo.ts` — `OG_IMAGE` بقى 1200×630 JPEG.
+- `src/app/layout.tsx` — `<Analytics />` من `@vercel/analytics/next`.
+- `.env.example` — `NEXT_PUBLIC_SITE_URL` بقى الدومين اللايف.
 
-الوضع الحالي:
+## التدفق
 
-- اللاب: النص في النص، غسيل خفيف على جنب النسخ، القزازة باينة (`object-[20%_40%]` + contrast/saturate).
-- الموبايل: النص تحت (`items-end`)، غسيل كريمي تقيل يغطي جزء كبير (`from-brand-50 from-28%`)، القص `object-[28%_center]` ممكن يقصّ القزازة، العنوان `text-2xl`.
+1. مراجع GitHub يفتح README ويشوف اللايف والسكاشوتات.
+2. شير اللينك → السكرابر يقرأ `og:image` → يجيب `og-image.jpg` الصغيرة.
+3. بعد الدبلوي، Analytics بيبعت page views على داشبورد Vercel (Enable من الداشبورد اتعمل؛ الكود بيركّب السكربت).
+4. كاش واتساب/فيسبوك ممكن يفضل على الصورة القديمة ساعات — إعادة الشير أو Facebook Sharing Debugger بعد الدبلوي.
 
-المطلوب (موبايل بس — الديسكتوب يفضل زي ما هو قدر الإمكان):
+## قرارات مهمة وليه
 
-1. قص يركّز على القزازة (عدّل `object-position` على الشاشات الصغيرة، أو صورة موبايل منفصلة لو القص مش كفاية).
-2. خفّف الغسيل الكريمي: جراديانت صغير ورا النص بس، مش طبقة تغطي تلت الشاشة.
-3. عنوان أكبر على الموبايل (`text-3xl` أو `text-4xl`) وCTA بعرض أوضح.
-4. اختياري لو لسه فاضي: الهيرو حوالي `80vh` / `85svh` بدل `h-svh` عشان سطر من السيكشن اللي بعده يبان.
+- سكاشوت `admin-order-details` اتضافت: قائمة الطلبات بتوري الجدول، التفاصيل بتوري الـ snapshot والحالة والأسطر — ده شغل الأدمن الفعلي.
+- صورة الـ OG اتغير اسمها لـ `.jpg` عمداً عشان كاش السكرابرز مايفضلش معلّق على الـ PNG القديم.
+- Analytics في الـ root layout عشان كل الصفحات (ستورفرونت وأدمن) تتعدّ، من غير env keys إضافية.
 
-متغيّرش نصوص ألاء، ومتعملش كروسل (باك لوج).
+## تحقق بنفسك
 
----
-
-## 2. تأخير النافيجيشن — بما فيه الـ prefetch
-
-التأخير من تلات حاجات مع بعض: مفيش إشارة تحميل، كل راوت ديناميك بسبب السيشن، وبعد الرسم TanStack بيجيب الداتا من جديد من العميل.
-
-### أ) Prefetch + hydrate — مش باك لوج، اتنفذ دلوقت
-
-كان مؤجّل في `docs/backlog.md`. اتنفذ دلوقت لأنه جزء من الإحساس بالسرعة.
-
-النمط:
-
-- في الـ Server Component بتاع الصفحة: `QueryClient` → `prefetchQuery` → `dehydrate` → `HydrationBoundary`.
-- نفس `queryKey` ونفس `get*` اللي الـ `use*` بتستخدمهم. متستبدلش الكاش ولا الـ invalidation.
-
-الصفحات:
-
-| الصفحة | المفاتيح | الدوال |
-|---|---|---|
-| `/` | `latestProductsQueryKey`، `featuredProductsQueryKey`، `homeTestimonialsQueryKey` | `getLatestProducts`، `getFeaturedProducts`، `getHomeTestimonials` |
-| `/products` | `productsQueryKey` (نفس بارامز الكتالوج الافتراضية) + التصنيفات لو `useCategories` شغالة هناك | `getProducts`، و`getCategories` لو مستخدمة |
-| `/products/[slug]` | `productQueryKey({ slug })` + ريفيوهات المنتج لو الصفحة بتطلبها من أول رسم | `getProduct`، و`getProductReviews` لو الـ hook بيشتغل مع أول رسم |
-
-الثوابت جاهزة: `HOME_LATEST_PAGE_SIZE` / `HOME_FEATURED_PAGE_SIZE` / `HOME_TESTIMONIALS_PAGE_SIZE` / `PRODUCTS_PAGE_SIZE`.
-
-`HydrationBoundary` جوه `QueryClientProvider` (موجود في `src/app/Providers.tsx`). الصفحة تقدر تلف المحتوى بـ `HydrationBoundary` من غير ما تكسّر الـ Providers.
-
-ملاحظة على `get*`: دلوقت بتستخدم `createClient` من `src/lib/supabase/client.ts` (browser). قراءة الكتالوج عامة (anon + RLS) ومش محتاجة كوكيز. لو الـ prefetch من الـ RSC وقع، حوّل استدعاءات الـ prefetch دي على `createClient` من `src/lib/supabase/server.ts` — من غير ما تغيّر شكل الـ `use*`.
-
-متعملش prefetch لأوردرات العميل أو الأدمن في الجولة دي (محتاجة سيشن).
-
-### ب) إشارة تحميل أثناء التنقل
-
-مفيش `loading.tsx`. ضيف `src/app/(customer)/loading.tsx` (سكيلتون بسيط، مش سبينر عشوائي) عشان الانتقال ميتحسّش تجميد. الـ layout (نافبار/فوتر) يفضل ظاهر.
-
-اختياري فوق ده: شريط رفيع أعلى الصفحة (`useLinkStatus` في Next 16، أو مكوّن خفيف بنفس الفكرة). مش بديل للـ prefetch.
-
-### ج) منطقة Vercel
-
-لو الدالة بتشتغل بعيد عن مصر، حط `preferredRegion` أقرب (`fra1` أو `dub1`) على مستوى التطبيق/الراوتات العامة. ده RTT، مش بديل للـ prefetch.
-
-### د) Link prefetch
-
-`next/link` أصلًا بيعمل prefetch للينكات الظاهرة. راجع لينكات النافبار والهيرو وCTA السلة إنها `Link` مش `router.push` من غير سبب. متقفلش الـ prefetch.
-
----
-
-## تحقق بعد التنفيذ
-
-- موبايل `/`: القزازة باينة، النص مقروء، مفيش طبقة كريمية ماسحة الصورة.
-- أول دخول `/` و`/products` وصفحة منتج: الداتا تظهر من غير ووترفول العميل (Network: مفيش طلب كتالوج تاني فوري بعد الـ hydrate لو الكاش اتملّى).
-- تنقل بين صفحات العميل: سكيلتون أو شريط يظهر، وبعدين المحتوى. السكرول لسه من فوق (`ScrollToTop` موجود، متكسرهوش).
+- بعد الدبلوي: افتح اللينك في واتساب/تليجرام. لازم تظهر كارت فيها بنر أريج مش أيقونة فاضية.
+- في Vercel → المشروع → Analytics: بعد زيارة أو اتنين المفروض تظهر page views (ممكن تتأخر شوية).
