@@ -9,7 +9,7 @@ export const SITE_URL = (
 
 export const SITE_NAME = "أريج";
 
-export const SITE_TAGLINE = "أريج | للمنتجات العطرية";
+export const SITE_TAGLINE = "أريج | عطور، مسك، مخمرية وزيوت شعر";
 
 export const SITE_DESCRIPTION =
   "متجر أريج للعطور، المسك، المخمرية، وزيوت الشعر — تسوّقي بجودة تليق بكِ مع الدفع عند الاستلام.";
