@@ -28,7 +28,9 @@ import Features from "./_components/Features";
 import Hero from "./_components/Hero";
 
 export const metadata: Metadata = {
-  title: SITE_TAGLINE,
+  // absolute: the root title template is `%s | أريج`. Without this,
+  // SITE_TAGLINE would render as "أريج | … | أريج" in Google.
+  title: { absolute: SITE_TAGLINE },
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
   openGraph: storefrontOpenGraph({ url: "/" }),
