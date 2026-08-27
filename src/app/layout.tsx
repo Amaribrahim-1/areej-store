@@ -21,6 +21,14 @@ export const metadata: Metadata = {
     default: SITE_TAGLINE,
   },
   description: SITE_DESCRIPTION,
+  // Stable /favicon.ico + 96px PNG so Google Search can show the brand mark
+  // (it ignores hashed App Router /icon URLs and tiny 16×16-only icons).
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48", type: "image/x-icon" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+  },
   openGraph: storefrontOpenGraph({ url: "/" }),
   twitter: storefrontTwitter(),
   robots: {
